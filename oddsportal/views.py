@@ -36,6 +36,7 @@ def labels_getter():
 @app.route('/index', methods=['GET', 'POST'])
 def index():
 
+    return 'Helloworld'
     labels = labels_getter()
     return render_template('index.html', years      = labels.get('years'),
                                          ou_values  = labels.get('ou_values'), 
