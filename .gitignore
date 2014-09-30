@@ -39,3 +39,5 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+
+*~
