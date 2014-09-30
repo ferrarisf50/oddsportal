@@ -1,0 +1,28 @@
+<div id="left_side_bar">
+    <br>
+    {% if output_results %}
+        <div id="download">
+            <a href="javascript:void()"> <img src="{{ url_for('static', filename='img/download16.svg') }}" id="download_button"></a>
+        </div>
+    {% endif %}
+</div>
+
+{% if output_results %}
+    <form id="download_form" action="/download" method="POST">
+        <input name="raw_results" value="{{output_results_raw}}">
+        <input name="table_years" value="{{table_years}}">
+        <input name="home_teams"  value="{{home_teams}}">
+        <input name="away_teams"  value="{{away_teams}}">
+    </form>
+{% endif %}
+
+<script type="text/javascript">
+    $('#download_button').click(function() {
+        $('#download_form').submit();
+    })
+</script>
+
+
+<script type="text/javascript">
+    $('#download_form').hide();
+</script>

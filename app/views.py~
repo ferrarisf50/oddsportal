@@ -1,0 +1,267 @@
+from flask import Flask, render_template, redirect, jsonify
+from flask import session, request, url_for, flash
+from flask.ext.sqlalchemy import SQLAlchemy
+from app import *
+import models
+
+import json, re, datetime, collections
+
+
+def labels_getter():
+
+    years, leagues = [], []
+
+    results = models.Result.query.all()
+    over_under_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
+
+    for result in results:
+        years.append(result.year)
+        leagues.append(result.league)
+
+    years   = sorted(list(set(years)), reverse=True)
+    leagues = list(set(leagues))
+
+    labels  = {'years':   years,
+               'leagues': leagues,
+               'over_under_values':  over_under_values}
+
+    return labels
+
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+
+    labels = labels_getter()
+    return render_template('index.html', years   = labels.get('years'),
+                                         over_under_values  = labels.get('over_under_values'), 
+                                         leagues = labels.get('leagues'))
+
+
+
+
+
+
+@app.route('/search_results', methods=['GET', 'POST'])
+def search_results():
+
+    #-- Getting request from webform and formatting them --#
+
+    playing_at_type =  request.values.get('playing_at_types')            # 'at home' or 'away'
+    playing_at_type = 'home' if 'home' in playing_at_type.lower() else 'away'
+
+    handicap        =  request.values.get('handicap')                    # 'Home/Draw/Away', 'Over/Under'
+    handicap        = 'hda' if handicap == 'Home/Draw/Away' else 'ou'    # 'hda' for home/draw/away handicap and 'ou' for over/under
+    
+    strategy        =  request.values.get('strategy')                    # 'Home', 'Draw', 'Away', 'Over', 'Under'
+    strategy_db     =  strategy[0].lower()                               # 'h' for home, 'd' for draw etc
+
+    game_part       =  request.values.get('game_part')                   # 'full', 'frst', 'scnd'
+    
+    odd_value       =  request.values.get('odd_value')
+    odd_value       =  int(odd_value)
+
+    odd_type        =  request.values.get('odds_type')                   # 'a' or 'h' for average and highest
+
+    odd_type_db     =  odd_type + strategy_db
+    table_name      = '{0}_{1}_results'.format(handicap, game_part)        #  eg 'hda_ou_results' 
+
+    odd_toggle      = request.values.get('odd_toggle')                   # Integer
+    if odd_toggle:
+        odd_toggle  = int(odd_toggle) 
+    coefficient     = request.values.get('coeff')                        # Integer
+    ou_odd_value    = request.values.get('over_under_values')             # Integer
+    if ou_odd_value:
+
+        float(ou_odd_value) if '.' in ou_odd_value else int(ou_odd_value)
+    else:
+        pass
+
+
+    league  = request.values.get('league')
+    years   = request.form.getlist('years_checkbox')
+    years   = sorted(years, reverse=True)
+
+
+    results = models.Result.query.filter(models.Result.league==league, 
+                                         models.Result.year.in_(years)).all()
+
+    teams = []
+    for result in results:
+        teams.append(result.team_01)
+        teams.append(result.team_02)
+    
+    results_by_year = {}
+    for year in years:
+        results_by_year[year] = {'played': 0, 'won': 0, 'r_total': 0.0,
+                                 'p_l_profit': 0, 'p_l_loss': 0}
+
+    output_results  = {}
+    output_results  = collections.OrderedDict(sorted(output_results.items()))
+    
+    output_results_time = 0
+
+    for team in teams:
+
+        output_results[team] = {}
+
+        for year in years:
+
+            output_results[team][year] = {}
+        
+            sum_profit_loss  = 0
+            matches_played   = 0
+            matches_won      = 0
+
+            if playing_at_type == 'home':
+                matches = [result for result in results if result.year == year and result.team_01 == team]    
+            else:
+                matches = [result for result in results if result.year == year and result.team_02 == team]
+
+            if not matches:
+                continue
+
+            for match in matches:
+
+                try:
+                    event_result = match.event_results                   # output: {"{"full": "3:0", "first": "1:0"}"}
+                    event_result = json.loads(event_result)[game_part]   # output: 3:0 if game_part was 'full'
+                    event_result = event_result.split(':')
+                except:
+                    continue
+
+                profit_loss  = 'l'
+
+                if handicap == 'hda':
+                    if event_result[0] > event_result[1]:
+                        if strategy_db == 'h': profit_loss = 'p'
+
+                    elif event_result[0] == event_result[1]:
+                        if strategy_db == 'd': profit_loss = 'p'
+
+                    else:
+                        if strategy_db == 'a': profit_loss = 'p'
+
+                    if profit_loss == 'p':
+                        matches_won += 1
+
+                elif handicap == 'ou':
+                    total_score = int(event_result[0]) + int(event_result[1])
+                    score_delta = float(ou_odd_value) - total_score
+                    if strategy_db == "o":
+                        if score_delta > 0:
+                            profit_loss  = 'p'
+                        elif score_delta < 0:
+                            profit_loss  = 'l'
+                        else:
+                            pass
+                    elif strategy_db == 'u':
+                        pass
+                    else:
+                        pass
+                else:
+                    pass
+
+                
+                if handicap == 'hda':
+                    try:
+                        odd = json.loads(getattr(match, table_name))
+                    except:
+                        continue
+                    try:
+                        odd = odd[odd_type_db]
+                    except:
+                        continue
+                else:
+                    try:
+                        odd = json.loads(getattr(match, table_name))
+                    except:
+                        continue
+                    try:
+                        odd = odd[str(ou_odd_value)][odd_type_db]
+                    except:
+                        continue
+
+
+
+                odd = float(odd)
+                if odd_toggle and not odd_toggle == '':
+                    odd = odd - odd*odd_toggle/100
+                profit_loss_value = -(odd_value * odd) if profit_loss == 'l' else (odd_value * odd)
+
+                sum_profit_loss  += profit_loss_value
+
+                matches_played   += 1
+
+
+            results_by_year[year]['played'] += matches_played
+            results_by_year[year]['won']    += matches_won
+
+
+            if profit_loss_value > 0:
+                results_by_year[year]['p_l_profit'] += int(profit_loss_value)
+            else:
+                results_by_year[year]['p_l_loss']   += int(-profit_loss_value)
+
+                
+            output_results[team][year]['pld/won'] = str(matches_played) + '/' + str(matches_won)
+            output_results[team][year]['pl']      = round(sum_profit_loss, 2)
+
+
+
+    running_total = {}
+
+    for year in years:
+        results_by_year[year]['r_total'] = 0
+
+    for t,v in output_results.iteritems():
+        for key, values in v.iteritems():
+            running_total[key] = 0
+    
+    for t,v in output_results.iteritems():
+        for key, values in v.iteritems():
+            try:
+                running_total[key] += values.get('pl')
+                values['rt'] = running_total[key]
+                results_by_year[key]['r_total'] = running_total[key]
+            except:
+                continue
+
+
+    if   strategy == 'Home':
+         label = 'Home team to win'
+    elif strategy == 'Draw':
+         label = 'Draw'
+    else:
+         label = 'Away team to win'
+
+    if playing_at_type == 'home':
+        result_label = '{}: Backing the {} at home'.format(league, label)
+    else:
+        result_label = '{}: Backing the {} away'.format(league, label)
+
+
+    return render_template("search_results.html", output_results  = output_results,
+                                                  results_by_year = results_by_year,
+                                                  years           = years,
+                                                  result_label    = result_label)
+
+
+
+
+@app.route('/form_checker', methods=['GET', 'POST'])
+def form_checker():
+
+    odd_value = request.values.get('odd_value')
+    years     = request.values.get('years')
+
+    if not odd_value:
+        error = 'Odd value is not selected'
+        return jsonify(error = error)
+
+    if not years or years == '':
+        error = 'Year(s) not selected'
+        return jsonify(error = error)
+
+    return jsonify(error = ' ')

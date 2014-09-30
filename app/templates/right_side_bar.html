@@ -1,0 +1,325 @@
+<div id="right_side_bar">
+    <form id="searchForm" method="post" action="/search_results">
+        <br>
+        <div class="row">
+            <div class="large-12 columns">
+                <label>Country
+                    <select name="league">
+                        <option selected="selected" value=""></option>
+                        {% for league in leagues %}
+                            <option value="{{ league }}">{{ league }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="large-12 columns">
+                <label>League
+                    <select name="group">
+                        <option selected="selected" value=""></option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="large-7 text-left columns">
+                <label>Select year</label>
+            </div>
+            <div class="large-5 text-left columns">
+                <label>Coefficient</label>
+            </div>
+
+
+            
+
+            <div class="large-7 text-left columns" id="years">
+                <input id="2014" checked name="year" type="checkbox" value="2014"><label>2014</label><br>
+            </div>
+
+            <div class="large-5 columns" id="years_coeffs">
+                <input id="coefficient" name="year_coeff" type="text" autocomplete='off'>
+            </div>
+
+
+            <div id="mySlideContent">
+            </div>
+            <div id="mySlideToggler">
+                <a href="javascript:void()"> Show all years</a>
+            </div>
+
+            
+            
+        </div>
+
+        <div class="row">
+            <br>
+            <div class="large-12 columns">
+                <label>Results for teams playing
+                    <select name="form_playing_at_types">
+                        <option value="h">At Home</option>
+                        <option value="a">Away</option>
+                    </select>
+                </label>
+            </div>
+            <div class="large-12 columns">
+                <label>Handicap type
+                    <select id="handicap" name="handicap">
+                        <option value="hda">Home/Draw/Away</option>
+                        <option value="ou">Over/Under</option>
+                    </select>
+                </label>
+            </div>
+            <div class="large-7 columns">
+                <label>Backing strategy
+                    <select id="strategy" name="strategy">
+                        <option value="h">Home</option>
+                        <option value="d">Draw</option>
+                        <option value="a">Away</option>
+                    </select>
+                </label>
+            </div>
+
+
+            <div class="large-5 columns">
+                <label>Value
+                    <select id="ou_values" disabled name="ou_values">
+                        {% for ou_value in ou_values %}
+                            <option value={{ou_value}}>{{ ou_value }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+
+            <div class="large-6 columns">
+                <label>Game part
+                    <select id="game_part" name="game_part">
+                        <option value="full">Full</option>
+                        <option value="frst">1st Half</option>
+                        <option value="scnd">2nd Half</option>
+                    </select>
+                </label>
+            </div>
+            
+            <div class="large-6 columns">
+                <label>Odds type
+                    <select id="odds_type" name="odds_type">
+                        <option value="a">Average</option>
+                        <option value="h">Highest</option>
+                    </select>
+                </label>
+            </div>
+            <div class="large-6 columns">
+                <label>Odds toggle
+                    <input class="high_input" name="odd_toggle" type="text" autocomplete='off'>
+                </label>
+            </div>
+            <div class="large-6 columns">
+                <label><i class="fa fa-usd"></i> <b>Stake</b>
+                    <input class="high_input" name="odd_value" type="text" autocomplete='off'>
+                </label>
+            </div>
+
+            
+            
+            <div class="large-12 columns">
+                <br> 
+                <input disabled type="submit" class="button expand" value="Go">
+            </div>
+
+            <div class="large-12 columns">
+                <span id="error">{{error}}</span>
+            </div>
+            <br><br><br><br>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </form>
+</div>
+
+
+<script type="text/javascript">
+    $(function(){
+
+        $('#mySlideContent').css('display','none');
+        $('#mySlideToggler').click(function(){
+
+            if ($('#mySlideContent').css('display') == 'block') {
+                $('#mySlideContent').css('display','none');
+                return
+            };
+            $('#mySlideContent').css('display','block');
+
+        });
+    });
+</script>
+
+
+<script type="text/javascript">
+    $("#handicap").change(function(){
+
+        var handicap = $("#handicap").find(":selected").text();
+
+
+        if (handicap == 'Home/Draw/Away') {
+            $("#ou_values").attr("disabled", "disabled");
+            $('#strategy').html('');
+
+            function hda_appender(selector) {
+
+                $(selector)
+                    .append('<option value="h">Home</option>')
+                    .append('<option value="d">Draw</option>')
+                    .append('<option value="a">Away</option>')
+            }
+            hda_appender('#strategy');
+
+        };
+
+        if (handicap == 'Over/Under') {
+            $("#ou_values").removeAttr("disabled");
+            $('#strategy').html('');
+
+            function ou_appender(selector) {
+
+                $(selector)
+                    .append('<option value="o">Over</option>')
+                    .append('<option value="u">Under</option>')
+            }
+            ou_appender('#strategy');
+
+        };
+
+     });    
+       
+</script>
+
+<script type="text/javascript">
+
+    var page_height = $( 'html' ).height();
+    $('#left_side_bar').css( 'height',page_height+80);
+    $('#right_side_bar').css('height',page_height+80);
+    
+</script>
+
+
+<script type=text/javascript>
+
+    $('#searchForm').keyup(function () {
+
+        var years_selected = [];
+        $('#years input:checked').each(function() {
+            years_selected.push($(this).attr('value'));
+        });
+        if (years_selected != '') {
+            var years = true;
+        }
+
+        $.post('/form_checker', {
+
+            odd_value: $('input[name="odd_value"]').val(),
+            years:     years,
+
+
+        }).done(function(data) {
+
+            if (data.error !== ' ') {
+                $("#error").text(data.error);
+                $('input[type=submit]').attr('disabled', 'disabled');
+            }
+            else {
+                $("#error").text(data.error);
+                $('input[type=submit]').removeAttr("disabled");
+            }
+
+
+        });
+    });
+    
+</script>
+
+<script type="text/javascript">
+    
+    $('select[name=group]').attr('disabled', 'disabled');
+
+    $("select[name=league]").change(function(){
+        var league = $('select[name=league]').find(":selected").text();
+
+        if (league === '') {
+            $('select[name=group]').attr('disabled', 'disabled');
+        }
+
+        else {
+            $.post('/groups_update', {
+                lea: league
+            }).done(function(data) {
+                $('select[name=group]').empty();
+
+                $('select[name=group]').append(new Option(""));
+                for (var i in data.groups) {
+                    $('select[name=group]').append(new Option(data.groups[i], data.groups[i]));
+                    $('select[name=group]').removeAttr("disabled");
+                }
+            }); 
+        };
+        
+    });
+
+</script>
+
+
+<script type="text/javascript">
+    
+    $('input[name=year]').attr('disabled', 'disabled');
+    $('input[name=year_coeff]').attr('disabled', 'disabled');
+
+    $("select[name=group]").change(function(){
+        var group = $('select[name=group]').find(":selected").text();
+        var league = $('select[name=league]').find(":selected").text();
+        $('#mySlideContent').html('');
+
+        if (group === '') {
+            $('input[name=year]').attr('disabled', 'disabled');
+            $('input[name=year_coeff]').attr('disabled', 'disabled');
+        }
+        else {
+            $.post('/years_update', {
+                grp: group,
+                lea: league
+            }).done(function(data) {
+                $('#years').html('');
+                $('#years_coeffs').html('');
+
+                if (data.years.length > 1) {
+                    $('#mySlideToggler').show();
+                }
+                else {
+                    $('#mySlideToggler').hide();
+                }
+
+                $('#years').append('<input id="' + data.years.slice(-1) + '" checked name="years" type="checkbox" value="' + data.years.slice(-1) + '"><label>' + data.years.slice(-1) + '</label><br>');
+                $('#years_coeffs').append('<input id="coefficient" name="' + data.years.slice(-1) + '_coeff" type="text" autocomplete="off">');
+
+                for (var i in data.years.slice(1)) {
+                    $('#mySlideContent').prepend('<div class="large-7 text-left columns" id="years"><input id="' + data.years[i] + '" name="years" type="checkbox" value="' + data.years[i] + '"><label>' + data.years[i] + '</label><br></div><div class="large-5 columns" id="years_coeffs"><input id="coefficient" name="' + data.years[i] + '_coeff" type="text" autocomplete="off"></div>');
+                };
+            }); 
+        };
+    });
+    
+</script>
+
+<!--
+<div class="large-7 text-left columns" id="years">
+                <input id="{{years[0]}}" checked name="years" type="checkbox" value="{{years[0]}}"><label>{{years[0]}}</label><br>
+            </div>
+
+            <div class="large-5 columns" id="years_coeffs">
+                <input id="coefficient" name="{{years[0]}}_coeff" type="text" autocomplete='off'>
+            </div>
+
+
+
+$('select[name=group]').empty();
+                for (var i in data.groups) {
+                    $('select[name=group]').append(new Option(data.groups[i], data.groups[i]));
+                    $('select[name=group]').removeAttr("disabled");
+                }
+
+-->
