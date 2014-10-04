@@ -9,6 +9,7 @@ tr .table_total td {
 
 #left_side_bar #download {
   width: 5rem;
+  margin-top: 5rem;
 }
 #left_side_bar #download img {
   width: 3rem;

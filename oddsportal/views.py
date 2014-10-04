@@ -50,7 +50,7 @@ def download():
     response = Response()
     response.status_code = 200
 
-    workbook = generate_xls.generate_xls(raw_results, table_years, home_teams, away_teams)
+    workbook = generate_xls(raw_results, table_years, home_teams, away_teams)
     output   = StringIO.StringIO()
 
     workbook.save(output)
