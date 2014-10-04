@@ -1,9 +1,9 @@
 from flask import Flask, render_template, redirect, jsonify, Response
-from functions import RequestObject, analyzation
+from functions.analysis import RequestObject, analyzation
 from flask import session, request, url_for, flash
 from werkzeug.datastructures import Headers
 from flask.ext.sqlalchemy import SQLAlchemy
-from generate_xls import generate_xls
+from functions.generate_xls import generate_xls
 
 from oddsportal import *
 
@@ -15,15 +15,10 @@ def labels_getter():
 
     years, leagues, groups = [], [], []
 
-    results   = models.Result.query.all()
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
 
-    for result in results:
-        years.append(result.year)
-        leagues.append(result.league)
-
-    years   = sorted(list(set(years)), reverse=True)
-    leagues = list(set(leagues))
+    leagues = json.loads(open('oddsportal/tmp/leagues.txt').read())
+    years   = ['2014', '2013']
 
     labels  = {'years':     years,
                'leagues':   leagues,
@@ -36,7 +31,6 @@ def labels_getter():
 @app.route('/index', methods=['GET', 'POST'])
 def index():
 
-    return 'Helloworld'
     labels = labels_getter()
     return render_template('index.html', years      = labels.get('years'),
                                          ou_values  = labels.get('ou_values'), 
@@ -217,14 +211,9 @@ def form_checker():
 def groups_update():
 
     requested_league = request.values.get('lea').strip()
-    results = models.Result.query.filter_by(league = requested_league).all()
-    #return jsonify(groups = str(len(results)))
-    groups  = []
 
-    for result in results:
-        groups.append(result.group)
+    groups = json.loads(open('oddsportal/tmp/league_groups.txt').read())[requested_league]
 
-    groups = list(set(groups))
     return jsonify(groups = groups)
 
 
@@ -233,13 +222,7 @@ def years_update():
 
     requested_group  = request.values.get('grp').strip()
     requested_league = request.values.get('lea').strip()
-    results = models.Result.query.filter_by(group  = requested_group, 
-                                            league = requested_league).all()
-    #return jsonify(groups = str(len(results)))
-    years  = []
 
-    for result in results:
-        years.append(result.year)
+    years = sorted(json.loads(open('oddsportal/tmp/group_years.txt').read())[requested_league][requested_group])
 
-    years = sorted(list(set(years)))
     return jsonify(years = years)
