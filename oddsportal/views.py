@@ -18,8 +18,8 @@ def labels_getter():
 
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
 
-    path    = os.path.dirname(amodule.__file__)
-    leagues = json.loads(open(path + 'tmp/leagues.txt').read())
+    path    = os.path.dirname(__file__)
+    leagues = json.loads(open(path + '/tmp/leagues.txt').read())
     years   = ['2014', '2013']
 
     labels  = {'years':     years,
@@ -214,8 +214,8 @@ def groups_update():
 
     requested_league = request.values.get('lea').strip()
 
-    path   = os.path.dirname(amodule.__file__)
-    groups = json.loads(open(path + 'tmp/league_groups.txt').read())[requested_league]
+    path   = os.path.dirname(__file__)
+    groups = json.loads(open(path + '/tmp/league_groups.txt').read())[requested_league]
 
     return jsonify(groups = groups)
 
@@ -226,7 +226,7 @@ def years_update():
     requested_group  = request.values.get('grp').strip()
     requested_league = request.values.get('lea').strip()
 
-    path  = os.path.dirname(amodule.__file__)
-    years = sorted(json.loads(open(path + 'tmp/group_years.txt').read())[requested_league][requested_group])
+    path  = os.path.dirname(__file__)
+    years = sorted(json.loads(open(path + '/tmp/group_years.txt').read())[requested_league][requested_group])
 
     return jsonify(years = years)
