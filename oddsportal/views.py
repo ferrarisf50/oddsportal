@@ -19,7 +19,7 @@ def labels_getter():
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
 
     path    = os.path.dirname(__file__)
-    leagues = json.loads(open(path + '/tmp/leagues.txt').read())
+    leagues = json.loads(open(path + '/tmp/leagues.txt').read(), sort_keys=True)
     years   = ['2014', '2013']
 
     labels  = {'years':     years,
