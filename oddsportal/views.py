@@ -8,7 +8,7 @@ from functions.generate_xls import generate_xls
 from oddsportal import *
 import os
 
-import json, re, datetime, collections, xlwt, StringIO, mimetypes
+import json, re, datetime, collections, xlwt, StringIO, mimetypes, ast
 import models
 
 
@@ -19,7 +19,7 @@ def labels_getter():
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
 
     path    = os.path.dirname(__file__)
-    leagues = json.loads(open(path + '/tmp/leagues.txt').read(), sort_keys=True)
+    leagues = sorted(json.loads(open(path + '/tmp/leagues.txt').read()))
     years   = ['2014', '2013']
 
     labels  = {'years':     years,
@@ -42,15 +42,16 @@ def index():
 @app.route('/download', methods=['GET', 'POST'])
 def download():
 
-    raw_results = json.loads(request.values.get('raw_results'))
+    raw_results = request.values.get('output_results')
     table_years = request.values.get('table_years')
     home_teams  = request.values.get('home_teams')
     away_teams  = request.values.get('away_teams')
+    totals      = request.values.get('totals')
 
     response = Response()
     response.status_code = 200
 
-    workbook = generate_xls(raw_results, table_years, home_teams, away_teams)
+    workbook = generate_xls(raw_results, table_years, home_teams, away_teams, totals)
     output   = StringIO.StringIO()
 
     workbook.save(output)

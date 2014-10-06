@@ -9,10 +9,11 @@
 
 {% if output_results %}
     <form id="download_form" action="/download" method="POST">
-        <input name="raw_results" value="{{output_results_raw}}">
+        <input name="output_results" value="{{output_results}}">
         <input name="table_years" value="{{table_years}}">
         <input name="home_teams"  value="{{home_teams}}">
         <input name="away_teams"  value="{{away_teams}}">
+        <input name="totals"      value="{{totals}}">
     </form>
 {% endif %}
 
