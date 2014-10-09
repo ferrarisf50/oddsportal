@@ -45,7 +45,7 @@ def analyzation(form_request):
             else:
                 profit_loss_value = -odd_value
 
-            return (profit_loss, profit_loss_value)
+            return (profit_loss, round(profit_loss_value, 1))
 
         def hda_calc(event_result, strategy, odd, odd_value):
             '''Takes event data and returns True of False for Win and Loss and value'''
@@ -61,7 +61,7 @@ def analyzation(form_request):
                 profit_loss      = 1
 
             profit_loss_value    = (odd*odd_value) if profit_loss == 1 else -odd_value
-            return (profit_loss, profit_loss_value)
+            return (profit_loss, round(profit_loss_value, 1))
 
 
         output_results = {}
