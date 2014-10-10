@@ -7,7 +7,7 @@ from oddsportal import db
 
 class Result(db.Model):
     """Sqlalchemy deals model"""
-    __tablename__ = "results_03"
+    __tablename__ = "results"
 
     id = db.Column(Integer, primary_key=True)
 

@@ -1,4 +1,4 @@
-import json, collections, re
+import json, collections, re, datetime
 import models
 
 
@@ -93,8 +93,8 @@ def analyzation(form_request):
 
                 matches_played, matches_won, sum_profit_loss = 0, 0, 0
 
-                ccc = 'home_team' if playing_at == 'home' else 'away_team'
-                matches = (match for match in year_matches if getattr(match, ccc) == team)
+                where = 'home_team' if playing_at == 'home' else 'away_team'
+                matches = (match for match in year_matches if getattr(match, where) == team)
                 
                 for match in matches:
                     try:
@@ -129,11 +129,15 @@ def analyzation(form_request):
 
         return output_results
 
-
+    timer_01 = datetime.datetime.now()
     results = models.Result.query.filter(models.Result.league == form_request.league,
                                          models.Result.group  == form_request.group,
                                          models.Result.year.in_(form_request.years)).all()
+    stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
+    leagues = [league[0] for league in set(models.Result.query.with_entities(models.Result.league).all())]
+
+    timer_01 = datetime.datetime.now()
     home_teams = sorted(list(set([result.home_team for result in results])))
     away_teams = sorted(list(set([result.away_team for result in results])))
 
@@ -147,10 +151,14 @@ def analyzation(form_request):
     except:
         ou_value   = 0
 
+    stopwatch_02 = ((datetime.datetime.now()) - timer_01).total_seconds()
+
+    timer_01 = datetime.datetime.now()
     home_teams_results = analyze_teams(home_teams, results, 'home')
     away_teams_results = analyze_teams(away_teams, results, 'away')
+    stopwatch_03 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
-
+    timer_01 = datetime.datetime.now()
     first_value, previous_value = 0, 0
     for k,v in home_teams_results['home'].iteritems():
         for i, home_team in enumerate(home_teams):
@@ -178,9 +186,13 @@ def analyzation(form_request):
                 away_teams_results['away'][k]['teams'][away_team]['r_total'] = previous_value + new_value
                 previous_value = away_teams_results['away'][k]['teams'][away_team]['r_total']
 
+    stopwatch_04 = ((datetime.datetime.now()) - timer_01).total_seconds()
+    stopwatches  = [stopwatch_01, stopwatch_02, stopwatch_03, stopwatch_04]
+
 
 
     teams_results = {home_teams_results.keys()[0]: home_teams_results.values()[0],
-                     away_teams_results.keys()[0]: away_teams_results.values()[0]}
+                     away_teams_results.keys()[0]: away_teams_results.values()[0],
+                     'timers': stopwatches}
 
     return json.dumps(teams_results)

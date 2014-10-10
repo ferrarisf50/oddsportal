@@ -1,7 +1,7 @@
 import sys, os, json
 
 sys.dont_write_bytecode = True
-sys.path.append('/home/desprit/Documents/Flask/openshift/oddscalculator')
+sys.path.append(os.path.abspath(__name__).split('oddsportal')[0] + 'oddsportal/')
 
 import models
 
