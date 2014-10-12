@@ -231,3 +231,19 @@ def years_update():
     years = sorted(json.loads(open(path + '/tmp/group_years.txt').read())[requested_league][requested_group])
 
     return jsonify(years = years)
+
+
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+
+    if request.method == 'POST':
+
+        requested_url = request.values.get('url')
+        results = models.Result.query.filter_by(tournament_url = requested_url).first()
+
+        return render_template("test.html", results = results.__dict__)
+
+
+    else:
+
+        return render_template("test.html")

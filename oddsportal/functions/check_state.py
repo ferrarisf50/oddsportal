@@ -12,6 +12,9 @@ import models
 
 
 
+# This script is used to look for empty data in database and
+# run crawler again for every missing one
+
 Session = sessionmaker()
 engine  = create_engine('postgresql://soccer:soccer@localhost/soccer_db')
 Session.configure(bind = engine)
