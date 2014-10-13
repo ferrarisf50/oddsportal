@@ -195,6 +195,49 @@ form #date {
       padding-left: 5px;
     }
 
+#registration_form legend {
+  font-size: 1.2rem;
+  height: 2rem;
+  color: #2a2a2a;
+  line-height: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+#registration_form input {
+  height: 2rem;
+  margin-left: 1rem;
+}
+#registration_form label {
+  font-size: 1.1rem;
+}
+#registration_form button {
+  background-color: orange;
+  line-height: 1rem;
+}
+  #registration_form button:hover {
+    background-color: darkorange;
+  }
+#registration_form i {
+  line-height: 2rem;
+  font-size: 1.3rem;
+}
+
+
+#username_icon_true {
+  display: none;
+  color: green;
+}
+#username_icon_false {
+  color: #ed4a3b;
+}
+#email_icon_true {
+  display: none;
+  color: green;
+}
+#email_icon_false {
+  color: #ed4a3b;
+}
+
 
 #registration_form .title {
   color: #ccc;
@@ -315,8 +358,13 @@ form #date {
   margin-top:30px;
 }
 
-#loginForm p {
-  font-family: 'CourierNew';
+#login_form input {
+  height: 2rem;
+  background-color: white;
+  color: #2a2a2a;
+}
+#login_form button {
+  line-height: 1rem;
 }
 
 #sidr span {

@@ -6,7 +6,6 @@ from oddsportal import db
 
 
 class Result(db.Model):
-    """Sqlalchemy deals model"""
     __tablename__ = "results_03"
 
     id = db.Column(Integer, primary_key=True)
@@ -33,3 +32,14 @@ class Result(db.Model):
     hda_full_results = db.Column('hda_full_results', String)
     hda_frst_results = db.Column('hda_frst_results', String)
     hda_scnd_results = db.Column('hda_scnd_results', String)
+
+
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(Integer, primary_key=True)
+
+    login     = db.Column('login',     String)
+    password  = db.Column('password',  String)
+    email     = db.Column('email',     String)
+    templates = db.Column('templates', String)

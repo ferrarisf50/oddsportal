@@ -1101,6 +1101,19 @@ select {
     position: relative;
     right: 91.66667%;
     left: auto; } }
+
+#button_save {
+  padding-left: 1.5rem;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  padding-right: 1.5rem;
+  height: 2.2rem;
+  border-width: 0px;
+  color: white;
+  cursor: pointer;
+  outline: none;
+}
+
 button, .button {
   border-style: solid;
   border-width: 0px;
@@ -4600,8 +4613,8 @@ select {
 input[type="file"],
 input[type="radio"],
 select {
-  margin: 0rem 0.5rem 1rem 0;
-  margin-top: 0.3rem; }
+  margin-bottom: 1rem
+}
 input[type="checkbox"] {
   margin: 0rem 0.5rem 1rem .5rem;
   margin-top: 0.3rem;

@@ -31,12 +31,16 @@ def labels_getter():
 
 @app.route('/',      methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
-def index():
+def index(logged = False):
+
+    if 'login' in session:
+        logged = True
 
     labels = labels_getter()
     return render_template('index.html', years      = labels.get('years'),
                                          ou_values  = labels.get('ou_values'), 
-                                         leagues    = labels.get('leagues'))
+                                         leagues    = labels.get('leagues'),
+                                         logged     = logged)
 
 
 @app.route('/download', methods=['GET', 'POST'])
@@ -247,3 +251,97 @@ def test():
     else:
 
         return render_template("test.html")
+
+
+
+
+@app.route('/save_template', methods=['GET', 'POST'])
+def save_template():
+    '''
+
+    playing_at  = request.values.get('playing_at')
+    handicap    = request.values.get('handicap')
+    strategy    = request.values.get('strategy')
+    value       = request.values.get('value')
+    game_part   = request.values.get('game_part')
+    odds_type   = request.values.get('odds_type')
+    odds_toggle = request.values.get('odds_toggle')
+    stake       = request.values.get('stake')
+    '''
+    templates = ['123', '234', '345']
+
+    return jsonify(templates = templates)
+
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = models.User.query.filter_by(login = username).first()
+        if user and password == user.password:
+            session['login'] = request.form['username']
+            return redirect(url_for('index'))
+        else:
+            error = 'Invalid username or password'
+            return jsonify(result = user.password)
+
+    else:
+        return render_template("index.html")
+
+    
+@app.route("/registration", methods=['GET', 'POST'])
+def registration(error=False):
+
+    if request.method == 'POST':
+        
+        username = request.form['sign_up_username']
+        password = request.form['sign_up_password']
+        email    = request.form['sign_up_email']
+
+        login_db = models.User.query.filter_by(login = username).first()
+        email_db = models.User.query.filter_by(email = email).first()
+
+        if login_db or email_db:
+            error = 'User with the same login or email already exist'
+            return render_template("registration.html", error=error)
+
+        user = models.User(login = username, password = password, email = email)
+        db.session.add(user)
+        db.session.commit()
+
+        return render_template("index.html")
+        
+        
+    else:
+        if 'login' in session:
+            return render_template("index.html")
+
+        return render_template("registration.html", error=error)
+
+
+@app.route("/logout")
+def logout():
+    session.pop('login', None)
+    return redirect(url_for('index'))
+
+
+
+@app.route('/reg_checker', methods=['GET', 'POST'])
+def reg_checker():
+
+
+    username = request.values.get('username')
+    email = request.values.get('email')
+
+    login_db = models.User.query.filter_by(login = username).first()
+    email_db = models.User.query.filter_by(email = email).first()
+    
+    username = False if login_db or username == "" else True
+    email    = False if email_db or email    == "" else True
+
+    return jsonify(username = username, email = email)

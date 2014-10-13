@@ -1,6 +1,29 @@
 <div id="sidr">
+	{% if not logged %}
+	    <div id="loginForm">
+			<form method="post" action="javascript:signIn()" id="login_form">
+			    <div class="large-12 columns">
+			        <label for="username">Login:</label>
+			        <input type="text" name="username">
+			    </div>
 
-    <p>123</p>
+			    <div class="large-12 columns">
+			        <label for="password">Password:</label>
+			        <input type="password" name="password">
+			    </div>
+
+			    <div class="large-12 columns">
+			    	<br>
+			        <button type="submit" class="button expand">Login</button>
+			    </div>
+
+			    <p id="error"></p>
+			</form>
+	    </div>
+
+    {% else %}
+		<span class="logout"><br><a href="/logout">logout</a></span>
+    {% endif %}
 </div>
 
 
@@ -8,4 +31,22 @@
     $(document).ready(function() {
         $('#simple-menu').sidr();
     });
+</script>
+
+
+<script type=text/javascript>
+    function signIn() {
+        $.post('/login', {
+            username: $('input[name="username"]').val(),
+            password: $('input[name="password"]').val()
+
+        }).done(function(data) {
+            if (data.result) {
+                $("#error").text(data.result)
+            }
+            else {
+                window.location.replace("/index")
+            };
+        });
+    };
 </script>
