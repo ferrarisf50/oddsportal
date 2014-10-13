@@ -49,12 +49,31 @@
             
         </div>
 
+        {% if logged %}
+            <div class="row">
+                <br>
+                <div class="large-7 columns">
+                    <label>Select template
+                        <select name="save_template">
+                            <option value="h">At Home</option>
+                            <option value="a">Away</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="large-5 columns">
+                    <label>Save it
+                        <input id="button_save" class="button expand" type=button onClick="javescript:void()" value='save'>
+                    </label>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="row">
             <br>
             <div class="large-12 columns">
                 <label>Results for teams playing
                     <select name="form_playing_at_types">
-                        <option value="h">At Home</option>
+                        <option selected value="h">At Home</option>
                         <option value="a">Away</option>
                     </select>
                 </label>
@@ -305,21 +324,44 @@
     
 </script>
 
-<!--
-<div class="large-7 text-left columns" id="years">
-                <input id="{{years[0]}}" checked name="years" type="checkbox" value="{{years[0]}}"><label>{{years[0]}}</label><br>
-            </div>
 
-            <div class="large-5 columns" id="years_coeffs">
-                <input id="coefficient" name="{{years[0]}}_coeff" type="text" autocomplete='off'>
-            </div>
+<script type="text/javascript">
 
+    $(".button_save").click(function(){
 
+        var playing_at  = $('select[name=form_playing_at_types]').find(":selected").val();
+        var handicap    = $('select[name=handicap]').find(":selected").val();
+        var strategy    = $('select[name=strategy]').find(":selected").val();
+        var value       = $('select[name=ou_values]').find(":selected").val();
+        var game_part   = $('select[name=game_part]').find(":selected").val();
+        var odds_type   = $('select[name=odds_type]').find(":selected").val();
+        var odds_toggle = $('input[name=odd_toggle]').val();
+        var stake       = $('input[name=odd_value]').val();
 
-$('select[name=group]').empty();
-                for (var i in data.groups) {
-                    $('select[name=group]').append(new Option(data.groups[i], data.groups[i]));
-                    $('select[name=group]').removeAttr("disabled");
+        $.post('/save_template', {
+
+            playing_at:   playing_at,
+            handicap:     handicap,
+            strategy:     strategy,
+            value:        value,
+            game_part:    game_part,
+            odds_type:    odds_type,
+            odds_toggle:  odds_toggle,
+            stake:        stake
+
+        }).done(function(data) {
+            
+            $('select[name=save_template]').empty();
+
+                function templates_appender(selector) {
+                    for (x in data.templates) {
+                        $(selector)
+                            .append('<option>' + data.templates[x] + '</option>')
+                    }
                 }
+                templates_appender('select[name=save_template]');
 
--->
+        });
+    });
+
+</script>

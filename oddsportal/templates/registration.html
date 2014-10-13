@@ -1,0 +1,135 @@
+<html>
+<head>
+    <link href="static/css/style.css"   rel="stylesheet" media="screen">
+    <link href="static/css/jquery.sidr.dark.css"   rel="stylesheet" media="screen">
+    <link href="static/css/foundation.css"   rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="static/css/jquery.mCustomScrollbar.css" />
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='js/jquery.sidr.min.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='js/foundation.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+
+
+    <title>Sports betting strategies</title>
+    
+</head>
+
+<body>
+    {% include "header.html" %}
+    {% include "left_side_slide.html" %}
+    <br><br><br><br><br><br><br><br>
+    <div class="large-12 columns">
+        <div class="large-3 large-centered columns">
+            <form id="registration_form" method="post" action="/registration">
+                <fieldset>
+                    <legend>Registration</legend>
+                
+                    <br>
+                    <div class="large-3 columns">
+                        <label>Username:</label>
+                    </div>
+                    <div class="large-8 columns">
+                        <input type  = "text" 
+                               name  = "sign_up_username" 
+                               id    = "sign_up_username" 
+                               value = "">
+                    </div>
+                    <div class="large-1 columns">
+                        <i id="username_icon_true" class="fa fa-check"></i>
+                        <i id="username_icon_false" class="fa fa-times"></i>
+                    </div>
+
+
+                    <div class="large-3 columns">
+                        <label>Password:</label>
+                    </div>
+                    <div class="large-8 columns">
+                        <input type  = "password" 
+                               name  = "sign_up_password" 
+                               id    = "sign_up_password" 
+                               value = "">
+                    </div>
+
+                    <div class="large-1 columns">
+                    </div>
+
+
+                    <div class="large-3 columns">
+                        <label>E-mail:</label>
+                    </div>
+                    <div class="large-8 columns">
+                        <input type  = "email" 
+                               name  = "sign_up_email" 
+                               id    = "sign_up_email" 
+                               value = "">
+                    </div>
+                    <div class="large-1 columns">
+                        <i id="email_icon_true" class="fa fa-check"></i>
+                        <i id="email_icon_false" class="fa fa-times"></i>
+                    </div>
+
+                    
+                    
+                    <div class="large-12 columns">
+                        <br>
+                        <button class="button expand">Sign Up</button> 
+                    </div>
+                    
+                    {% if error %}
+                        <label><span>&nbsp;</span><center><p id="error">{{ error }}</center></p></label>
+                    {% endif %}    
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    
+    <div id="footer">
+        <span class="copyright">
+            <p>© 2014 AllWebDirectory</p>
+        </span>
+        <span class="source">
+            <a href="/">contact us</a>
+        </span>
+    </div>
+</body>
+
+
+
+
+<script type=text/javascript>
+
+    $(document).change(function () {
+        $.post('/reg_checker', {
+
+            username: $('input[name="sign_up_username"]').val(),
+            email:    $('input[name="sign_up_email"]').val()
+
+        }).done(function(data) {
+            if (data.username) {
+                $("#username_icon_true").css('display','block');
+                $("#username_icon_false").css('display','none');
+            }
+            else {
+                $("#username_icon_true").css('display','none');
+                $("#username_icon_false").css('display','block');
+            };
+
+            if (data.email) {
+                $("#email_icon_true").css('display','block');
+                $("#email_icon_false").css('display','none');
+            }
+            else {
+                $("#email_icon_true").css('display','none');
+                $("#email_icon_false").css('display','block');
+            };
+        });
+    });
+    
+</script>
+
+
