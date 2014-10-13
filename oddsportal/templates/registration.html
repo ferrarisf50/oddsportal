@@ -110,6 +110,7 @@
             email:    $('input[name="sign_up_email"]').val()
 
         }).done(function(data) {
+	swal("Good job!", "You clicked the button!", "success");
             if (data.username) {
                 $("#username_icon_true").css('display','block');
                 $("#username_icon_false").css('display','none');
