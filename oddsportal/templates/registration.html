@@ -110,22 +110,22 @@
             email:    $('input[name="sign_up_email"]').val()
 
         }).done(function(data) {
-	swal("Good job!", "You clicked the button!", "success");
+
             if (data.username) {
-                $("#username_icon_true").css('display','block');
+                $("#username_icon_true").css('display', 'block');
                 $("#username_icon_false").css('display','none');
             }
             else {
-                $("#username_icon_true").css('display','none');
+                $("#username_icon_true").css('display', 'none');
                 $("#username_icon_false").css('display','block');
             };
 
             if (data.email) {
-                $("#email_icon_true").css('display','block');
+                $("#email_icon_true").css('display', 'block');
                 $("#email_icon_false").css('display','none');
             }
             else {
-                $("#email_icon_true").css('display','none');
+                $("#email_icon_true").css('display', 'none');
                 $("#email_icon_false").css('display','block');
             };
         });

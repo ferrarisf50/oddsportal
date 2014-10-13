@@ -12,10 +12,14 @@ import json, re, datetime, collections, xlwt, StringIO, mimetypes, ast
 import models
 
 
-def labels_getter():
+def labels_getter(session, logged = False):
+
+    if 'login' in session:
+        logged = True
+        templates = models.User.query.filter_by(login = session['login']).first().templates
+        templates = json.loads(templates) if templates else {}
 
     years, leagues, groups = [], [], []
-
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
 
     path    = os.path.dirname(__file__)
@@ -24,7 +28,8 @@ def labels_getter():
 
     labels  = {'years':     years,
                'leagues':   leagues,
-               'ou_values': ou_values}
+               'ou_values': ou_values,
+               'templates': templates}
 
     return labels
 
@@ -33,13 +38,15 @@ def labels_getter():
 @app.route('/index', methods=['GET', 'POST'])
 def index(logged = False):
 
+
     if 'login' in session:
         logged = True
 
-    labels = labels_getter()
+    labels = labels_getter(session)
     return render_template('index.html', years      = labels.get('years'),
                                          ou_values  = labels.get('ou_values'), 
                                          leagues    = labels.get('leagues'),
+                                         templates  = labels.get('templates'),
                                          logged     = logged)
 
 
@@ -84,7 +91,10 @@ def download():
 
 
 @app.route('/search_results', methods=['GET', 'POST'])
-def search_results():
+def search_results(logged = False):
+
+    if 'login' in session:
+        logged = True
 
     form_request        = RequestObject(request.form)
 
@@ -193,7 +203,8 @@ def search_results():
                                                   group              = form_request.group,
                                                   totals             = totals,
                                                   league             = form_request.league,
-                                                  timers             = {'analyse': time_01, 'rest': time_02})
+                                                  timers             = {'analyse': time_01, 'rest': time_02},
+                                                  logged             = logged)
 
 
 
@@ -256,19 +267,30 @@ def test():
 
 
 @app.route('/save_template', methods=['GET', 'POST'])
-def save_template():
-    '''
+def save_template(logged = False):
 
-    playing_at  = request.values.get('playing_at')
-    handicap    = request.values.get('handicap')
-    strategy    = request.values.get('strategy')
-    value       = request.values.get('value')
-    game_part   = request.values.get('game_part')
-    odds_type   = request.values.get('odds_type')
-    odds_toggle = request.values.get('odds_toggle')
-    stake       = request.values.get('stake')
-    '''
-    templates = ['123', '234', '345']
+
+    templates = models.User.query.filter_by(login = session['login']).first().templates
+    templates = json.loads(templates) if templates else {}
+
+    name = request.values.get('template_name')
+    
+    template    = {'playing_at':  request.values.get('playing_at'),
+                   'handicap':    request.values.get('handicap'),
+                   'strategy':    request.values.get('strategy'),
+                   'value':       request.values.get('value'),
+                   'game_part':   request.values.get('game_part'),
+                   'odds_type':   request.values.get('odds_type'),
+                   'odds_toggle': request.values.get('odds_toggle'),
+                   'stake':       request.values.get('stake')}
+
+    templates[name] = json.dumps(template)
+
+    user = models.User.query.filter_by(login = session['login']).first()
+    user.templates = json.dumps(templates)
+
+    db.session.add(user)
+    db.session.commit()
 
     return jsonify(templates = templates)
 
@@ -319,7 +341,7 @@ def registration(error=False):
         
     else:
         if 'login' in session:
-            return render_template("index.html")
+            return render_template("index.html", logged = True)
 
         return render_template("registration.html", error=error)
 

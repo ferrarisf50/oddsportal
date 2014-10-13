@@ -1102,17 +1102,7 @@ select {
     right: 91.66667%;
     left: auto; } }
 
-#button_save {
-  padding-left: 1.5rem;
-  padding-bottom: 0px;
-  padding-top: 0px;
-  padding-right: 1.5rem;
-  height: 2.2rem;
-  border-width: 0px;
-  color: white;
-  cursor: pointer;
-  outline: none;
-}
+
 
 button, .button {
   border-style: solid;
@@ -4474,6 +4464,9 @@ span.postfix, label.postfix {
     border-top-right-radius: 3px; }
 
 /* We use this to get basic styling on all basic form elements */
+.template_name {
+  height: 2.3125rem !important;
+}
 input[type="text"],
 input[type="password"],
 input[type="date"],

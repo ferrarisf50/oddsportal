@@ -52,37 +52,45 @@
         {% if logged %}
             <div class="row">
                 <br>
-                <div class="large-7 columns">
+                <div class="large-12 columns">
                     <label>Select template
-                        <select name="save_template">
-                            <option value="h">At Home</option>
-                            <option value="a">Away</option>
+                        <select id="select_template" name="select_template">
+                            <option disabled selected> -- select a template -- </option>
+                            {% for template in templates %}
+                                <option value="h">{{ template }}</option>
+                            {% endfor %}
                         </select>
                     </label>
                 </div>
-                <div class="large-5 columns">
-                    <label>Save it
-                        <input id="button_save" class="button expand" type=button onClick="javescript:void()" value='save'>
-                    </label>
+                <div class="large-12 columns">
+                    <div class="row collapse">
+                        <div class="small-10 columns">
+                            <input class="template_name" name="template_name" type="text" placeholder="Template name">
+                        </div>
+                        <div class="small-2 columns">
+                            <a id="button_save" class="button postfix">save</a>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         {% endif %}
 
         <div class="row">
             <br>
-            <div class="large-12 columns">
-                <label>Results for teams playing
-                    <select name="form_playing_at_types">
-                        <option selected value="h">At Home</option>
-                        <option value="a">Away</option>
-                    </select>
-                </label>
-            </div>
-            <div class="large-12 columns">
-                <label>Handicap type
+            <div class="large-7 columns">
+                <label>Handicap
                     <select id="handicap" name="handicap">
                         <option value="hda">Home/Draw/Away</option>
                         <option value="ou">Over/Under</option>
+                    </select>
+                </label>
+            </div>
+            <div class="large-5 columns">
+                <label>Playing at
+                    <select name="form_playing_at_types">
+                        <option selected value="h">At Home</option>
+                        <option value="a">Away</option>
                     </select>
                 </label>
             </div>
@@ -168,7 +176,6 @@
         });
     });
 </script>
-
 
 <script type="text/javascript">
     $("#handicap").change(function(){
@@ -327,7 +334,9 @@
 
 <script type="text/javascript">
 
-    $(".button_save").click(function(){
+    $("#button_save").click(function(){
+
+        var template_name = $('input[name=template_name]').val();
 
         var playing_at  = $('select[name=form_playing_at_types]').find(":selected").val();
         var handicap    = $('select[name=handicap]').find(":selected").val();
@@ -340,28 +349,37 @@
 
         $.post('/save_template', {
 
-            playing_at:   playing_at,
-            handicap:     handicap,
-            strategy:     strategy,
-            value:        value,
-            game_part:    game_part,
-            odds_type:    odds_type,
-            odds_toggle:  odds_toggle,
-            stake:        stake
+            playing_at:    playing_at,
+            handicap:      handicap,
+            strategy:      strategy,
+            value:         value,
+            game_part:     game_part,
+            odds_type:     odds_type,
+            odds_toggle:   odds_toggle,
+            stake:         stake,
+            template_name: template_name
 
         }).done(function(data) {
-            
-            $('select[name=save_template]').empty();
+
+            $('select[name=select_template]').empty();
 
                 function templates_appender(selector) {
-                    for (x in data.templates) {
+                    $(selector).append('<option disabled selected> -- select a template -- </option>')
+                    $.each(data.templates, function (i, v) {
                         $(selector)
-                            .append('<option>' + data.templates[x] + '</option>')
-                    }
+                            .append('<option>' + i + '</option>')
+                    });
                 }
-                templates_appender('select[name=save_template]');
+                templates_appender('select[name=select_template]');
 
         });
     });
 
+</script>
+
+
+<script type="text/javascript">
+    $("#select_template").change(function() {
+        alert(123);
+    })
 </script>
