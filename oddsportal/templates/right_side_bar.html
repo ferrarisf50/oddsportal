@@ -53,14 +53,19 @@
             <div class="row">
                 <br>
                 <div class="large-12 columns">
-                    <label>Select template
-                        <select id="select_template" name="select_template">
-                            <option disabled selected> -- select a template -- </option>
-                            {% for template in templates %}
-                                <option value="h">{{ template }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
+                    <div class="row collapse">
+                        <div class="small-10 columns">
+                            <select id="select_template" name="select_template">
+                                <option disabled selected> -- select a template -- </option>
+                                {% for template in templates %}
+                                    <option value={{ template }}>{{ template }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="small-2 columns">
+                            <a id="button_get" class="button postfix">get</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="large-12 columns">
                     <div class="row collapse">
@@ -338,28 +343,30 @@
 
         var template_name = $('input[name=template_name]').val();
 
-        var playing_at  = $('select[name=form_playing_at_types]').find(":selected").val();
+        var form_playing_at_types  = $('select[name=form_playing_at_types]').find(":selected").val();
         var handicap    = $('select[name=handicap]').find(":selected").val();
         var strategy    = $('select[name=strategy]').find(":selected").val();
-        var value       = $('select[name=ou_values]').find(":selected").val();
+        var ou_values   = $('select[name=ou_values]').find(":selected").val();
         var game_part   = $('select[name=game_part]').find(":selected").val();
         var odds_type   = $('select[name=odds_type]').find(":selected").val();
-        var odds_toggle = $('input[name=odd_toggle]').val();
-        var stake       = $('input[name=odd_value]').val();
+        var odd_toggle  = $('input[name=odd_toggle]').val();
+        var odd_value   = $('input[name=odd_value]').val();
 
         $.post('/save_template', {
 
-            playing_at:    playing_at,
+            form_playing_at_types: form_playing_at_types,
             handicap:      handicap,
             strategy:      strategy,
-            value:         value,
+            ou_values:     ou_values,
             game_part:     game_part,
             odds_type:     odds_type,
-            odds_toggle:   odds_toggle,
-            stake:         stake,
+            odd_toggle:    odd_toggle,
+            odd_value:     odd_value,
             template_name: template_name
 
         }).done(function(data) {
+
+            alert('template saved')
 
             $('select[name=select_template]').empty();
 
@@ -379,7 +386,13 @@
 
 
 <script type="text/javascript">
-    $("#select_template").change(function() {
-        alert(123);
+    $("#button_get").click(function() {
+        var selected_template = $('select[name=select_template]').find(":selected").val();
+        var templates = "{{ templates }}"
+
+        var template_values = JSON.parse({{ templates|tojson|safe }}[selected_template]);
+        for (x in template_values){
+            $('select[name=' + x + ']').val(template_values[x]);
+        }
     })
 </script>

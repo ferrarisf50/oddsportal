@@ -18,6 +18,8 @@ def labels_getter(session, logged = False):
         logged = True
         templates = models.User.query.filter_by(login = session['login']).first().templates
         templates = json.loads(templates) if templates else {}
+    else:
+        templates = {}
 
     years, leagues, groups = [], [], []
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
@@ -278,11 +280,11 @@ def save_template(logged = False):
     template    = {'playing_at':  request.values.get('playing_at'),
                    'handicap':    request.values.get('handicap'),
                    'strategy':    request.values.get('strategy'),
-                   'value':       request.values.get('value'),
+                   'ou_values':   request.values.get('ou_values'),
                    'game_part':   request.values.get('game_part'),
                    'odds_type':   request.values.get('odds_type'),
-                   'odds_toggle': request.values.get('odds_toggle'),
-                   'stake':       request.values.get('stake')}
+                   'odd_toggle':  request.values.get('odd_toggle'),
+                   'odd_value':   request.values.get('odd_value')}
 
     templates[name] = json.dumps(template)
 
@@ -310,7 +312,7 @@ def login():
             return redirect(url_for('index'))
         else:
             error = 'Invalid username or password'
-            return jsonify(result = user.password)
+            return jsonify(result = error)
 
     else:
         return render_template("index.html")

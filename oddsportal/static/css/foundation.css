@@ -4404,6 +4404,12 @@ select::-ms-expand {
   line-height: 2.3125rem; }
 
 /* Adjust padding, alignment and radius if pre/post element is a button */
+#button_save {
+  background-color: #ed4a3b !important;
+}
+#button_get {
+  background-color: #ed4a3b !important;
+}
 .postfix.button {
   padding-left: 0;
   padding-right: 0;
@@ -4585,6 +4591,9 @@ textarea[rows] {
   height: auto; }
 
 /* Add height value for select elements to match text input height */
+#select_template {
+  height: 2.325rem !important;
+}
 select {
   -webkit-appearance: none !important;
   background-color: #fafafa;
