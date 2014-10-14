@@ -134,7 +134,7 @@ def search_results(logged = False):
         results_labels = {'h': 'Backing home teams to {}'.format(strategies_dict[form_request.strategy]),
                           'a': 'Backing away teams to {}'.format(strategies_dict[form_request.strategy])}
 
-    labels = labels_getter()
+    labels = labels_getter(session)
 
 
     for team in home_teams:

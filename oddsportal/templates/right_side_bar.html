@@ -31,7 +31,7 @@
             
 
             <div class="large-7 text-left columns" id="years">
-                <input id="2014" checked name="year" type="checkbox" value="2014"><label>2014</label><br>
+                <input id="2014"  name="year" type="checkbox" value="2014"><label>2014</label><br>
             </div>
 
             <div class="large-5 columns" id="years_coeffs">
@@ -232,35 +232,23 @@
 
 <script type=text/javascript>
 
-    $('#searchForm').keyup(function () {
+    $('#searchForm').change(function () {
 
         var years_selected = [];
         $('#years input:checked').each(function() {
             years_selected.push($(this).attr('value'));
         });
-        if (years_selected != '') {
-            var years = true;
+        
+        odd_value = $('input[name="odd_value"]').val()
+
+        if (odd_value && years_selected.length > 0) {
+            $("#error").text('');
+            $('input[type=submit]').removeAttr("disabled");
         }
-
-        $.post('/form_checker', {
-
-            odd_value: $('input[name="odd_value"]').val(),
-            years:     years,
-
-
-        }).done(function(data) {
-
-            if (data.error !== ' ') {
-                $("#error").text(data.error);
-                $('input[type=submit]').attr('disabled', 'disabled');
-            }
-            else {
-                $("#error").text(data.error);
-                $('input[type=submit]').removeAttr("disabled");
-            }
-
-
-        });
+        else {
+            $("#error").text("Year or Stake field is empty");
+            $('input[type=submit]').attr('disabled', 'disabled');
+        };
     });
     
 </script>
@@ -324,7 +312,7 @@
                     $('#mySlideToggler').hide();
                 }
 
-                $('#years').append('<input id="' + data.years.slice(-1) + '" checked name="years" type="checkbox" value="' + data.years.slice(-1) + '"><label>' + data.years.slice(-1) + '</label><br>');
+                $('#years').append('<input id="' + data.years.slice(-1) + '" name="years" type="checkbox" value="' + data.years.slice(-1) + '"><label>' + data.years.slice(-1) + '</label><br>');
                 $('#years_coeffs').append('<input id="coefficient" name="' + data.years.slice(-1) + '_coeff" type="text" autocomplete="off">');
 
                 for (var i in data.years.slice(1)) {
@@ -336,12 +324,27 @@
     
 </script>
 
+<script type="text/javascript">
+
+    {% if templates %}
+        var templates = {{ templates|tojson|safe }}
+    {% else %}
+        var templates = {}
+    {% endif %}
+
+</script>
+
 
 <script type="text/javascript">
 
     $("#button_save").click(function(){
 
         var template_name = $('input[name=template_name]').val();
+
+        if (template_name === "") {
+            alert('Put name');
+            return
+        }
 
         var form_playing_at_types  = $('select[name=form_playing_at_types]').find(":selected").val();
         var handicap    = $('select[name=handicap]').find(":selected").val();
@@ -366,8 +369,7 @@
 
         }).done(function(data) {
 
-            alert('template saved')
-
+            templates = data.templates
             $('select[name=select_template]').empty();
 
                 function templates_appender(selector) {
@@ -378,6 +380,8 @@
                     });
                 }
                 templates_appender('select[name=select_template]');
+                alert('Template saved');
+
 
         });
     });
@@ -387,12 +391,19 @@
 
 <script type="text/javascript">
     $("#button_get").click(function() {
-        var selected_template = $('select[name=select_template]').find(":selected").val();
-        var templates = "{{ templates }}"
 
-        var template_values = JSON.parse({{ templates|tojson|safe }}[selected_template]);
+        var selected_template = $('select[name=select_template]').find(":selected").val();
+        var template_values   = JSON.parse(templates[selected_template])
+
         for (x in template_values){
             $('select[name=' + x + ']').val(template_values[x]);
+            $('input[name='  + x + ']').val(template_values[x]);
         }
+
+        if ($('input[name="odd_value"]').val() === ""){
+            $("#error").text("Year or Stake field is empty");
+            $('input[type=submit]').attr('disabled', 'disabled');
+        }
+        
     })
 </script>

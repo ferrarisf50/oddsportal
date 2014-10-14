@@ -39,7 +39,7 @@ def analyzation(form_request):
 
 
             if   full_win == 1:
-                profit_loss_value =   odd * odd_value
+                profit_loss_value =   odd * odd_value - odd_value
             elif half_win == 1:
                 profit_loss_value =  (odd * odd_value / 2) + (odd_value / 2)
             else:
@@ -60,7 +60,7 @@ def analyzation(form_request):
                (event_away_win  == 1 and strategy == 'a'):
                 profit_loss      = 1
 
-            profit_loss_value    = (odd*odd_value) if profit_loss == 1 else -odd_value
+            profit_loss_value    = (odd*odd_value - odd_value) if profit_loss == 1 else -odd_value
             return (profit_loss, round(profit_loss_value, 1))
 
 
