@@ -206,7 +206,8 @@ def search_results(logged = False):
                                                   totals             = totals,
                                                   league             = form_request.league,
                                                   timers             = {'analyse': time_01, 'rest': time_02},
-                                                  logged             = logged)
+                                                  logged             = logged,
+                                                  templates          = labels.get('templates'))
 
 
 
