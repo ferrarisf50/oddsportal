@@ -34,7 +34,7 @@
         </div>
         <br><br><br><br>
     </form>
-
+    {% if results %}
     <div id="content">
     	<div class="row">
 
@@ -52,12 +52,14 @@
             {% endif %}
     		
     	</div>
-
-        <div class="row">
-            <div class="large-3 large-offset-9 columns">
-                <br>
-                <a href="/test" class="button postfix">save changes</a>
+        
+            <div class="row">
+                <div class="large-3 large-offset-9 columns">
+                    <br>
+                    <a href="/test" class="button postfix">save changes</a>
+                </div>
             </div>
-        </div>
+
     </div>
+    {% endif %}
 </body>
