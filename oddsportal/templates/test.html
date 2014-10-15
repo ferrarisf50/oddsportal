@@ -20,35 +20,44 @@
 	<br><br><br>
 	<form id="searchForm" method="post" action="/test">
         <div class="row">
-            <div class="large-12 columns">
-                <label>Game url
-                    <input class="high_input" name="url" type="text" autocomplete='off'>
-                </label>
+            <div class="large-9 columns">
+                <input id="get_results_by_link" name="url" type="text" autocomplete='off'>
             </div> 
             
-            <div class="large-6 large-centered columns">
-                <br> 
-                <input type="submit" class="button expand" value="Go">
+            <div class="small-3 columns">
+                <a id="button_get" href="/test" class="button postfix">get results</a>
             </div>
-
-            <div class="large-12 columns">
-                <span id="error">{{error}}</span>
-            </div>
-            <br><br><br><br>
         </div>
+
+        <div class="large-12 columns">
+            <span id="error">{{error}}</span>
+        </div>
+        <br><br><br><br>
     </form>
 
     <div id="content">
     	<div class="row">
-    		<div class="large-12 columns">
-    			<center>
-		    		{% if results %}
-		    			{% for k,v in results.iteritems() %}
-		    				<p id="results">{{ k }}: {{ v }}</p>
-		    			{% endfor %}
-		    		{% endif %}
-	    		</center>
-	    	</div>
+
+            {% if results %}
+                {% for k,v in results.iteritems() %}
+                    <div class="large-3 columns">
+                        <label>{{ k }}</label>
+                    </div>
+                    <div class="large-9 columns">
+                        <input type  = "text" 
+                               name  = "{{k}}" 
+                               value = "{{ v }}"></input>
+                    </div>
+                {% endfor %}
+            {% endif %}
+    		
     	</div>
+
+        <div class="row">
+            <div class="large-3 large-offset-9 columns">
+                <br>
+                <a href="/test" class="button postfix">save changes</a>
+            </div>
+        </div>
     </div>
 </body>

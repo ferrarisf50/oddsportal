@@ -259,7 +259,21 @@ def test():
         requested_url = request.values.get('url')
         results = models.Result.query.filter_by(tournament_url = requested_url).first()
 
-        return render_template("test.html", results = results.__dict__)
+        results = {'home_team':        results.home_team,
+                   'away_team':        results.away_team,
+                   'league':           results.league,
+                   'group':            results.group,
+                   'event_results':    results.event_results,
+                   'ou_full_results':  results.ou_full_results,
+                   'ou_frst_results':  results.ou_frst_results,
+                   'ou_scnd_results':  results.ou_scnd_results,
+                   'hda_full_results': results.hda_full_results,
+                   'hda_frst_results': results.hda_frst_results,
+                   'hda_scnd_results': results.hda_scnd_results}
+
+
+
+        return render_template("test.html", results = results)
 
 
     else:

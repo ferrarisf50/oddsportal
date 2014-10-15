@@ -4470,6 +4470,9 @@ span.postfix, label.postfix {
     border-top-right-radius: 3px; }
 
 /* We use this to get basic styling on all basic form elements */
+#get_results_by_link {
+  height: 2.3125rem !important;
+}
 .template_name {
   height: 2.3125rem !important;
 }
