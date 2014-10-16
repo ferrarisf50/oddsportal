@@ -4476,6 +4476,9 @@ span.postfix, label.postfix {
 .template_name {
   height: 2.3125rem !important;
 }
+input:disabled {
+  opacity: 0.5;
+}
 input[type="text"],
 input[type="password"],
 input[type="date"],

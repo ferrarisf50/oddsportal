@@ -259,21 +259,23 @@ def test():
         requested_url = request.values.get('url')
         results = models.Result.query.filter_by(tournament_url = requested_url).first()
 
-        results = {'home_team':        results.home_team,
-                   'away_team':        results.away_team,
-                   'league':           results.league,
-                   'group':            results.group,
-                   'event_results':    results.event_results,
-                   'ou_full_results':  results.ou_full_results,
-                   'ou_frst_results':  results.ou_frst_results,
-                   'ou_scnd_results':  results.ou_scnd_results,
-                   'hda_full_results': results.hda_full_results,
-                   'hda_frst_results': results.hda_frst_results,
-                   'hda_scnd_results': results.hda_scnd_results}
+        if results:
+            results = {'home_team':        results.home_team,
+                       'away_team':        results.away_team,
+                       'league':           results.league,
+                       'group':            results.group,
+                       'event_results':    results.event_results,
+                       'ou_full_results':  results.ou_full_results,
+                       'ou_frst_results':  results.ou_frst_results,
+                       'ou_scnd_results':  results.ou_scnd_results,
+                       'hda_full_results': results.hda_full_results,
+                       'hda_frst_results': results.hda_frst_results,
+                       'hda_scnd_results': results.hda_scnd_results,
+                       'id': results.id}
 
+        error = True if not results else False
 
-
-        return render_template("test.html", results = results)
+        return render_template("test.html", results = results, error = error)
 
 
     else:
@@ -384,3 +386,29 @@ def reg_checker():
     email    = False if email_db or email    == "" else True
 
     return jsonify(username = username, email = email)
+
+
+
+
+@app.route('/apply_changes', methods=['GET', 'POST'])
+def apply_changes():
+
+    game = models.Result.query.filter_by(id = request.values.get('id')).first()
+
+    game.home_team        = request.values.get('home_team')
+    game.away_team        = request.values.get('away_team')
+    game.league           = request.values.get('league')
+    game.group            = request.values.get('group')
+    game.event_results    = request.values.get('event_results')
+    game.ou_full_results  = request.values.get('ou_full_results')
+    game.ou_frst_results  = request.values.get('ou_frst_results')
+    game.ou_scnd_results  = request.values.get('ou_scnd_results')
+    game.hda_full_results = request.values.get('hda_full_results')
+    game.hda_frst_results = request.values.get('hda_frst_results')
+    game.hda_scnd_results = request.values.get('hda_scnd_results')
+
+    db.session.add(game)
+    db.session.commit()
+
+    return jsonify(message = 'Database updated')
+    #http://www.oddsportal.com/soccer/argentina/torneos-de-verano-2008-2009/independiente-racing-club-jTRyAn3Q/
