@@ -12,8 +12,10 @@
 	<script type=text/javascript src="{{ url_for('static', filename='js/jquery.sidr.min.js') }}"></script>
 	<script type=text/javascript src="{{ url_for('static', filename='js/foundation.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
-	<script src="static/js/sweet-alert.min.js"></script> 
-	<script src="static/js/website_scripts/all.js"></script> 
+	<script src="static/js/sweet-alert.min.js"></script>
+	{% assets "js_all" %}
+		<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+	{% endassets %}
 	<link rel="stylesheet" type="text/css" href="static/css/sweet-alert.css">
 
 

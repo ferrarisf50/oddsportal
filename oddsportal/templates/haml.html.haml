@@ -1,0 +1,41 @@
+{% haml %}
+
+%html
+    %head
+        <link href="static/css/foundation.css"   rel="stylesheet" media="screen">
+        %title -> Hello world
+        -assets "js_all"
+        %script src="{{ ASSET_URL }}" type="text/javascript"
+        -assets "css_all"
+        %link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"
+    %body
+        %form#searchForm method="post" action="/test">
+            .row
+                .large-9.columns
+                    %input#get_results_by_link name="url" type="text" autocomplete='off'
+                
+                .small-3.columns
+                    %button.button.postfix type="submit" id="button_get" href="/test" -> get results
+
+            .large-12.columns
+                %span#error -> {{ error }}
+
+        -if results
+            #content
+                .row
+                    -for k,v in results.iteritems()
+                        .large-3.columns
+                            %label << {{ k }}
+
+                        .large-9.columns
+                            %input type="text" name="{{k}}" value="{{ v }}"
+
+                .row
+                    .large-3.large-offset-9.columns
+                        %a#apply_changes.button.postfix
+
+        -else
+            -if error
+                %p -> No results found
+
+{% endhaml %}
