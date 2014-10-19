@@ -273,6 +273,9 @@ form #date {
     color: #ececec;
     margin-top: 4rem;
   }
+  .intro  table {
+    margin-top: 4rem;
+  }
 
 
 .intro2 {
@@ -281,7 +284,6 @@ form #date {
   .intro2 p {
     font-size: 1.3rem;
     color: #ececec;
-    margin-top: 2rem;
   }
   .intro2 a {
     color: #0887ad;

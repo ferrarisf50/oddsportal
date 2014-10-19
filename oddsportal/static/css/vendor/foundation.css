@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'CourierNew'; /*a name to be used later*/
-    src: url('../fonts/cour.ttf'); /*URL to font*/
+    src: url('../../fonts/cour.ttf'); /*URL to font*/
 }
 
 meta.foundation-version {

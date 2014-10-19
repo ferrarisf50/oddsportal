@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 
 assets = Environment(app)
+
 js_bundle  = Bundle('js/vendor/jquery.min.js',
 					'js/custom/dom_ajax.js',
 					'js/vendor/foundation.min.js',
@@ -18,7 +19,7 @@ js_bundle  = Bundle('js/vendor/jquery.min.js',
 					'js/vendor/sweet-alert.min.js', output = 'gen/all.js')
 
 css_bundle = Bundle('css/custom/style.css',
-					'css/vendor/font-awesome.min.css',
+					'css/vendor/font-awesome.css',
 					'css/vendor/foundation.css',
 					'css/vendor/scrollbar.css',
 					'css/vendor/sidr.dark.css',
@@ -26,6 +27,8 @@ css_bundle = Bundle('css/custom/style.css',
 
 assets.register('js_all',  js_bundle)
 assets.register('css_all', css_bundle)
+assets.debug = True
+app.config['ASSETS_DEBUG'] = True
 
 
 app.config.from_pyfile('configs/production.py')

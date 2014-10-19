@@ -1,46 +1,47 @@
 <html>
-<head>
+    <head>
 
-	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-	{% assets "js_all" %}
-		<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-	{% endassets %}
-	{% assets "css_all" %}
-		<script rel="stylesheet" type="text/css" src="{{ ASSET_URL }}"></script>
-	{% endassets %}
-
-
-	<title>Sports betting strategies</title>
-	
-</head>
-
-<body>
-	<div id="container">
-		{% include "left_side_slide.html" %}
-		{% include "header.html" %}
-		{% include "left_side_bar.html"  %}
-		{% include "right_side_bar.html" %}
-		{% block content %}{% endblock %}
-	</div>
-	<br><br><br><br><br><br><br><br>
-	<div id="footer">
-		<span class="copyright">
-			<p>© 2014 AllWebDirectory</p>
-		</span>
-		<span class="source">
-			<a href="/">contact us</a>
-		</span>
-	</div>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        
+        {% assets "js_all" %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+        {% assets "css_all" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+        {% endassets %}
+        
 
 
-<script>
-    $(window).load(function(){
-        $("#right_side_bar").mCustomScrollbar({
-        	axis: 'y'
+        <title>Sports betting strategies</title>
+        
+    </head>
+
+    <body>
+        <div id="container">
+            {% include "left_side_slide.html" %}
+            {% include "header.html" %}
+            {% include "left_side_bar.html"  %}
+            {% include "right_side_bar.html" %}
+            {% block content %}{% endblock %}
+        </div>
+        <br><br><br><br><br><br><br><br>
+        <div id="footer">
+            <span class="copyright">
+                <p>© 2014 AllWebDirectory</p>
+            </span>
+            <span class="source">
+                <a href="/">contact us</a>
+            </span>
+        </div>
+
+
+    <script>
+        $(window).load(function(){
+            $("#right_side_bar").mCustomScrollbar({
+                axis: 'y'
+            });
         });
-    });
-</script>
+    </script>
 
-</body>
+    </body>
 </html>
