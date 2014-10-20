@@ -1,21 +1,18 @@
-<div id="header">
-	<a id="simple-menu" href="#sidr">
-		<div id="settings">
-			<img class="settings" src="{{ url_for('static', filename='img/list23.svg') }}" alt="list" width="40px">
-		</div>
-	</a>
-	
-	<div id='logo'>
-		<a class="logo" href="/">
-			<i class="fa fa-futbol-o"></i>
-			OddsCalc
-		</a>
-	</div>
+{% haml %}
 
-	<div id="menu">
-		<ul>
-			<li><a href="/">Link</a></li>
-			<li><a href="/">Another link</a></li>
-		</ul>
-	</div>
-</div>
+#header
+    %a#simple-menu href="#sidr"
+        #settings
+            %img.settings src="{{ url_for('static', filename='img/list23.svg') }}"
+    
+    #logo
+        %a.logo href="/"
+            %i.fa.fa-futbol-o
+            OddsCalc
+
+    #menu
+        %ul
+            %li -> %a href="/" -> Link
+            %li -> %a href="/" -> Another link
+
+{% endhaml %}

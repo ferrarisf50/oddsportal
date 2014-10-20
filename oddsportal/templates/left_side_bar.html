@@ -1,21 +1,20 @@
-<div id="left_side_bar">
-    <br>
-    {% if output_results %}
-        <div id="download">
-            <a href="javascript:void()"> <img src="{{ url_for('static', filename='img/download16.svg') }}" id="download_button"></a>
-        </div>
-    {% endif %}
-</div>
+{% haml %}
 
-{% if output_results %}
-    <form id="download_form" action="/download" method="POST">
-        <input name="output_results" value="{{output_results}}">
-        <input name="table_years" value="{{table_years}}">
-        <input name="home_teams"  value="{{home_teams}}">
-        <input name="away_teams"  value="{{away_teams}}">
-        <input name="totals"      value="{{totals}}">
-    </form>
-{% endif %}
+#left_side_bar
+    %br
+    -if output_results
+        #download
+            %a href="javascript:void()" 
+                %img#download_button src="{{ url_for('static', filename='img/download16.svg') }}
+
+-if output_results
+    %form#download_form action="/download" method="POST"
+        %input name="output_results" value="{{output_results}}"
+        %input name="table_years"    value="{{table_years}}"
+        %input name="home_teams"     value="{{home_teams}}"
+        %input name="away_teams"     value="{{away_teams}}"
+        %input name="totals"         value="{{totals}}"
+
 
 <script type="text/javascript">
     $('#download_button').click(function() {
@@ -23,7 +22,9 @@
     })
 </script>
 
-
 <script type="text/javascript">
     $('#download_form').hide();
 </script>
+
+
+{% endhaml %}

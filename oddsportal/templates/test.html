@@ -1,101 +1,48 @@
-<html>
-<head>
-	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+{% haml %}
 
-	<link rel="stylesheet" type="text/css" href="static/gen/all.css">
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    
-	<title>Sports betting strategies</title>
-	
-</head>
-
-<body>
-	<br><br><br>
-	<form id="searchForm" method="post" action="/test">
-        <div class="row">
-            <div class="large-9 columns">
-                <input id="get_results_by_link" name="url" type="text" autocomplete='off'>
-            </div> 
-            
-            <div class="small-3 columns">
-                <button type="submit" id="button_get" href="/test" class="button postfix">get results</button>
-            </div>
-        </div>
-
-        <div class="large-12 columns">
-            <span id="error">{{error}}</span>
-        </div>
-        <br><br><br><br>
-    </form>
-    {% if results %}
-    <div id="content">
-    	<div class="row">
-
-            {% if results %}
-                {% for k,v in results.iteritems() %}
-                    <div class="large-3 columns">
-                        <label>{{ k }}</label>
-                    </div>
-                    <div class="large-9 columns">
-                        <input type  = "text" 
-                               name  = "{{k}}" 
-                               value = "{{ v }}"></input>
-                    </div>
-                {% endfor %}
-            {% endif %}
-    		
-    	</div>
-        
-        <div class="row">
-            <div class="large-3 large-offset-9 columns">
-                <br>
-                <a id="apply_changes" class="button postfix">save changes</a>
-            </div>
-        </div>
-
-    </div>
-    {% else %}
-        {% if error %}
-            <center><p>No results found</p></center>
-        {% endif %}
-    {% endif %}
+%html
+    %head
+        -assets "js_all"
+            %script src="{{ ASSET_URL }}" type="text/javascript"
+        -assets "css_all"
+            %link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"
+    %body
+        %form#apiForm method="post" action="/test"
+            .row
+                .large-9.columns
+                    %input#get_results_by_link name="url" type="text" autocomplete='off'
+                
+                .small-3.columns
+                    %button.button.postfix type="submit" id="button_get" href="/test" -> get results
 
 
+        -if results
+            #apiResult
+                .row#apiResultLabels
+                    -for k,v in results.iteritems()
+                        .large-3.columns
+                            %label << {{ k }}
 
-<script type="text/javascript">
+                        .large-9.columns
+                            %input type="text" name="{{k}}" value="{{ v }}"
 
-    $('input[name=id]').attr('disabled', 'disabled');
-    $('input').each(function() {
-        if ($(this).val() === "None") {
-            $(this).attr('disabled', 'disabled');
-        };
-    });
+                .row
+                    .large-3.large-offset-9.columns
+                        %a#apply_changes.button.postfix onclick="save_database_changes()"
+                            save changes
 
-    $('#apply_changes').click(function() {
+        -else
+            -if error
+                .large-9.large-centered.columns#apiError -> No results found
 
-        $.post('/apply_changes', {
-
-            home_team:        $('input[name=home_team]').val(),
-            away_team:        $('input[name=away_team]').val(),
-            league:           $('input[name=league]').val(),
-            group:            $('input[name=group]').val(),
-            event_results:    $('input[name=event_results]').val(),
-            ou_full_results:  $('input[name=ou_full_results]').val(),
-            ou_frst_results:  $('input[name=ou_frst_results]').val(),
-            ou_scnd_results:  $('input[name=ou_scnd_results]').val(),
-            hda_full_results: $('input[name=hda_full_results]').val(),
-            hda_frst_results: $('input[name=hda_frst_results]').val(),
-            hda_scnd_results: $('input[name=hda_scnd_results]').val(),
-            id : $('input[name=id]').val()
-
-        }).done(function(data) {
-            alert('Database updated');
-        }); 
-    })
-
-</script>
+    <script>
+        $('input[name=id]').attr('disabled', 'disabled');
+        $('input').each(function() {
+            if ($(this).val() === "None") {
+                $(this).attr('disabled', 'disabled');
+            };
+        });
+    </script>
 
 
-</body>
-
-</html>
+{% endhaml %}

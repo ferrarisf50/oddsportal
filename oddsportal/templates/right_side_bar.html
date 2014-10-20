@@ -1,169 +1,121 @@
-<div id="right_side_bar">
-    <form id="searchForm" method="post" action="/search_results">
-        <br>
-        <div class="row">
-            <div class="large-12 columns">
-                <label>Country
-                    <select name="league">
-                        <option selected="selected" value=""></option>
-                        {% for league in leagues %}
-                            <option value="{{ league }}">{{ league }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-            </div>
-            <div class="large-12 columns">
-                <label>League
-                    <select name="group">
-                        <option selected="selected" value=""></option>
-                    </select>
-                </label>
-            </div>
+{% haml %}
 
-            <div class="large-7 text-left columns">
-                <label>Select year</label>
-            </div>
-            <div class="large-5 text-left columns">
-                <label>Coefficient</label>
-            </div>
+#right_side_bar
+    %form#searchForm method="post" action="/search_results"
+        %br
+        #row
+            .large-12.columns
+                %label -> Country
+                    %select name="league"
+                        %option selected="selected" value=""
+                        -for league in leagues
+                            %option value="{{ league }}" -> {{ league }}
 
+            .large-12.columns
+                %label -> League
+                    %select name="group"
+                        %option selected="selected" value=""
 
+            .large-7.text-left.columns
+                %label -> Select year
+            .large-5.text-left.columns
+                %label -> Coefficient
             
 
-            <div class="large-7 text-left columns" id="years">
-                <input id="2014"  name="year" type="checkbox" value="2014"><label>2014</label><br>
-            </div>
+            .large-7.text-left.columns#years
+                %input#2014 name="year" type="checkbox" value="2014"
+                %label -> 2014
+                %br
 
-            <div class="large-5 columns" id="years_coeffs">
-                <input id="coefficient" name="year_coeff" type="text" autocomplete='off'>
-            </div>
+            .large-5.columns#years_coeffs
+                %input#coefficient name="year_coeff" type="text" autocomplete='off'
 
-
-            <div id="mySlideContent">
-            </div>
-            <div id="mySlideToggler">
-                <a href="javascript:void()"> Show all years</a>
-            </div>
-
+            #mySlideContent
+            #mySlideToggler
+                %a href="javascript:void()" -> Show all years
             
-            
-        </div>
 
-        {% if logged %}
-            <div class="row">
-                <br>
-                <div class="large-12 columns">
-                    <div class="row collapse">
-                        <div class="small-10 columns">
-                            <select id="select_template" name="select_template">
-                                <option disabled selected> -- select a template -- </option>
-                                {% for template in templates %}
-                                    <option value={{ template }}>{{ template }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="small-2 columns">
-                            <a id="button_get" onclick="get_template()" class="button postfix">get</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="large-12 columns">
-                    <div class="row collapse">
-                        <div class="small-10 columns">
-                            <input class="template_name" name="template_name" type="text" placeholder="Template name">
-                        </div>
-                        <div class="small-2 columns">
-                            <a id="button_save" onclick="save_template()" class="button postfix">save</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        -if logged
+            .row
+                %br
+                .large-12.columns
+                    .row.collapse
+                        .small-10.columns
+                            %select#select_template name="select_template"
+                                %option disabled selected -> select a template
+                                -for template in templates
+                                    %option value={{ template }} -> {{ template }}
 
-        {% endif %}
+                        .small-2.columns
+                            %a#button_get.button.postfix onclick="get_template()" -> get
+                        
+                .large-12.columns
+                    .row.collapse
+                        .small-10.columns
+                            %input.template_name name="template_name" type="text" placeholder="Template name"
 
-        <div class="row">
-            <br>
-            <div class="large-7 columns">
-                <label>Handicap
-                    <select id="handicap" name="handicap">
-                        <option value="hda">Home/Draw/Away</option>
-                        <option value="ou">Over/Under</option>
-                    </select>
-                </label>
-            </div>
-            <div class="large-5 columns">
-                <label>Playing at
-                    <select name="form_playing_at_types">
-                        <option selected value="h">At Home</option>
-                        <option value="a">Away</option>
-                    </select>
-                </label>
-            </div>
-            <div class="large-7 columns">
-                <label>Backing strategy
-                    <select id="strategy" name="strategy">
-                        <option value="h">Home</option>
-                        <option value="d">Draw</option>
-                        <option value="a">Away</option>
-                    </select>
-                </label>
-            </div>
+                        .small-2.columns
+                            %a#button_save.button.postfix onclick="save_template()" -> save
 
 
-            <div class="large-5 columns">
-                <label>Value
-                    <select id="ou_values" disabled name="ou_values">
-                        {% for ou_value in ou_values %}
-                            <option value={{ou_value}}>{{ ou_value }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-            </div>
+        .row
+            %br
+            .large-7.columns
+                %label -> Handicap
+                    %select#handicap name="handicap"
+                        %option value="hda" -> Home/Draw/Away
+                        %option value="ou" -> Over/Under
 
-            <div class="large-6 columns">
-                <label>Game part
-                    <select id="game_part" name="game_part">
-                        <option value="full">Full</option>
-                        <option value="frst">1st Half</option>
-                        <option value="scnd">2nd Half</option>
-                    </select>
-                </label>
-            </div>
-            
-            <div class="large-6 columns">
-                <label>Odds type
-                    <select id="odds_type" name="odds_type">
-                        <option value="a">Average</option>
-                        <option value="h">Highest</option>
-                    </select>
-                </label>
-            </div>
-            <div class="large-6 columns">
-                <label>Odds toggle
-                    <input class="high_input" name="odd_toggle" type="text" autocomplete='off'>
-                </label>
-            </div>
-            <div class="large-6 columns">
-                <label><i class="fa fa-usd"></i> <b>Stake</b>
-                    <input class="high_input" name="odd_value" type="text" autocomplete='off'>
-                </label>
-            </div>
+            .large-5.columns
+                %label -> Playing at
+                    %select name="form_playing_at_types"
+                        %option selected value="h" -> At Home
+                        %option value="a" -> Away
+
+            .large-7.columns">
+                %label -> Backing strategy
+                    %select#strategy name="strategy"
+                        %option value="h" -> Home
+                        %option value="d" -> Draw
+                        %option value="a" -> Away
+
+            .large-5.columns">
+                %label -> Value
+                    %select#ou_values disabled name="ou_values"
+                        -for ou_value in ou_values
+                            %option value={{ou_value}} -> {{ ou_value }}
+
+            .large-6.columns
+                %label -> Game part
+                    %select#game_part name="game_part
+                        %option value="full" -> Full
+                        %option value="frst" -> 1st Half
+                        %option value="scnd" -> 2nd Half
+
+            .large-6.columns
+                %label -> Odds type
+                    %select#odds_type name="odds_type
+                        %option value="a" -> Average
+                        %option value="h" -> Highest
+
+            .large-6.columns
+                %label -> Odds toggle
+                    %input.high_input name="odd_toggle" type="text" autocomplete='off'
+
+            .large-6.columns
+                %label
+                    %i.fa.fa-usd
+                    %b -> Stake
+                    %input.high_input name="odd_value" type="text" autocomplete='off'
 
             
             
-            <div class="large-12 columns">
-                <br> 
-                <input disabled type="submit" class="button expand" value="Go">
-            </div>
+            .large-12.columns
+                %br
+                %input.button.expand disabled type="submit"value="Go"
 
-            <div class="large-12 columns">
-                <span id="error">{{error}}</span>
-            </div>
-            <br><br><br><br>
-        </div>
-        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    </form>
-</div>
+            .large-12.columns
+                %span#error -> {{error}}
 
 
 <script type="text/javascript">
@@ -217,7 +169,7 @@
 
         };
 
-     });    
+    });    
        
 </script>
 
@@ -283,7 +235,7 @@
 </script>
 
 
-<script type="text/javascript">
+:javascript
     
     $('input[name=year]').attr('disabled', 'disabled');
     $('input[name=year_coeff]').attr('disabled', 'disabled');
@@ -312,17 +264,17 @@
                     $('#mySlideToggler').hide();
                 }
 
-                $('#years').append('<input id="' + data.years.slice(-1) + '" name="years" type="checkbox" value="' + data.years.slice(-1) + '"><label>' + data.years.slice(-1) + '</label><br>');
-                $('#years_coeffs').append('<input id="coefficient" name="' + data.years.slice(-1) + '_coeff" type="text" autocomplete="off">');
+                $('#years').append('%input#' + data.years.slice(-1) + ' name="years" type="checkbox" value="' + data.years.slice(-1) + '"%label' + data.years.slice(-1) + '%br');
+                $('#years_coeffs').append('%input#coefficient name="' + data.years.slice(-1) + '_coeff" type="text" autocomplete="off"');
 
                 for (var i in data.years.slice(1)) {
-                    $('#mySlideContent').prepend('<div class="large-7 text-left columns" id="years"><input id="' + data.years[i] + '" name="years" type="checkbox" value="' + data.years[i] + '"><label>' + data.years[i] + '</label><br></div><div class="large-5 columns" id="years_coeffs"><input id="coefficient" name="' + data.years[i] + '_coeff" type="text" autocomplete="off"></div>');
+                    $('#mySlideContent').prepend('.large-7.text-left.columns#years -> %input#' + data.years[i] + ' name="years" type="checkbox" value="' + data.years[i] + '%label' + data.years[i] + '%br .large-5.columns#years_coeffs -> %input#coefficient name="' + data.years[i] + '_coeff" type="text" autocomplete="off"');
                 };
             }); 
         };
     });
     
-</script>
+
 
 <script type="text/javascript">
 
@@ -333,3 +285,6 @@
     {% endif %}
 
 </script>
+
+
+{% endhaml %}

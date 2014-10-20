@@ -412,9 +412,3 @@ def apply_changes():
 
     return jsonify(message = 'Database updated')
     #http://www.oddsportal.com/soccer/argentina/torneos-de-verano-2008-2009/independiente-racing-club-jTRyAn3Q/
-
-
-
-@app.route('/haml')
-def haml():
-    return render_template('haml.html.haml', var = 'var11', error='123')

@@ -1,4 +1,17 @@
-
+#apiForm {
+  margin-top:4rem;
+}
+#apiError {
+  text-align: center;
+  margin-top: 1rem;
+  color: red;
+}
+#apiResult {
+  text-align: center;
+}
+#apiResultLabels {
+  text-align: left;
+}
 
 #home_results_table {
 }
@@ -16,10 +29,6 @@ tr .table_total td {
   margin-left: 1rem;
   opacity: 0.5;
 }
-#error {
-  color: red;
-}
-
 #left_side_bar #download img:hover {
   opacity: 1;
 }
@@ -131,6 +140,7 @@ tr .table_total td {
 }
   #settings img {
     height: 4rem;
+    width: 40px;
   }
 
 
@@ -195,6 +205,9 @@ form #date {
       padding-left: 5px;
     }
 
+#registration_form {
+  margin-top: 6rem;
+}
 #registration_form legend {
   font-size: 1.2rem;
   height: 2rem;

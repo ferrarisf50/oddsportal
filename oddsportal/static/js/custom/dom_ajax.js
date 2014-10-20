@@ -63,3 +63,73 @@ function save_template() {
 
     });
 }
+
+
+function save_database_changes() {
+    
+    $.post('/apply_changes', {
+
+        home_team:        $('input[name=home_team]').val(),
+        away_team:        $('input[name=away_team]').val(),
+        league:           $('input[name=league]').val(),
+        group:            $('input[name=group]').val(),
+        event_results:    $('input[name=event_results]').val(),
+        ou_full_results:  $('input[name=ou_full_results]').val(),
+        ou_frst_results:  $('input[name=ou_frst_results]').val(),
+        ou_scnd_results:  $('input[name=ou_scnd_results]').val(),
+        hda_full_results: $('input[name=hda_full_results]').val(),
+        hda_frst_results: $('input[name=hda_frst_results]').val(),
+        hda_scnd_results: $('input[name=hda_scnd_results]').val(),
+        id : $('input[name=id]').val()
+
+    }).done(function(data) {
+        alert('Database updated');
+    }); 
+}
+
+
+
+function signIn() {
+    $.post('/login', {
+        username: $('input[name="username"]').val(),
+        password: $('input[name="password"]').val()
+
+    }).done(function(data) {
+        if (data.result) {
+            $("#error").text(data.result)
+        }
+        else {
+            window.location.replace("/index")
+        };
+    });
+};
+
+
+
+function registration_form_check() {
+    $.post('/reg_checker', {
+
+        username: $('input[name="sign_up_username"]').val(),
+        email:    $('input[name="sign_up_email"]').val()
+
+    }).done(function(data) {
+
+        if (data.username) {
+            $("#username_icon_true").css('display', 'block');
+            $("#username_icon_false").css('display','none');
+        }
+        else {
+            $("#username_icon_true").css('display', 'none');
+            $("#username_icon_false").css('display','block');
+        };
+
+        if (data.email) {
+            $("#email_icon_true").css('display', 'block');
+            $("#email_icon_false").css('display','none');
+        }
+        else {
+            $("#email_icon_true").css('display', 'none');
+            $("#email_icon_false").css('display','block');
+        };
+    });
+}

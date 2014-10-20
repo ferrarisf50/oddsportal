@@ -1,39 +1,27 @@
-<html>
-    <head>
+{% haml %}
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        
-        {% assets "js_all" %}
-            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-        {% endassets %}
-        {% assets "css_all" %}
-            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-        {% endassets %}
-        
+%html
+    %head
+        %link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"
+        %title -> Sports betting strategies
 
+        -assets "js_all"
+            %script src="{{ ASSET_URL }}" type="text/javascript"
+        -assets "css_all"
+            %link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"
+    %body
 
-        <title>Sports betting strategies</title>
-        
-    </head>
-
-    <body>
-        <div id="container">
-            {% include "left_side_slide.html" %}
-            {% include "header.html" %}
-            {% include "left_side_bar.html"  %}
-            {% include "right_side_bar.html" %}
-            {% block content %}{% endblock %}
-        </div>
-        <br><br><br><br><br><br><br><br>
-        <div id="footer">
-            <span class="copyright">
-                <p>© 2014 AllWebDirectory</p>
-            </span>
-            <span class="source">
-                <a href="/">contact us</a>
-            </span>
-        </div>
-
+        #container
+            -include "left_side_slide.html"
+            -include "header.html"
+            -include "left_side_bar.html" 
+            -include "right_side_bar.html"
+            -block content
+        #footer
+            #span.copyright
+                %p -> © 2014 AllWebDirectory
+            %span.source
+                %a href="/" -> contact us
 
     <script>
         $(window).load(function(){
@@ -43,5 +31,4 @@
         });
     </script>
 
-    </body>
-</html>
+{% endhaml %}
