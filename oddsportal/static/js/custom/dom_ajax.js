@@ -267,3 +267,27 @@ function handicap_changed_event() {
 
     };
 }
+
+
+
+function click_result_options() {
+    
+    if ($('.result_options').text() === 'Switch to away teams') {
+        $('#results_label').html('{{results_labels['a']}}')
+        $('.result_options').html('Switch to <span class="higlighted">home</span> teams');
+    }
+    else {
+        $('#results_label').html('{{results_labels['h']}}')
+        $('.result_options').html('Switch to <span class="higlighted">away</span> teams');
+    }
+
+    if ($('#home_results_table').is(":visible")) {
+        $('#home_results_table').hide();
+        $('#away_results_table').show();
+    }
+    else {
+        $('#away_results_table').hide();
+        $('#home_results_table').show();
+    };
+}
+

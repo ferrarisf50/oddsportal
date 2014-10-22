@@ -1,206 +1,168 @@
-{% extends 'base.html' %}
+{% haml %}
 
-{% block content %}
+-extends 'base.html'
 
-    <meta name="description" content="{{timers}}">
-    <div id="content">
-    	<br><br>
-	    	<div id="result_header">
-		        <div id="result_label">
-	       			<span><img src="{{ url_for('static', filename='img/circle.svg') }}"></span>
-	       			<span class="higlightedheader">{{league}}: {{group}} </span><span id="results_label" class="non_higlighted">{{results_labels[playing_at_type]}}</span><br><br>
-		       	</div>
+-block content
 
-	       		<div id="result_options">
-			       	<a href="javascript:void()"><span class="result_options"></span></a>
-			    </div>
-		    </div>
-	        <br><br>
-	        <table id="home_results_table">
-	            <thead>
-	                <tr class='table_header'>
-	                    <th width="250px">Team</th>
-	                    <th colspan="3">Total</th>
-	                    {% for table_year in table_years %}
-	                    	<th colspan="2">{{table_year}}</th>
-	                    {% endfor %}
-	                </tr>
-	                <tr class='table_labels'>
-	                	<th></th>
-	                	<th>p/l</th>
-		                <th>#</th>
-		                <th>w</th>
-	                	{% for table_year in table_years %}
-		                	<th>p/l</th>
-		                    <th>pld/w</th>
-		                {% endfor %}
-		            </tr>
-	            </thead>
-	            <tbody>
-	                {% for team in home_teams %}
-	                	<tr>
-	                		<td width="250px">{{team}}</td>
-		                    	
-                    		<td class="totals">{{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pl'] }}</td>
-		                    <td>{{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pld'] }}</td>
-		                    <td>{{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_won'] }}</td>
+    %meta name="description" content="{{timers}}"
+    #content
+        %br
+        %br
+        #result_header
+            #result_label
+                %span
+                    %img src="{{ url_for('static', filename='img/circle.svg') }}"
+                %span.higlightedheader
+                    {{league}}: {{group}} 
+                %span#results_label.non_higlighted
+                    {{results_labels[playing_at_type]}}
+                    %br
+                    %br
 
-                    		{% for table_year in table_years %}
-		                        <td> {{ output_results['home'][table_year]['teams'][team]['prft_lss_value'] }}</td>
-		                        <td> {{ output_results['home'][table_year]['teams'][team]['played'] }}/{{ output_results['home'][table_year]['teams'][team]['won'] }}</td>
-		                    {% endfor %}
-			                    	
-			            </tr>
-	                {% endfor %}
-	                <tr class='table_total' height="5rem">
-	                	<td>Total</th>
-	                	<td class="totals"> {{totals['home']['all_teams_all_years_pl']}} </td>
-	                    <td> {{totals['home']['all_teams_all_years_pld']}} </td>
-	                    <td> {{totals['home']['all_teams_all_years_won']}} </td>
-	                	{% for table_year in table_years %}
+            #result_options
+                %a href="javascript:void()"
+                    %span.result_options
 
-		                	<td>{{output_results['home'][table_year]['prft_lss_year']}}</td>
+        %br
+        %br
+        %table#home_results_table
+            %thead
+                %tr.table_header
+                    %th width="250px" -> Team
+                    %th colspan="3" -> Total
+                    -for table_year in table_years
+                        %th colspan="2" -> {{table_year}}
 
-		                    <td>{{output_results['home'][table_year]['played_year']}}/{{output_results['home'][table_year]['won_year']}}</td>
+                
+                %tr.table_labels
+                    %th
+                    %th -> p/l
+                    %th -> #
+                    %th -> w
+                    -for table_year in table_years
+                        %th -> p/l
+                        %th -> pld/w
 
-	                    {% endfor %}
-	                    
-		            </tr>
-	            </tbody>
-	        </table>
+            %tbody
+                -for team in home_teams
+                    %tr
+                        %td width="250px" -> {{team}}
+                            
+                        %td.totals -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pl'] }}
+                        %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
+                        %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_won'] }}
+
+                        -for table_year in table_years
+                            %td -> {{ output_results['home'][table_year]['teams'][team]['prft_lss_value'] }}
+                            %td -> {{ output_results['home'][table_year]['teams'][team]['played'] }}/{{ output_results['home'][table_year]['teams'][team]['won'] }}
 
 
-	        <table id="away_results_table">
-	            <thead>
-	                <tr class='table_header'>
-	                    <th width="250px">Team</th>
-	                    <th colspan="3">Total</th>
-	                    {% for table_year in table_years %}
-	                    	<th colspan="2">{{table_year}}</th>
-	                    {% endfor %}
-	                </tr>
-	                <tr class='table_labels'>
-	                	<th></th>
-	                	<th>p/l</th>
-		                <th>#</th>
-		                <th>w</th>
-	                	{% for table_year in table_years %}
-		                	<th>p/l</th>
-		                    <th>pld/w</th>
-		                {% endfor %}
-		            </tr>
-	            </thead>
-	            <tbody>
-	                {% for team in away_teams %}
-	                	<tr>
-	                		<td>{{team}}</td>
+                %tr.table_total height="5rem"
+                    %th -> Total
+                    %td.totals -> {{totals['home']['all_teams_all_years_pl']}} 
+                    %td -> {{totals['home']['all_teams_all_years_pld']}} 
+                    %td -> {{totals['home']['all_teams_all_years_won']}} 
+                    -for table_year in table_years
 
-	                		<td  class="totals">{{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pl'] }}</td>
-		                    <td>{{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pld'] }}</td>
-		                    <td>{{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_won'] }}</td>
-		                    	
-                    		{% for table_year in table_years %}
-		                        <td> {{ output_results['away'][table_year]['teams'][team]['prft_lss_value'] }}</td>
-		                        <td> {{ output_results['away'][table_year]['teams'][team]['played'] }}/{{ output_results['away'][table_year]['teams'][team]['won'] }}</td>
-		                    {% endfor %}
-			                    	
-			            </tr>
-	                {% endfor %}
-	                <tr class='table_total' height="5rem">
-	                	<td>Total</th>
-	                	<td> {{totals['away']['all_teams_all_years_pl']}} </td>
-	                    <td> {{totals['away']['all_teams_all_years_pld']}} </td>
-	                    <td> {{totals['away']['all_teams_all_years_won']}} </td>
-	                	{% for table_year in table_years %}
+                        %td -> {{output_results['home'][table_year]['prft_lss_year']}}
 
-		                	<td>{{output_results['away'][table_year]['prft_lss_year']}}</td>
-
-		                    <td>{{output_results['away'][table_year]['played_year']}}/{{output_results['away'][table_year]['won_year']}}</td>
-
-	                    {% endfor %}
-	                    
-		            </tr>
-	            </tbody>
-	        </table>
-
-	    
-	</div>
-
-<script type="text/javascript">
-	$(function(){
-		var playing_at = "{{playing_at_type}}";
-
-		if (playing_at === 'h') {
-			$('#away_results_table').hide();
-			$('#home_results_table').show();
-			$('.result_options').html('Switch to <span class="higlighted">away</span> teams')
-		}
-		else if (playing_at === 'a') {
-			$('#home_results_table').hide();
-			$('#away_results_table').show();
-			$('.result_options').html('Switch to <span class="higlighted">home</span> teams')
-		}
-		
-	});
-
-	$('.result_options').click(function() {
-
-		if ($('.result_options').text() === 'Switch to away teams') {
-			$('#results_label').html('{{results_labels['a']}}')
-			$('.result_options').html('Switch to <span class="higlighted">home</span> teams');
-		}
-		else {
-			$('#results_label').html('{{results_labels['h']}}')
-			$('.result_options').html('Switch to <span class="higlighted">away</span> teams');
-		}
-
-		if ($('#home_results_table').is(":visible")) {
-			$('#home_results_table').hide();
-			$('#away_results_table').show();
-		}
-		else {
-			$('#away_results_table').hide();
-			$('#home_results_table').show();
-		};
-	});
-
-</script>
-
-<script type="text/javascript">
-	$('td').each(function() {
-    var cellvalue = $(this).html();
-    if ( cellvalue < 0) {
-    	var mystring = cellvalue;
-    	mystring = mystring.replace('-','').replace(' ','');
-    	$(this).html('('+mystring+')');
-    	$(this).wrapInner('<span class="negative"></span>');
-    }
-});  
-</script>
+                        %td -> {{output_results['home'][table_year]['played_year']}}/{{output_results['home'][table_year]['won_year']}}
 
 
-<script>
+
+        %table#away_results_table
+            %thead
+                %tr.table_header
+                    %th width="250px" -> Team
+                    %th colspan="3" -> Total
+                    -for table_year in table_years
+                        %th colspan="2" -> {{table_year}}
+
+                %tr.table_labels
+                    %th
+                    %th -> p/l
+                    %th -> #
+                    %th -> w
+                    -for table_year in table_years
+                        %th -> p/l
+                        %th -> pld/w
+
+            %tbody
+                -for team in away_teams
+                    %tr
+                        %td width="250px" -> {{team}}
+
+                        %td.totals" -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pl'] }}
+                        %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
+                        %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_won'] }}
+                            
+                        -for table_year in table_years
+                            %td -> {{ output_results['away'][table_year]['teams'][team]['prft_lss_value'] }}
+                            %td -> {{ output_results['away'][table_year]['teams'][team]['played'] }}/{{ output_results['away'][table_year]['teams'][team]['won'] }}
+
+                %tr.table_total height="5rem"
+                    %th -> Total
+                    %td.totals -> {{totals['away']['all_teams_all_years_pl']}} 
+                    %td -> {{totals['away']['all_teams_all_years_pld']}} 
+                    %td -> {{totals['away']['all_teams_all_years_won']}} 
+                    -for table_year in table_years
+
+                        %td -> {{output_results['away'][table_year]['prft_lss_year']}}
+
+                        %td -> {{output_results['away'][table_year]['played_year']}}/{{output_results['away'][table_year]['won_year']}}
+
+
+
+
+%script
+
+    alert(123);
+
     $(window).load(function(){
         $("#content").mCustomScrollbar({
-        	axis: 'yx'
+            axis: 'yx'
         });
     });
-</script>
-
-<script type="text/javascript">
-	$(document).ready(function() {
-		var right_bar_width = $("#left_side_bar").width();
-		var left_bar_width  = $("#right_side_bar").width();
-		var window_width    = $(window).width();
-		var content_width   = window_width - right_bar_width - left_bar_width - 120;
-
-		$("#content").css("width", content_width+'px');
-	})
-	
-</script>
 
 
-{% endblock %}
+    $(document).ready(function() {
+        var right_bar_width = $("#left_side_bar").width();
+        var left_bar_width  = $("#right_side_bar").width();
+        var window_width    = $(window).width();
+        var content_width   = window_width - right_bar_width - left_bar_width - 120;
+
+        $("#content").css("width", content_width+'px');
+    })
 
 
+    $('td').each(function() {
+        var cellvalue = $(this).html();
+        if ( cellvalue < 0) {
+            var mystring = cellvalue;
+            mystring = mystring.replace('-','').replace(' ','');
+            $(this).html('('+mystring+')');
+            $(this).wrapInner('<span class="negative"></span>');
+        }
+    });
 
+    
+    $(function(){
+        var playing_at = "{{playing_at_type}}";
+
+        if (playing_at === 'h') {
+            $('#away_results_table').hide();
+            $('#home_results_table').show();
+            $('.result_options').html('Switch to <span class="higlighted">away</span> teams')
+        }
+        else if (playing_at === 'a') {
+            $('#home_results_table').hide();
+            $('#away_results_table').show();
+            $('.result_options').html('Switch to <span class="higlighted">home</span> teams')
+        }
+        
+    });
+
+    $('.result_options').click(click_result_options);
+
+
+{% endhaml %}
