@@ -8,9 +8,13 @@ function get_template() {
         $('input[name='  + x + ']').val(template_values[x]);
     }
 
-    if ($('input[name="odd_value"]').val() === ""){
+    if ($('input[name="odd_value"]').val() == ""){
         $("#error").text("Year or Stake field is empty");
         $('input[type=submit]').attr('disabled', 'disabled');
+    }
+    else {
+        $('input[type=submit]').removeAttr('disabled');
+        $("#error").html("")
     }
 }
 
@@ -132,4 +136,134 @@ function registration_form_check() {
             $("#email_icon_false").css('display','block');
         };
     });
+}
+
+
+function get_years() {
+    var group = $('select[name=group]').find(":selected").text();
+    var league = $('select[name=league]').find(":selected").text();
+    $('#mySlideContent').html('');
+
+    if (group === '') {
+        $('input[name=year]').attr('disabled', 'disabled');
+        $('input[name=year_coeff]').attr('disabled', 'disabled');
+    }
+    else {
+        $.post('/years_update', {
+            grp: group,
+            lea: league
+        }).done(function(data) {
+            $('#years').html('');
+            $('#years_coeffs').html('');
+
+            if (data.years.length > 1) {
+                $('#mySlideToggler').show();
+            }
+            else {
+                $('#mySlideToggler').hide();
+            }
+
+            var first_year = data.years.slice(-1)
+            $('#years').append('<input id="' + first_year + '" name="years" type="checkbox" value="' + first_year +  '"><label>' + first_year + '</label><br>');
+            $('#years_coeffs').append('<input id="coefficient" name="' + first_year + '_coeff" type="text" autocomplete="off">');
+
+            for (var i in data.years.slice(1)) {
+            
+                var year_div    = '<div class="large-7 text-left columns" id="years">'
+
+                var year_input  = '<input id="' + data.years[i] + '" \
+                                   name="years" \
+                                   type="checkbox" \
+                                   value="' + data.years[i] + '">'
+
+                var coeff_div   = '<div class="large-5 columns id="years_coeffs">'
+
+                var coeff_input = '<input id="coefficient" name="' + data.years[i] + '_coeff" type="text" autocomplete="off">'
+
+                $('#mySlideContent').prepend(year_div + year_input + '<label>' + data.years[i] + '</label><br></div>' + coeff_div + coeff_input + '</div>');
+            };
+
+            $('#button_save').removeAttr('disabled');
+            $('#button_get').removeAttr('disabled');
+        }); 
+    };
+}
+
+
+function get_groups() {
+    var league = $('select[name=league]').find(":selected").text();
+
+    if (league === '') {
+        $('select[name=group]').attr('disabled', 'disabled');
+    }
+
+    else {
+        $.post('/groups_update', {
+            lea: league
+        }).done(function(data) {
+            $('select[name=group]').empty();
+
+            $('select[name=group]').append(new Option(""));
+            for (var i in data.groups) {
+                $('select[name=group]').append(new Option(data.groups[i], data.groups[i]));
+            }
+            $('select[name=group]').removeAttr("disabled");
+        }); 
+    };
+}
+
+
+
+
+function search_form_check() {
+    var years_selected = [];
+    $('#years input:checked').each(function() {
+        years_selected.push($(this).attr('value'));
+    });
+    
+    odd_value = $('input[name="odd_value"]').val()
+
+    if (odd_value && years_selected.length > 0) {
+        $("#error").text('');
+        $('input[type=submit]').removeAttr("disabled");
+    }
+    else {
+        $("#error").text("Year or Stake field is empty");
+        $('input[type=submit]').attr('disabled', 'disabled');
+    };
+}
+
+
+
+function handicap_changed_event() {
+
+    var handicap = $("#handicap").find(":selected").text();
+    if (handicap == 'Home/Draw/Away') {
+        $("#ou_values").attr("disabled", "disabled");
+        $('#strategy').html('');
+
+        function hda_appender(selector) {
+
+            $(selector)
+                .append('<option value="h">Home</option>')
+                .append('<option value="d">Draw</option>')
+                .append('<option value="a">Away</option>')
+        }
+        hda_appender('#strategy');
+
+    };
+
+    if (handicap == 'Over/Under') {
+        $("#ou_values").removeAttr("disabled");
+        $('#strategy').html('');
+
+        function ou_appender(selector) {
+
+            $(selector)
+                .append('<option value="o">Over</option>')
+                .append('<option value="u">Under</option>')
+        }
+        ou_appender('#strategy');
+
+    };
 }

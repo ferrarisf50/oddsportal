@@ -146,7 +146,7 @@ tr .table_total td {
 
 #logo {
   position: absolute;
-  margin-left: 7%;
+  margin-left: 7rem;
   font-size: 1.5rem;
   outline: none;
   margin: 0, auto;
@@ -271,14 +271,14 @@ form #date {
 #content {
   position: absolute;
   overflow: hidden;
-  margin-left: 10rem;  
-  margin-top: 5rem;
+  margin-left: 8rem;  
+  margin-top: 4rem;
   height: 80%;
 }
 
 
 .intro {
-  text-align: left;
+  text-align: justify;
 }
   .intro p {
     font-size: 1rem;
@@ -287,12 +287,13 @@ form #date {
     margin-top: 4rem;
   }
   .intro  table {
+    margin-left: 4rem;
     margin-top: 4rem;
   }
 
 
 .intro2 {
-  text-align: left;
+  text-align: justify;
 }
   .intro2 p {
     font-size: 1.3rem;

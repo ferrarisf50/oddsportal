@@ -13,22 +13,21 @@
 
             .large-12.columns
                 %label -> League
-                    %select name="group"
+                    %select name="group" disabled
                         %option selected="selected" value=""
 
             .large-7.text-left.columns
                 %label -> Select year
             .large-5.text-left.columns
                 %label -> Coefficient
-            
 
             .large-7.text-left.columns#years
-                %input#2014 name="year" type="checkbox" value="2014"
-                %label -> 2014
+                %input#2014 name="year" type="checkbox" value="2014" disabled
+                %label
+                    2014
                 %br
-
             .large-5.columns#years_coeffs
-                %input#coefficient name="year_coeff" type="text" autocomplete='off'
+                %input#coefficient name="year_coeff" type="text" autocomplete='off' disabled
 
             #mySlideContent
             #mySlideToggler
@@ -47,7 +46,7 @@
                                     %option value={{ template }} -> {{ template }}
 
                         .small-2.columns
-                            %a#button_get.button.postfix onclick="get_template()" -> get
+                            %a#button_get.button.postfix disabled onclick="get_template()" -> get
                         
                 .large-12.columns
                     .row.collapse
@@ -55,8 +54,7 @@
                             %input.template_name name="template_name" type="text" placeholder="Template name"
 
                         .small-2.columns
-                            %a#button_save.button.postfix onclick="save_template()" -> save
-
+                            %a#button_save.button.postfix disabled onclick="save_template()" -> save
 
         .row
             %br
@@ -72,14 +70,14 @@
                         %option selected value="h" -> At Home
                         %option value="a" -> Away
 
-            .large-7.columns">
+            .large-7.columns
                 %label -> Backing strategy
                     %select#strategy name="strategy"
                         %option value="h" -> Home
                         %option value="d" -> Draw
                         %option value="a" -> Away
 
-            .large-5.columns">
+            .large-5.columns
                 %label -> Value
                     %select#ou_values disabled name="ou_values"
                         -for ou_value in ou_values
@@ -87,14 +85,14 @@
 
             .large-6.columns
                 %label -> Game part
-                    %select#game_part name="game_part
+                    %select#game_part name="game_part"
                         %option value="full" -> Full
                         %option value="frst" -> 1st Half
                         %option value="scnd" -> 2nd Half
 
             .large-6.columns
                 %label -> Odds type
-                    %select#odds_type name="odds_type
+                    %select#odds_type name="odds_type"
                         %option value="a" -> Average
                         %option value="h" -> Highest
 
@@ -109,16 +107,21 @@
                     %input.high_input name="odd_value" type="text" autocomplete='off'
 
             
-            
             .large-12.columns
                 %br
-                %input.button.expand disabled type="submit"value="Go"
+                %input.button.expand disabled type="submit" value="Go"
 
             .large-12.columns
                 %span#error -> {{error}}
 
 
-<script type="text/javascript">
+
+
+
+
+%script
+
+    ;Used to hide a list of available years
     $(function(){
 
         $('#mySlideContent').css('display','none');
@@ -132,159 +135,26 @@
 
         });
     });
-</script>
 
-<script type="text/javascript">
-    $("#handicap").change(function(){
-
-        var handicap = $("#handicap").find(":selected").text();
-
-
-        if (handicap == 'Home/Draw/Away') {
-            $("#ou_values").attr("disabled", "disabled");
-            $('#strategy').html('');
-
-            function hda_appender(selector) {
-
-                $(selector)
-                    .append('<option value="h">Home</option>')
-                    .append('<option value="d">Draw</option>')
-                    .append('<option value="a">Away</option>')
-            }
-            hda_appender('#strategy');
-
-        };
-
-        if (handicap == 'Over/Under') {
-            $("#ou_values").removeAttr("disabled");
-            $('#strategy').html('');
-
-            function ou_appender(selector) {
-
-                $(selector)
-                    .append('<option value="o">Over</option>')
-                    .append('<option value="u">Under</option>')
-            }
-            ou_appender('#strategy');
-
-        };
-
-    });    
-       
-</script>
-
-<script type="text/javascript">
-
+    ;Better change it somehow
     var page_height = $( 'html' ).height();
     $('#left_side_bar').css( 'height',page_height+80);
     $('#right_side_bar').css('height',page_height+80);
     
-</script>
+    $("select[name=group]").change(get_years);
+    $("select[name=league]").change(get_groups);
+    $("#handicap").change(handicap_changed_event);
+
+    $('#searchForm').on('keyup keypress change', search_form_check);
 
 
-<script type=text/javascript>
-
-    $('#searchForm').change(function () {
-
-        var years_selected = [];
-        $('#years input:checked').each(function() {
-            years_selected.push($(this).attr('value'));
-        });
-        
-        odd_value = $('input[name="odd_value"]').val()
-
-        if (odd_value && years_selected.length > 0) {
-            $("#error").text('');
-            $('input[type=submit]').removeAttr("disabled");
-        }
-        else {
-            $("#error").text("Year or Stake field is empty");
-            $('input[type=submit]').attr('disabled', 'disabled');
-        };
-    });
-    
-</script>
-
-<script type="text/javascript">
-    
-    $('select[name=group]').attr('disabled', 'disabled');
-
-    $("select[name=league]").change(function(){
-        var league = $('select[name=league]').find(":selected").text();
-
-        if (league === '') {
-            $('select[name=group]').attr('disabled', 'disabled');
-        }
-
-        else {
-            $.post('/groups_update', {
-                lea: league
-            }).done(function(data) {
-                $('select[name=group]').empty();
-
-                $('select[name=group]').append(new Option(""));
-                for (var i in data.groups) {
-                    $('select[name=group]').append(new Option(data.groups[i], data.groups[i]));
-                    $('select[name=group]').removeAttr("disabled");
-                }
-            }); 
-        };
-        
-    });
-
-</script>
-
-
-:javascript
-    
-    $('input[name=year]').attr('disabled', 'disabled');
-    $('input[name=year_coeff]').attr('disabled', 'disabled');
-
-    $("select[name=group]").change(function(){
-        var group = $('select[name=group]').find(":selected").text();
-        var league = $('select[name=league]').find(":selected").text();
-        $('#mySlideContent').html('');
-
-        if (group === '') {
-            $('input[name=year]').attr('disabled', 'disabled');
-            $('input[name=year_coeff]').attr('disabled', 'disabled');
-        }
-        else {
-            $.post('/years_update', {
-                grp: group,
-                lea: league
-            }).done(function(data) {
-                $('#years').html('');
-                $('#years_coeffs').html('');
-
-                if (data.years.length > 1) {
-                    $('#mySlideToggler').show();
-                }
-                else {
-                    $('#mySlideToggler').hide();
-                }
-
-                $('#years').append('%input#' + data.years.slice(-1) + ' name="years" type="checkbox" value="' + data.years.slice(-1) + '"%label' + data.years.slice(-1) + '%br');
-                $('#years_coeffs').append('%input#coefficient name="' + data.years.slice(-1) + '_coeff" type="text" autocomplete="off"');
-
-                for (var i in data.years.slice(1)) {
-                    $('#mySlideContent').prepend('.large-7.text-left.columns#years -> %input#' + data.years[i] + ' name="years" type="checkbox" value="' + data.years[i] + '%label' + data.years[i] + '%br .large-5.columns#years_coeffs -> %input#coefficient name="' + data.years[i] + '_coeff" type="text" autocomplete="off"');
-                };
-            }); 
-        };
-    });
-    
-
-
-<script type="text/javascript">
-
+    ;Variable templates comes from Flask view and to be able to use it
+    ;we need to convert it to JSON object
     {% if templates %}
         var templates = {{ templates|tojson|safe }}
     {% else %}
         var templates = {}
     {% endif %}
-
-</script>
 
 
 {% endhaml %}
