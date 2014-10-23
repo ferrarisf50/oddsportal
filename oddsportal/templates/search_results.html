@@ -52,10 +52,14 @@
                         %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
                         %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_won'] }}
 
-                        -for table_year in table_years
+                        ;Here is a column with the last year
+                        %td -> {{ output_results['home'][table_years[0]]['teams'][team]['prft_lss_value'] }}
+                        %td.last_season -> {{ output_results['home'][table_years[0]]['teams'][team]['played'] }}/{{ output_results['home'][table_years[0]]['teams'][team]['won'] }}
+
+                        ;And here is a column with other years
+                        -for table_year in table_years[1:]
                             %td -> {{ output_results['home'][table_year]['teams'][team]['prft_lss_value'] }}
                             %td -> {{ output_results['home'][table_year]['teams'][team]['played'] }}/{{ output_results['home'][table_year]['teams'][team]['won'] }}
-
 
                 %tr.table_total height="5rem"
                     %th -> Total
@@ -96,7 +100,10 @@
                         %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
                         %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_won'] }}
                             
-                        -for table_year in table_years
+                        %td -> {{ output_results['away'][table_years[0]]['teams'][team]['prft_lss_value'] }}
+                        %td.last_season -> {{ output_results['away'][table_years[0]]['teams'][team]['played'] }}/{{ output_results['away'][table_years[0]]['teams'][team]['won'] }}
+
+                        -for table_year in table_years[1:]
                             %td -> {{ output_results['away'][table_year]['teams'][team]['prft_lss_value'] }}
                             %td -> {{ output_results['away'][table_year]['teams'][team]['played'] }}/{{ output_results['away'][table_year]['teams'][team]['won'] }}
 
@@ -140,7 +147,14 @@
                 mystring = mystring.replace('-','').replace(' ','');
                 $(this).html('('+mystring+')');
                 $(this).css('color', 'red');
-            }
+            };
+        });
+
+        $('.last_season').each(function (){
+            var cellvalue = $(this).html();
+            if ( cellvalue === '0/0') {
+                $(this).parent().css('opacity', '0.3')
+            };
         });
 
 

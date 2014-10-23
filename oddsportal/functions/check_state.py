@@ -91,8 +91,9 @@ def get_results(results, column_to_check):
 		print 'Successfully updated row for {}!'.format(column_to_check)
 
 
-
+'''
 for column_to_check in columns_to_check:
 
 	results = session.query(models.Result).filter(getattr(models.Result, column_to_check) == '{}').all()
 	get_results(results, column_to_check)
+'''
