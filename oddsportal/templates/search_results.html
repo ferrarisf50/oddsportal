@@ -13,14 +13,14 @@
                 %span
                     %img src="{{ url_for('static', filename='img/circle.svg') }}"
                 %span.higlightedheader
-                    {{league}}: {{group}} 
+                    {{league}}: {{group}} &nbsp;
                 %span#results_label.non_higlighted
                     {{results_labels[playing_at_type]}}
-                    %br
-                    %br
+                %br
+                %br
 
             #result_options
-                %a href="javascript:void()"
+                %a onclick="click_result_options(label_away, label_home)"
                     %span.result_options
 
         %br
@@ -114,55 +114,55 @@
 
 
 
-%script
+    %script
 
-    alert(123);
-
-    $(window).load(function(){
-        $("#content").mCustomScrollbar({
-            axis: 'yx'
+        $(window).load(function(){
+            $("#content").mCustomScrollbar({
+                axis: 'yx'
+            });
         });
-    });
 
 
-    $(document).ready(function() {
-        var right_bar_width = $("#left_side_bar").width();
-        var left_bar_width  = $("#right_side_bar").width();
-        var window_width    = $(window).width();
-        var content_width   = window_width - right_bar_width - left_bar_width - 120;
+        $(document).ready(function() {
+            var right_bar_width = $("#left_side_bar").width();
+            var left_bar_width  = $("#right_side_bar").width();
+            var window_width    = $(window).width();
+            var content_width   = window_width - right_bar_width - left_bar_width - 120;
 
-        $("#content").css("width", content_width+'px');
-    })
+            $("#content").css("width", content_width+'px');
+        });
 
 
-    $('td').each(function() {
-        var cellvalue = $(this).html();
-        if ( cellvalue < 0) {
-            var mystring = cellvalue;
-            mystring = mystring.replace('-','').replace(' ','');
-            $(this).html('('+mystring+')');
-            $(this).wrapInner('<span class="negative"></span>');
-        }
-    });
+        $('td').each(function() {
+            var cellvalue = $(this).html();
+            if ( cellvalue < 0) {
+                var mystring = cellvalue;
+                mystring = mystring.replace('-','').replace(' ','');
+                $(this).html('('+mystring+')');
+                $(this).css('color', 'red');
+            }
+        });
 
-    
-    $(function(){
-        var playing_at = "{{playing_at_type}}";
 
-        if (playing_at === 'h') {
-            $('#away_results_table').hide();
-            $('#home_results_table').show();
-            $('.result_options').html('Switch to <span class="higlighted">away</span> teams')
-        }
-        else if (playing_at === 'a') {
-            $('#home_results_table').hide();
-            $('#away_results_table').show();
-            $('.result_options').html('Switch to <span class="higlighted">home</span> teams')
-        }
-        
-    });
+        $(function () {
+            var playing_at = "{{playing_at_type}}";
 
-    $('.result_options').click(click_result_options);
+            if (playing_at === 'h') {
+                $('#away_results_table').hide();
+                $('#home_results_table').show();
+                $('.result_options').html('Switch to <span class="higlighted">away</span> teams')
+            }
+            else if (playing_at === 'a') {
+                $('#home_results_table').hide();
+                $('#away_results_table').show();
+                $('.result_options').html('Switch to <span class="higlighted">home</span> teams')
+            };
+            
+        });
+
+        ;These labels come from Flask view
+        var label_away = '{{results_labels['a']}}';
+        var label_home = '{{results_labels['h']}}';
 
 
 {% endhaml %}

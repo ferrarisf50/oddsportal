@@ -3,7 +3,7 @@ from functions.analysis import RequestObject, analyzation
 from flask import session, request, url_for, flash
 from werkzeug.datastructures import Headers
 from flask.ext.sqlalchemy import SQLAlchemy
-from functions.generate_xls import generate_xls
+from functions import generate_xls
 
 from oddsportal import *
 import os
@@ -64,7 +64,7 @@ def download():
     response = Response()
     response.status_code = 200
 
-    workbook = generate_xls(raw_results, table_years, home_teams, away_teams, totals)
+    workbook = generate_xls.generate_xls(raw_results, table_years, home_teams, away_teams, totals)
     output   = StringIO.StringIO()
 
     workbook.save(output)
@@ -412,3 +412,58 @@ def apply_changes():
 
     return jsonify(message = 'Database updated')
     #http://www.oddsportal.com/soccer/argentina/torneos-de-verano-2008-2009/independiente-racing-club-jTRyAn3Q/
+
+
+
+@app.route('/raw_download', methods=['GET', 'POST'])
+def raw_download(logged = False):
+
+    if request.method == 'POST':
+
+        league = request.values.get('league')
+        group  = request.values.get('group')
+        year   = request.values.get('year')
+
+        response = Response()
+        response.status_code = 200
+
+        workbook = generate_xls.generate_xls_raw(league, group, year)
+        output   = StringIO.StringIO()
+
+        workbook.save(output)
+        response.data = output.getvalue()
+
+        filename = 'results_raw.xls'
+        mimetype_tuple = mimetypes.guess_type(filename)
+        response_headers = Headers({
+            'Pragma': "public", # required,
+            'Cache-Control': 'private', # required for certain browsers,
+            'Content-Type': mimetype_tuple[0],
+            'Content-Disposition': 'attachment; filename=\"%s\";' % filename,
+            'Content-Transfer-Encoding': 'binary',
+            'Content-Length': len(response.data)
+        })
+         
+        if not mimetype_tuple[1] is None:
+            response.update({
+                'Content-Encoding': mimetype_tuple[1]
+            })
+         
+        response.headers = response_headers
+        response.set_cookie('fileDownload', 'true', path='/')
+
+        return response
+
+
+
+    else:
+
+        if 'login' in session:
+            logged = True
+            labels = labels_getter(session)
+
+            return render_template('raw_download.html', leagues    = labels.get('leagues'),
+                                                        logged     = logged)
+
+        return render_template("index.html")
+

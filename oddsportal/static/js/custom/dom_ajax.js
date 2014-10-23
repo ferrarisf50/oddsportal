@@ -1,21 +1,21 @@
 function get_template() {
 
     var selected_template = $('select[name=select_template]').find(":selected").val();
-    var template_values   = JSON.parse(templates[selected_template])
+    var template_values   = JSON.parse(templates[selected_template]);
 
-    for (x in template_values){
+    for (var x in template_values){
         $('select[name=' + x + ']').val(template_values[x]);
         $('input[name='  + x + ']').val(template_values[x]);
     }
 
-    if ($('input[name="odd_value"]').val() == ""){
+    if ($('input[name="odd_value"]').val() === ""){
         $("#error").text("Year or Stake field is empty");
         $('input[type=submit]').attr('disabled', 'disabled');
     }
     else {
         $('input[type=submit]').removeAttr('disabled');
         $("#error").html("")
-    }
+    };
 }
 
 
@@ -26,7 +26,7 @@ function save_template() {
 
     if (template_name === "") {
         alert('Put name');
-        return
+        return;
     }
 
     var form_playing_at_types  = $('select[name=form_playing_at_types]').find(":selected").val();
@@ -50,16 +50,16 @@ function save_template() {
         odd_value:     odd_value,
         template_name: template_name
 
-    }).done(function(data) {
+    }).done(function (data) {
 
-        templates = data.templates
+        var templates = data.templates;
         $('select[name=select_template]').empty();
 
             function templates_appender(selector) {
                 $(selector).append('<option disabled selected> -- select a template -- </option>')
                 $.each(data.templates, function (i, v) {
                     $(selector)
-                        .append('<option>' + i + '</option>')
+                        .append('<option>' + i + '</option>');
                 });
             }
             templates_appender('select[name=select_template]');
@@ -86,9 +86,9 @@ function save_database_changes() {
         hda_scnd_results: $('input[name=hda_scnd_results]').val(),
         id : $('input[name=id]').val()
 
-    }).done(function(data) {
+    }).done(function (data) {
         alert('Database updated');
-    }); 
+    });
 }
 
 
@@ -98,15 +98,15 @@ function signIn() {
         username: $('input[name="username"]').val(),
         password: $('input[name="password"]').val()
 
-    }).done(function(data) {
+    }).done(function (data) {
         if (data.result) {
-            $("#error").text(data.result)
+            $("#error").text(data.result);
         }
         else {
-            window.location.replace("/index")
+            window.location.replace("/index");
         };
     });
-};
+}
 
 
 
@@ -116,24 +116,24 @@ function registration_form_check() {
         username: $('input[name="sign_up_username"]').val(),
         email:    $('input[name="sign_up_email"]').val()
 
-    }).done(function(data) {
+    }).done(function (data) {
 
         if (data.username) {
             $("#username_icon_true").css('display', 'block');
-            $("#username_icon_false").css('display','none');
+            $("#username_icon_false").css('display', 'none');
         }
         else {
             $("#username_icon_true").css('display', 'none');
-            $("#username_icon_false").css('display','block');
+            $("#username_icon_false").css('display', 'block');
         };
 
         if (data.email) {
             $("#email_icon_true").css('display', 'block');
-            $("#email_icon_false").css('display','none');
+            $("#email_icon_false").css('display', 'none');
         }
         else {
             $("#email_icon_true").css('display', 'none');
-            $("#email_icon_false").css('display','block');
+            $("#email_icon_false").css('display', 'block');
         };
     });
 }
@@ -152,7 +152,7 @@ function get_years() {
         $.post('/years_update', {
             grp: group,
             lea: league
-        }).done(function(data) {
+        }).done(function (data) {
             $('#years').html('');
             $('#years_coeffs').html('');
 
@@ -200,7 +200,7 @@ function get_groups() {
     else {
         $.post('/groups_update', {
             lea: league
-        }).done(function(data) {
+        }).done(function (data) {
             $('select[name=group]').empty();
 
             $('select[name=group]').append(new Option(""));
@@ -217,7 +217,7 @@ function get_groups() {
 
 function search_form_check() {
     var years_selected = [];
-    $('#years input:checked').each(function() {
+    $('#years input:checked').each(function () {
         years_selected.push($(this).attr('value'));
     });
     
@@ -270,16 +270,16 @@ function handicap_changed_event() {
 
 
 
-function click_result_options() {
+function click_result_options(label_away, label_home) {
     
     if ($('.result_options').text() === 'Switch to away teams') {
-        $('#results_label').html('{{results_labels['a']}}')
+        $('#results_label').html(label_away);
         $('.result_options').html('Switch to <span class="higlighted">home</span> teams');
     }
     else {
-        $('#results_label').html('{{results_labels['h']}}')
+        $('#results_label').html(label_home);
         $('.result_options').html('Switch to <span class="higlighted">away</span> teams');
-    }
+    };
 
     if ($('#home_results_table').is(":visible")) {
         $('#home_results_table').hide();
@@ -291,3 +291,56 @@ function click_result_options() {
     };
 }
 
+
+function raw_get_years() {
+
+    var group = $('select[name=group]').find(":selected").text();
+    var league = $('select[name=league]').find(":selected").text();
+
+    if (group === '') {
+        $('input[name=year]').attr('disabled', 'disabled');
+    }
+    else {
+        $.post('/years_update', {
+            grp: group,
+            lea: league
+        }).done(function (data) {
+
+            $('#year').html('');
+
+            for (var i in data.years) {
+
+                function year_appender(selector) {
+
+                    $(selector)
+                        .append('<option value="' + data.years[i] + '">' + data.years[i] + '</option>')
+                }
+                year_appender('#year');
+            }
+
+            $('select[name=year]').removeAttr('disabled');
+            $('button[type=submit]').removeAttr("disabled");
+            $("#error").text('');
+            
+        }); 
+    };
+}
+
+
+
+function raw_data_check() {
+
+    var group  = $('select[name=group]').find(":selected").text();
+    var league = $('select[name=league]').find(":selected").text();
+    var year   = $('select[name=year]').find(":selected").text();
+
+    if (league && group && year !== "") {
+        $("#error").text('');
+        $('button[type=submit]').removeAttr("disabled");
+    }
+    else {
+        $("#error").text("Some field is missing data");
+        $('button[type=submit]').attr('disabled', 'disabled');
+    };
+
+}

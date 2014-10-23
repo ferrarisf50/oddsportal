@@ -10,9 +10,9 @@
             %i.fa.fa-futbol-o
             &nbsp;OddsCalc
 
-    #menu
-        %ul
-            %li -> %a href="/" -> Link
-            %li -> %a href="/" -> Another link
+    -if logged
+        #menu
+            %ul
+                %li -> %a href="/raw_download" -> Download raw data
 
 {% endhaml %}

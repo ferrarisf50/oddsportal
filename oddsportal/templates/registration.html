@@ -15,7 +15,7 @@
         -include "left_side_slide.html"
 
         .large-12.columns
-            .large-3.large-centered.columns
+            .large-5.large-centered.columns
                 %form#registration_form method="post" action="/registration"
                     %fieldset
                         %legend -> Registration
@@ -65,10 +65,7 @@
                 %a href="/" -> contact us
 
 
-        <script type=text/javascript>
-            $(document).change(function () {
-                registration_form_check()
-            });
-        </script>
+        %script
+            $(document).change(registration_form_check);
 
 {% endhaml %}

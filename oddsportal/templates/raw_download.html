@@ -1,0 +1,52 @@
+{% haml %}
+
+%html
+    %head
+        %link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"
+        %title - Sports betting strategies
+
+        -assets "js_all"
+            %script src="{{ ASSET_URL }}" type="text/javascript"
+        -assets "css_all"
+            %link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"
+    
+    %body
+        -include "header.html"
+        -include "left_side_slide.html"
+
+
+        %form#raw_data method="post" action="/raw_download"
+            .large-12.columns
+                .large-7.large-centered.columns
+                    %label -> Country
+                        %select name="league"
+                            %option selected="selected" value=""
+                            -for league in leagues
+                                %option value="{{ league }}" -> {{ league }}
+
+                .large-7.large-centered.columns
+                    %label -> League
+                        %select name="group" disabled
+                            %option selected="selected" value=""
+
+                .large-7.large-centered.columns
+                    %label -> Select year
+                        %select#year name="year" disabled
+                            %option selected="selected" value=""
+
+                .large-7.large-centered.columns
+                    %br
+                    %button.button.expand type="submit" disabled -> Download
+
+                %br
+
+                .large-7.large-centered.columns
+                    %p#error
+
+    %script
+        $("select[name=league]").change(get_groups);
+        $("select[name=group]").change(raw_get_years);
+
+        $('#raw_data').on('change', raw_data_check);
+
+{% endhaml %}
