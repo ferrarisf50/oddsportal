@@ -4,68 +4,38 @@
 
 -block content
 
-    .mCustomScrollbar#content
-        .large-12.text-left.columns
-            .large-5.text-center.columns
-                .intro
-                    %p
-                        The Simulations are based on the best bookmaker odds available on the evening before each match.
-                        %br
-                        %br
+    #content
+        #content_handler
+            .large-12.text-left.columns
+                .large-10.text-center.columns
+                    .intro
+                        %p
+                            The Simulations are based on the best bookmaker odds available on the evening before each match.
+                            %br
+                            %br
 
-                        The Odds Toggle allows you to adjust the odds to suit your own betting market. This will provide a more accurate indication of real results based on the odds you are able to obtain.
-                        %br
-                        %br
+                            The Odds Toggle allows you to adjust the odds to suit your own betting market. This will provide a more accurate indication of real results based on the odds you are able to obtain.
+                            %br
+                            %br
 
-                        To formulate your personal odds toggle figure you will need to calculate the difference between the odds you have access to and the highest odds available in the market at that time for each match. Averaging together these differences will produce a toggle figure for inputting into the relevant part of the form.
-                        %br
-                        %br
+                            To formulate your personal odds toggle figure you will need to calculate the difference between the odds you have access to and the highest odds available in the market at that time for each match. Averaging together these differences will produce a toggle figure for inputting into the relevant part of the form.
+                            %br
+                            %br
 
-                .intro2
-                    %p
-                        %a href="/registration" -> Sign up&nbsp;
-                        and see updates for the league of your choice directly on the home page!
+                    .intro2
+                        %p
+                            %a href="/registration" -> Sign up&nbsp;
+                            and see updates for the league of your choice directly on the home page!
+
+    %script
+        $(document).ready(function () {
+            var right_bar_width = $("#right_side_bar").width();
+            var left_bar_width  = $("#left_side_bar").width();
+            var window_width    = $(window).width();
+            var content_width   = window_width - right_bar_width - left_bar_width - 20;
+
+            $("#content").css("width", content_width+'px');
+        });
 
 
-            .large-3.text-center.columns
-                .intro
-                    %table
-                        %tr
-                            %th -> #
-                            %th -> Number of Recorded Matches in Cluster
-
-                        %tr
-                            %td -> FTHG
-                            %td -> Full-Time Home Goals
-                        
-                        %tr
-                            %td -> FTAG
-                            %td -> Full-Time Away Goals
-                         
-                        %tr
-                            %td -> FTR
-                            %td -> Full-Time Result
-                         
-                        %tr
-                            %td -> P/L
-                            %td -> Profit/Loss
-                         
-                        %tr
-                            %td -> Pld
-                            %td -> Played
-                         
-                        %tr
-                            %td -> R-Total
-                            %td -> Running Total
-                        
-                        %tr
-                            %td -> W
-                            %td -> Won
-                         
-                        %tr
-                            %td -> W/L
-                            %td -> Match Result: Won/Lost 
-
-            .large-3.text-center.columns
-    
 {% endhaml %}

@@ -6,117 +6,118 @@
 
     %meta name="description" content="{{timers}}"
     #content
-        %br
-        %br
-        #result_header
-            #result_label
-                %span
-                    %img src="{{ url_for('static', filename='img/circle.svg') }}"
-                %span.higlightedheader
-                    {{league}}: {{group}} &nbsp;
-                %span#results_label.non_higlighted
-                    {{results_labels[playing_at_type]}}
-                %br
-                %br
+        #content_handler
+            %br
+            %br
+            #result_header
+                #result_label
+                    %span
+                        %img src="{{ url_for('static', filename='img/circle.svg') }}"
+                    %span.higlightedheader
+                        {{league}}: {{group}} &nbsp;
+                    %span#results_label.non_higlighted
+                        {{results_labels[playing_at_type]}}
+                    %br
+                    %br
 
-            #result_options
-                %a onclick="click_result_options(label_away, label_home)"
-                    %span.result_options
+                #result_options
+                    %a onclick="click_result_options(label_away, label_home)"
+                        %span.result_options
 
-        %br
-        %br
-        %table#home_results_table
-            %thead
-                %tr.table_header
-                    %th width="250px" -> Team
-                    %th colspan="3" -> Total
-                    -for table_year in table_years
-                        %th colspan="2" -> {{table_year}}
+            %br
+            %br
+            %table#home_results_table
+                %thead
+                    %tr.table_header
+                        %th width="250px" -> Team
+                        %th colspan="3" -> Total
+                        -for table_year in table_years
+                            %th colspan="2" -> {{table_year}}
 
-                
-                %tr.table_labels
-                    %th
-                    %th -> p/l
-                    %th -> #
-                    %th -> w
-                    -for table_year in table_years
+                    
+                    %tr.table_labels
+                        %th
                         %th -> p/l
-                        %th -> pld/w
+                        %th -> #
+                        %th -> w
+                        -for table_year in table_years
+                            %th -> p/l
+                            %th -> pld/w
 
-            %tbody
-                -for team in home_teams
-                    %tr
-                        %td width="250px" -> {{team}}
-                            
-                        %td.totals -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pl'] }}
-                        %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
-                        %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_won'] }}
+                %tbody
+                    -for team in home_teams
+                        %tr
+                            %td width="250px" -> {{team}}
+                                
+                            %td.totals -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pl'] }}
+                            %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
+                            %td -> {{ output_results['home'][table_years[0]]['teams'][team]['team_all_years_won'] }}
 
-                        ;Here is a column with the last year
-                        %td -> {{ output_results['home'][table_years[0]]['teams'][team]['prft_lss_value'] }}
-                        %td.last_season -> {{ output_results['home'][table_years[0]]['teams'][team]['played'] }}/{{ output_results['home'][table_years[0]]['teams'][team]['won'] }}
+                            ;Here is a column with the last year
+                            %td -> {{ output_results['home'][table_years[0]]['teams'][team]['prft_lss_value'] }}
+                            %td.last_season -> {{ output_results['home'][table_years[0]]['teams'][team]['played'] }}/{{ output_results['home'][table_years[0]]['teams'][team]['won'] }}
 
-                        ;And here is a column with other years
-                        -for table_year in table_years[1:]
-                            %td -> {{ output_results['home'][table_year]['teams'][team]['prft_lss_value'] }}
-                            %td -> {{ output_results['home'][table_year]['teams'][team]['played'] }}/{{ output_results['home'][table_year]['teams'][team]['won'] }}
+                            ;And here is a column with other years
+                            -for table_year in table_years[1:]
+                                %td -> {{ output_results['home'][table_year]['teams'][team]['prft_lss_value'] }}
+                                %td -> {{ output_results['home'][table_year]['teams'][team]['played'] }}/{{ output_results['home'][table_year]['teams'][team]['won'] }}
 
-                %tr.table_total height="5rem"
-                    %th -> Total
-                    %td.totals -> {{totals['home']['all_teams_all_years_pl']}} 
-                    %td -> {{totals['home']['all_teams_all_years_pld']}} 
-                    %td -> {{totals['home']['all_teams_all_years_won']}} 
-                    -for table_year in table_years
+                    %tr.table_total height="5rem"
+                        %th -> Total
+                        %td.totals -> {{totals['home']['all_teams_all_years_pl']}} 
+                        %td -> {{totals['home']['all_teams_all_years_pld']}} 
+                        %td -> {{totals['home']['all_teams_all_years_won']}} 
+                        -for table_year in table_years
 
-                        %td -> {{output_results['home'][table_year]['prft_lss_year']}}
+                            %td -> {{output_results['home'][table_year]['prft_lss_year']}}
 
-                        %td -> {{output_results['home'][table_year]['played_year']}}/{{output_results['home'][table_year]['won_year']}}
+                            %td -> {{output_results['home'][table_year]['played_year']}}/{{output_results['home'][table_year]['won_year']}}
 
 
 
-        %table#away_results_table
-            %thead
-                %tr.table_header
-                    %th width="250px" -> Team
-                    %th colspan="3" -> Total
-                    -for table_year in table_years
-                        %th colspan="2" -> {{table_year}}
+            %table#away_results_table
+                %thead
+                    %tr.table_header
+                        %th width="250px" -> Team
+                        %th colspan="3" -> Total
+                        -for table_year in table_years
+                            %th colspan="2" -> {{table_year}}
 
-                %tr.table_labels
-                    %th
-                    %th -> p/l
-                    %th -> #
-                    %th -> w
-                    -for table_year in table_years
+                    %tr.table_labels
+                        %th
                         %th -> p/l
-                        %th -> pld/w
+                        %th -> #
+                        %th -> w
+                        -for table_year in table_years
+                            %th -> p/l
+                            %th -> pld/w
 
-            %tbody
-                -for team in away_teams
-                    %tr
-                        %td width="250px" -> {{team}}
+                %tbody
+                    -for team in away_teams
+                        %tr
+                            %td width="250px" -> {{team}}
 
-                        %td.totals" -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pl'] }}
-                        %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
-                        %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_won'] }}
-                            
-                        %td -> {{ output_results['away'][table_years[0]]['teams'][team]['prft_lss_value'] }}
-                        %td.last_season -> {{ output_results['away'][table_years[0]]['teams'][team]['played'] }}/{{ output_results['away'][table_years[0]]['teams'][team]['won'] }}
+                            %td.totals" -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pl'] }}
+                            %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_pld'] }}
+                            %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_won'] }}
+                                
+                            %td -> {{ output_results['away'][table_years[0]]['teams'][team]['prft_lss_value'] }}
+                            %td.last_season -> {{ output_results['away'][table_years[0]]['teams'][team]['played'] }}/{{ output_results['away'][table_years[0]]['teams'][team]['won'] }}
 
-                        -for table_year in table_years[1:]
-                            %td -> {{ output_results['away'][table_year]['teams'][team]['prft_lss_value'] }}
-                            %td -> {{ output_results['away'][table_year]['teams'][team]['played'] }}/{{ output_results['away'][table_year]['teams'][team]['won'] }}
+                            -for table_year in table_years[1:]
+                                %td -> {{ output_results['away'][table_year]['teams'][team]['prft_lss_value'] }}
+                                %td -> {{ output_results['away'][table_year]['teams'][team]['played'] }}/{{ output_results['away'][table_year]['teams'][team]['won'] }}
 
-                %tr.table_total height="5rem"
-                    %th -> Total
-                    %td.totals -> {{totals['away']['all_teams_all_years_pl']}} 
-                    %td -> {{totals['away']['all_teams_all_years_pld']}} 
-                    %td -> {{totals['away']['all_teams_all_years_won']}} 
-                    -for table_year in table_years
+                    %tr.table_total height="5rem"
+                        %th -> Total
+                        %td.totals -> {{totals['away']['all_teams_all_years_pl']}} 
+                        %td -> {{totals['away']['all_teams_all_years_pld']}} 
+                        %td -> {{totals['away']['all_teams_all_years_won']}} 
+                        -for table_year in table_years
 
-                        %td -> {{output_results['away'][table_year]['prft_lss_year']}}
+                            %td -> {{output_results['away'][table_year]['prft_lss_year']}}
 
-                        %td -> {{output_results['away'][table_year]['played_year']}}/{{output_results['away'][table_year]['won_year']}}
+                            %td -> {{output_results['away'][table_year]['played_year']}}/{{output_results['away'][table_year]['won_year']}}
 
 
 
@@ -124,17 +125,16 @@
     %script
 
         $(window).load(function(){
-            $("#content").mCustomScrollbar({
+            $("#content_handler").mCustomScrollbar({
                 axis: 'yx'
             });
         });
 
-
-        $(document).ready(function() {
-            var right_bar_width = $("#left_side_bar").width();
-            var left_bar_width  = $("#right_side_bar").width();
+        $(document).ready(function () {
+            var right_bar_width = $("#right_side_bar").width();
+            var left_bar_width  = $("#left_side_bar").width();
             var window_width    = $(window).width();
-            var content_width   = window_width - right_bar_width - left_bar_width - 120;
+            var content_width   = window_width - right_bar_width - left_bar_width - 20;
 
             $("#content").css("width", content_width+'px');
         });

@@ -344,3 +344,28 @@ function raw_data_check() {
     };
 
 }
+
+
+
+function scroll_right_side_bar() {
+    
+    var state = $('#hide_right_side').html();
+
+    if (state === "Show side bar") {
+        $('#hide_right_side').html('Hide side bar');
+        $('#right_side_bar').css('margin-right', '0');
+        var right_bar_width = $("#right_side_bar").width();
+        var left_bar_width  = $("#left_side_bar").width();
+        var window_width    = $(window).width();
+        var new_content_width   = window_width - right_bar_width - left_bar_width - 50;
+        $("#content").css("width", new_content_width+'px');
+    }
+    else {
+        $('#hide_right_side').html('Show side bar');
+        $('#right_side_bar').css('margin-right', '-25rem');
+        var left_bar_width  = $("#left_side_bar").width();
+        var window_width    = $(window).width();
+        var new_content_width   = window_width - left_bar_width - 50;
+        $("#content").css("width", new_content_width+'px');
+    };
+}

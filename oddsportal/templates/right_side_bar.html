@@ -3,22 +3,28 @@
 #right_side_bar
     %form#searchForm method="post" action="/search_results"
         %br
+        %br
         #row
-            .large-12.columns
-                %label -> Country
-                    %select name="league"
-                        %option selected="selected" value=""
-                        -for league in leagues
-                            %option value="{{ league }}" -> {{ league }}
+            .large-3.columns
+                %label.right-inline -> Country
+            .large-9.columns
+                %select name="league"
+                    %option selected="selected" value=""
+                    -for league in leagues
+                        %option value="{{ league }}" -> {{ league }}
 
-            .large-12.columns
+            .large-3.columns
                 %label -> League
-                    %select name="group" disabled
-                        %option selected="selected" value=""
+            .large-9.columns
+                %select name="group" disabled
+                    %option selected="selected" value=""
+
 
             .large-7.text-left.columns
+                %br
                 %label -> Select year
             .large-5.text-left.columns
+                %br
                 %label -> Coefficient
 
             .large-7.text-left.columns#years
@@ -31,7 +37,7 @@
 
             #mySlideContent
             #mySlideToggler
-                %a href="javascript:void()" -> Show all years
+                %a.show_years href="javascript:void()" -> Show all years
             
 
         -if logged
@@ -39,21 +45,21 @@
                 %br
                 .large-12.columns
                     .row.collapse
-                        .small-10.columns
+                        .small-9.columns
                             %select#select_template name="select_template"
                                 %option disabled selected -> select a template
                                 -for template in templates
                                     %option value={{ template }} -> {{ template }}
 
-                        .small-2.columns
+                        .small-3.columns
                             %a#button_get.button.postfix disabled onclick="get_template()" -> get
                         
                 .large-12.columns
                     .row.collapse
-                        .small-10.columns
+                        .small-9.columns
                             %input.template_name name="template_name" type="text" placeholder="Template name"
 
-                        .small-2.columns
+                        .small-3.columns
                             %a#button_save.button.postfix disabled onclick="save_template()" -> save
 
         .row
@@ -83,24 +89,27 @@
                         -for ou_value in ou_values
                             %option value={{ou_value}} -> {{ ou_value }}
 
-            .large-6.columns
+            .large-7.columns
                 %label -> Game part
                     %select#game_part name="game_part"
                         %option value="full" -> Full
                         %option value="frst" -> 1st Half
                         %option value="scnd" -> 2nd Half
 
-            .large-6.columns
+            .large-5.columns
                 %label -> Odds type
                     %select#odds_type name="odds_type"
                         %option value="a" -> Average
                         %option value="h" -> Highest
 
+
             .large-6.columns
+                %br
                 %label -> Odds toggle
                     %input.high_input name="odd_toggle" type="text" autocomplete='off'
 
             .large-6.columns
+                %br
                 %label
                     %i.fa.fa-usd
                     %b -> Stake
@@ -113,10 +122,8 @@
 
             .large-12.columns
                 %span#error -> {{error}}
-
-
-
-
+                <br><br><br><br><br><br><br><br><br><br><br>
+                
 
 
 %script
@@ -137,9 +144,6 @@
     });
 
     ;Better change it somehow
-    var page_height = $( 'html' ).height();
-    $('#left_side_bar').css( 'height',page_height+80);
-    $('#right_side_bar').css('height',page_height+80);
     
     $("select[name=group]").change(get_years);
     $("select[name=league]").change(get_groups);
@@ -147,6 +151,7 @@
 
     $('#searchForm').on('keyup keypress change', search_form_check);
 
+    
 
     ;Variable templates comes from Flask view and to be able to use it
     ;we need to convert it to JSON object

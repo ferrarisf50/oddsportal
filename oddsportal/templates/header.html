@@ -14,5 +14,10 @@
         #menu
             %ul
                 %li -> %a href="/raw_download" -> Download raw data
+                %li -> %a#hide_right_side -> Hide side bar
+
+
+    %script
+        $('#hide_right_side').click(scroll_right_side_bar)
 
 {% endhaml %}

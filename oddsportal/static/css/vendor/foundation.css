@@ -4406,9 +4406,13 @@ select::-ms-expand {
 /* Adjust padding, alignment and radius if pre/post element is a button */
 #button_save {
   background-color: #ed4a3b !important;
+  line-height: 1.8rem;
+  height: 2rem;
 }
 #button_get {
   background-color: #ed4a3b !important;
+  line-height: 1.8rem;
+  height: 2rem;
 }
 .postfix.button {
   padding-left: 0;
@@ -4474,7 +4478,7 @@ span.postfix, label.postfix {
   height: 2.3125rem !important;
 }
 .template_name {
-  height: 2.3125rem !important;
+  height: 2rem !important;
 }
 input:disabled {
   opacity: 0.5;
@@ -4598,7 +4602,7 @@ textarea[rows] {
 
 /* Add height value for select elements to match text input height */
 #select_template {
-  height: 2.325rem !important;
+  height: 2rem !important;
 }
 select {
   -webkit-appearance: none !important;
@@ -4607,10 +4611,10 @@ select {
   background-repeat: no-repeat;
   background-position: 97% center;
   border: 1px solid #cccccc;
-  padding: 0.5rem;
-  font-size: 0.875rem;
+  padding-left: 0.5rem;
+  font-size: 0.775rem;
   border-radius: 0;
-  height: 2.2rem; }
+  height: 1.5rem; }
   select.radius {
     border-radius: 3px; }
   select:hover {
@@ -4621,7 +4625,7 @@ select {
 input[type="file"],
 input[type="radio"],
 select {
-  margin-bottom: 1rem
+  margin-bottom: 0.5rem
 }
 input[type="checkbox"] {
   margin: 0rem 0.5rem 1rem .5rem;
