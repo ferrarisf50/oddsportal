@@ -171,7 +171,7 @@ def generate_xls_raw(league, group, year):
         ws.write(i+1, 7, json.loads(result.event_results).get('full'), style)
 
         col = 8
-        for x in ['hh', 'hd', 'ha', 'ah', 'ad', 'aa']:
+        for x in ['hh', 'ah', 'hd', 'ad', 'ha', 'aa']:
             try:
                 ws.write(i+1, col, json.loads(result.hda_full_results).get(x), style)
                 col += 1
