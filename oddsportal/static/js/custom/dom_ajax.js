@@ -30,7 +30,7 @@ function save_template() {
     var template_name = $('input[name=template_name]').val();
 
     if (template_name === "") {
-        alert('Put name');
+        swal("Don't you think tamplate needs a name?");
         return;
     }
 
@@ -80,7 +80,7 @@ function save_template() {
                 });
             }
             templates_appender('select[name=select_template]');
-            alert('Template saved');
+            swal("Template saved!", "You can now use it.", "success")
 
     });
 }
@@ -104,7 +104,7 @@ function save_database_changes() {
         id : $('input[name=id]').val()
 
     }).done(function (data) {
-        alert('Database updated');
+        swal("Database updated!", "Thank you for correction.", "success")
     });
 }
 
