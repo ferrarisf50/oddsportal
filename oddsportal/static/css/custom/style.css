@@ -18,6 +18,7 @@
 }
 
 #home_results_table {
+  position: relative;
 }
 
 tr .table_total td {
@@ -64,7 +65,7 @@ tr .table_total td {
 
 
   #result_label .non_higlighted {
-    font-size: 1.5rem;
+    font-size: 1rem;
     vertical-align: middle;
     color: white;
 
@@ -72,7 +73,7 @@ tr .table_total td {
   #result_label .higlightedheader {
     vertical-align: middle;
     color: #ef493b;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-left: 0.5rem;
   }
   #result_options .higlighted {
@@ -98,27 +99,32 @@ tr .table_total td {
   background: #2a2a2a;
   left: 0;
   z-index: 1;
+  top: 0;
   box-shadow: 5px 0px 5px -5px rgba(0,0,0,0.8);
 }
 
 #right_side_bar {
+  overflow: hidden;
   width: 20rem;
   position: fixed;
   height: 100%;
   top: 4rem;
   background: #2a2a2a;
   right: 0;
-  z-index: 1;
+  z-index: 1005;
   box-shadow: inset 5px 5px 5px -5px rgba(0,0,0,0.8);
   -webkit-box-shadow: inset 5px 5px 5px -5px rgba(0,0,0,0.8);
      -moz-box-shadow: inset 5px 5px 5px -5px rgba(0,0,0,0.8);
 }
 
-#mySlideToggler .show_years {
-  text-decoration: none;
+#stake {
+  color: gold;
+  font-weight: bold;
 }
 
+
 #container {
+  overflow: hidden;
   height: auto !important;  
   width:100%;
   top: 0;
@@ -278,19 +284,16 @@ form #date {
     opacity: 0.75;
   }
 
-#content_handler {
-  width: 100%;
-  overflow-y: scroll;
-  overflow-x: scroll;
-}
 
 #content {
-  position: absolute;
   overflow: hidden;
+  position: relative;
   margin-left: 7rem;  
   margin-right: 2rem;
-  margin-top: 3rem;
+  margin-top: 5rem;
   height: 80%;
+  width: auto;
+  z-index: 1000;
 }
 
 
@@ -359,7 +362,7 @@ form #date {
   bottom: 0px;
   background: #222222;
   position: fixed;
-  z-index: 2;
+  z-index: 1006;
 }
 
 .copyright {

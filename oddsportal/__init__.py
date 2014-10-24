@@ -15,15 +15,15 @@ js_bundle  = Bundle('js/vendor/jquery.min.js',
 					'js/custom/dom_ajax.js',
 					'js/vendor/foundation.min.js',
 					'js/vendor/jquery.sidr.min.js',
-					'js/vendor/scrollbar.min.js',
-					'js/vendor/sweet-alert.min.js', output = 'gen/all.js')
+					'js/vendor/sweet-alert.min.js',
+					'js/vendor/perfect-scrollbar.js', output = 'gen/all.js')
 
 css_bundle = Bundle('css/custom/style.css',
 					'css/vendor/font-awesome.css',
 					'css/vendor/foundation.css',
-					'css/vendor/scrollbar.css',
 					'css/vendor/sidr.dark.css',
-					'css/vendor/sweet-alert.css', output = 'gen/all.css')
+					'css/vendor/sweet-alert.css',
+					'css/vendor/perfect-scrollbar.css', output = 'gen/all.css')
 
 assets.register('js_all',  js_bundle)
 assets.register('css_all', css_bundle)

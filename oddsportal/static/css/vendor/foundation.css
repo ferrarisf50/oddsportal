@@ -4256,8 +4256,6 @@ ul.off-canvas-list {
 
 table {
   background: whitesmoke;
-  width: 97%;
-  min-width: 97%;
   margin-right: 3%;
   margin-bottom: 1.25rem;}
   table thead,
@@ -4506,7 +4504,7 @@ textarea {
   display: block;
   font-size: 0.875rem;
   margin: 0 0 1rem 0;
-  padding: 0.5rem;
+  padding-left: 0.5rem;
   height: 1.5rem;
   width: 100%;
   -webkit-box-sizing: border-box;

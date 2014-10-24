@@ -5,9 +5,15 @@ function get_template() {
 
     for (var x in template_values){
         $('select[name=' + x + ']').val(template_values[x]);
-        $('input[name='  + x + ']').val(template_values[x]);
     }
 
+    $('input[name=odd_toggle]').val(template_values['odd_toggle']);
+    $('input[name=odd_value]').val(template_values['odd_value']);
+
+    for (var x in template_values['years']) {
+        $('input[id=' + x + ']').attr('checked', 'checked');
+        $('input[name=' + x + '_coeff]').val(template_values['years'][x]);
+    }
     if ($('input[name="odd_value"]').val() === ""){
         $("#error").text("Year or Stake field is empty");
         $('input[type=submit]').attr('disabled', 'disabled');
@@ -19,7 +25,6 @@ function get_template() {
 }
 
 
-
 function save_template() {
 
     var template_name = $('input[name=template_name]').val();
@@ -28,6 +33,17 @@ function save_template() {
         alert('Put name');
         return;
     }
+
+    var years_handler = new Object();
+    $('input[name = years]:checked').each(function () {
+        var year = $(this).val();
+        var coeff_label = year + '_coeff'
+        var year_coeff = $('input[name=' + coeff_label + ']').val();
+        years_handler[year] = year_coeff;
+    });
+
+    var years_json = JSON.stringify(years_handler);
+
 
     var form_playing_at_types  = $('select[name=form_playing_at_types]').find(":selected").val();
     var handicap    = $('select[name=handicap]').find(":selected").val();
@@ -48,7 +64,8 @@ function save_template() {
         odds_type:     odds_type,
         odd_toggle:    odd_toggle,
         odd_value:     odd_value,
-        template_name: template_name
+        template_name: template_name,
+        years:         years_json
 
     }).done(function (data) {
 
@@ -238,7 +255,7 @@ function search_form_check() {
 function handicap_changed_event() {
 
     var handicap = $("#handicap").find(":selected").text();
-    if (handicap == 'Home/Draw/Away') {
+    if (handicap == 'H/D/A') {
         $("#ou_values").attr("disabled", "disabled");
         $('#strategy').html('');
 
@@ -253,7 +270,7 @@ function handicap_changed_event() {
 
     };
 
-    if (handicap == 'Over/Under') {
+    if (handicap == 'O/U') {
         $("#ou_values").removeAttr("disabled");
         $('#strategy').html('');
 
@@ -348,7 +365,7 @@ function raw_data_check() {
 
 
 function scroll_right_side_bar() {
-    
+
     var state = $('#hide_right_side').html();
 
     if (state === "Show side bar") {

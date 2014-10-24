@@ -293,6 +293,8 @@ def save_template(logged = False):
     templates = json.loads(templates) if templates else {}
 
     name = request.values.get('template_name')
+
+    years = json.loads(request.values.get('years'))
     
     template    = {'playing_at':  request.values.get('playing_at'),
                    'handicap':    request.values.get('handicap'),
@@ -301,7 +303,8 @@ def save_template(logged = False):
                    'game_part':   request.values.get('game_part'),
                    'odds_type':   request.values.get('odds_type'),
                    'odd_toggle':  request.values.get('odd_toggle'),
-                   'odd_value':   request.values.get('odd_value')}
+                   'odd_value':   request.values.get('odd_value'),
+                   'years':       years}
 
     templates[name] = json.dumps(template)
 
@@ -466,4 +469,3 @@ def raw_download(logged = False):
                                                         logged     = logged)
 
         return render_template("index.html")
-

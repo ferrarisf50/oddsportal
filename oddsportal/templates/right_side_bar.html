@@ -64,39 +64,39 @@
 
         .row
             %br
-            .large-7.columns
+            .large-4.columns
                 %label -> Handicap
                     %select#handicap name="handicap"
-                        %option value="hda" -> Home/Draw/Away
-                        %option value="ou" -> Over/Under
+                        %option value="hda" -> H/D/A
+                        %option value="ou" -> O/U
 
-            .large-5.columns
-                %label -> Playing at
+            .large-4.columns
+                %label -> Where
                     %select name="form_playing_at_types"
                         %option selected value="h" -> At Home
                         %option value="a" -> Away
 
-            .large-7.columns
-                %label -> Backing strategy
+            .large-4.columns
+                %label -> Strategy
                     %select#strategy name="strategy"
                         %option value="h" -> Home
                         %option value="d" -> Draw
                         %option value="a" -> Away
 
-            .large-5.columns
+            .large-4.columns
                 %label -> Value
                     %select#ou_values disabled name="ou_values"
                         -for ou_value in ou_values
                             %option value={{ou_value}} -> {{ ou_value }}
 
-            .large-7.columns
+            .large-4.columns
                 %label -> Game part
                     %select#game_part name="game_part"
                         %option value="full" -> Full
                         %option value="frst" -> 1st Half
                         %option value="scnd" -> 2nd Half
 
-            .large-5.columns
+            .large-4.columns
                 %label -> Odds type
                     %select#odds_type name="odds_type"
                         %option value="a" -> Average
@@ -110,9 +110,9 @@
 
             .large-6.columns
                 %br
-                %label
+                %label#stake
                     %i.fa.fa-usd
-                    %b -> Stake
+                    &nbsp;Stake
                     %input.high_input name="odd_value" type="text" autocomplete='off'
 
             
@@ -122,7 +122,7 @@
 
             .large-12.columns
                 %span#error -> {{error}}
-                <br><br><br><br><br><br><br><br><br><br><br>
+                <br><br><br><br><br>
                 
 
 
@@ -160,6 +160,9 @@
     {% else %}
         var templates = {}
     {% endif %}
+
+%script
+        $('#right_side_bar').perfectScrollbar();
 
 
 {% endhaml %}
