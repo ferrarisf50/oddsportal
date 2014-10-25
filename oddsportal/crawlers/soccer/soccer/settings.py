@@ -41,12 +41,20 @@ DOWNLOADER_MIDDLEWARES = {
 
 
 
-logger = logging.getLogger('myapp')
-hdlr = logging.FileHandler('myapp.log')
+logger_present = logging.getLogger('present')
+logger_absent  = logging.getLogger('absent')
+hdlr_present   = logging.FileHandler('present.log')
+hdlr_absent    = logging.FileHandler('absent.log')
+
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr) 
-logger.setLevel(logging.WARNING)
+hdlr_present.setFormatter(formatter)
+hdlr_absent.setFormatter(formatter)
+
+logger_present.addHandler(hdlr_present)
+logger_absent.addHandler(hdlr_absent)
+logger_present.setLevel(logging.DEBUG)
+logger_absent.setLevel(logging.WARNING)
+
 
 
 Session = sessionmaker()
