@@ -53,7 +53,7 @@ hdlr_absent.setFormatter(formatter)
 logger_present.addHandler(hdlr_present)
 logger_absent.addHandler(hdlr_absent)
 logger_present.setLevel(logging.DEBUG)
-logger_absent.setLevel(logging.WARNING)
+logger_absent.setLevel(logging.DEBUG)
 
 
 
