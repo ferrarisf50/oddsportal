@@ -221,5 +221,5 @@ class Missing_games_crawler(CrawlSpider):
 
         response.meta['item'].add_value('hda_scnd_results', home_draw_away(response.body))
 
-        #logger.warning(response.meta['item'])
+        logger_absent.info('Saved: ' + response.meta['item'][tournament_url])
         yield response.meta['item'].load_item()
