@@ -13,12 +13,19 @@ from scrapy.http import Request
 from flask import session, request, url_for, flash
 import re, json, time, urllib2, requests
 from soccer import models
-from soccer.settings import session, logger_present, logger_absent
+from soccer.settings import session
 
 
+crawlers_path = os.path.abspath(__name__).split('crawlers')[0]
+links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()
 
-spider_path = os.path.abspath(__name__).split('spiders')[0][:-1]
-links = open(spider_path + '/spiders/links.txt').readlines()
+#try:
+#    os.remove(crawlers_path + '/crawlers/soccer/present.log')
+#    os.remove(crawlers_path + '/crawlers/soccer/absent.log')
+#except:
+#    pass
+
+from soccer.settings import logger_present, logger_absent
 
 
 class Missing_games_crawler(CrawlSpider):
@@ -38,6 +45,7 @@ class Missing_games_crawler(CrawlSpider):
         
             year_url = re.findall(re.compile('\"(.+?)\"'),  year)[0]
             year_num = re.findall(re.compile('>(.+?)</a>'), year)[0]
+            year_for_database = re.sub('/', '-', year_num)
             new_url  = urljoin_rfc(get_base_url(response),  year_url)
 
             yield Request((new_url), meta = {'year':   year_num,
@@ -59,7 +67,7 @@ class Missing_games_crawler(CrawlSpider):
     def parse_category(self, response):
 
         hxs = HtmlXPathSelector(response)
-        tournament_links = hxs.select("//table[@id='tournamentTable']//a[not(@class)]/@href").extract()  
+        tournament_links = hxs.select("//table[@id='tournamentTable']//a[not(@class)]/@href").extract()
         
         for i, link in enumerate(tournament_links[1:]):
             new_url = urljoin_rfc(get_base_url(response), link)
@@ -77,11 +85,18 @@ class Missing_games_crawler(CrawlSpider):
 
     def parse_item(self, response):
 
+        print '='*30
+        print 'Start working on tournament'
 
         hxs = HtmlXPathSelector(response)
         html_data  = response.body
         event_id   = re.findall(re.compile('"id":"(.+?)"'),             html_data)[0]
-        event_hash_01  = re.findall(re.compile('"xhash":"(.+?)"'),      html_data)[0]
+        
+        #-- If there is no xhash tag on the page, we are on the wrong page, let's skip it
+        try:
+            event_hash_01  = re.findall(re.compile('"xhash":"(.+?)"'),      html_data)[0]
+        except:
+            return
         event_hash_02  = re.findall(re.compile('"xhashf":"(.+?)"'),     html_data)[0]
         tournament_id  = re.findall(re.compile('tournamentId\":(\d*)'), html_data)[0]
         tournament_url = response.url
@@ -221,5 +236,5 @@ class Missing_games_crawler(CrawlSpider):
 
         response.meta['item'].add_value('hda_scnd_results', home_draw_away(response.body))
 
-        logger_absent.info('Saved: ' + response.meta['item'][tournament_url])
+        logger_absent.info('Saved: ' + str(response.meta['item'].__dict__))
         yield response.meta['item'].load_item()
