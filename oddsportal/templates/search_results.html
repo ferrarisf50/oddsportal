@@ -133,7 +133,7 @@
 
         $('td').each(function() {
             var cellvalue = $(this).html();
-            if ( cellvalue < 0) {
+            if ( cellvalue < 0 || cellvalue === 0 ) {
                 var mystring = cellvalue;
                 mystring = mystring.replace('-','').replace(' ','');
                 $(this).html('('+mystring+')');
