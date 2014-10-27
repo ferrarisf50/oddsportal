@@ -15,6 +15,9 @@ def analyzation(form_request):
 
     def analyze_teams(home_away_teams, results, playing_at, stake_varying = None):
 
+        def stake_varying_calc(varying_template, ):
+
+
         def ou_calc(event_result, strategy, odd, odd_value, ou_value):
             '''Takes event_results and odd, returns True of False for Win and Loss'''
 
