@@ -1,4 +1,4 @@
-import json, collections, re, datetime
+import json, collections, re, datetime, os, sys
 import models
 
 
@@ -13,7 +13,7 @@ class RequestObject():
 
 def analyzation(form_request):
 
-    def analyze_teams(home_away_teams, results, playing_at):
+    def analyze_teams(home_away_teams, results, playing_at, stake_varying = None):
 
         def ou_calc(event_result, strategy, odd, odd_value, ou_value):
             '''Takes event_results and odd, returns True of False for Win and Loss'''
@@ -47,7 +47,7 @@ def analyzation(form_request):
 
             return (profit_loss, round(profit_loss_value, 1))
 
-        def hda_calc(event_result, strategy, odd, odd_value):
+        def hda_calc(event_result, strategy, odd, odd_value, frst_game_coefficient, stake_running_total, stake_varying):
             '''Takes event data and returns True of False for Win and Loss and value'''
 
             event_home_win = 1 if event_result[0] >  event_result[1] else 0
@@ -60,16 +60,30 @@ def analyzation(form_request):
                (event_away_win  == 1 and strategy == 'a'):
                 profit_loss      = 1
 
-            profit_loss_value    = (odd*odd_value - odd_value) if profit_loss == 1 else -odd_value
-            return (profit_loss, round(profit_loss_value, 1))
+
+            if stake_varying:
+                if stake_running_total > odd_value:
+                    profit_loss_value  = (odd * stake_running_total - stake_running_total) if profit_loss == 1 else -stake_running_total
+                else:
+                    profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+
+                stake_running_total    = (stake_running_total + stake_running_total * frst_game_coefficient) if not profit_loss else odd_value
+                return (profit_loss, round(profit_loss_value, 1), stake_running_total)
+
+            else:
+                profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                return (profit_loss, round(profit_loss_value, 1))
+
+
+            
 
 
         output_results = {}
         output_results[playing_at] = {}
         for year in form_request.years:
 
-            if getattr(form_request, year+'_coeff'):
-                year_coefficient = re.sub(',', '.', getattr(form_request, year+'_coeff'))
+            if getattr(form_request, year + '_coeff'):
+                year_coefficient = re.sub(',', '.', getattr(form_request, year + '_coeff'))
                 year_coefficient = float(year_coefficient)
             else:
                 year_coefficient = 1
@@ -95,6 +109,14 @@ def analyzation(form_request):
 
                 where = 'home_team' if playing_at == 'home' else 'away_team'
                 matches = (match for match in year_matches if getattr(match, where) == team)
+
+                #-- Stake variation
+                if stake_varying:
+                    pass
+
+                stake_varying = True
+                frst_game_coefficient = 0.2
+                stake_running_total   = odd_value
                 
                 for match in matches:
                     try:
@@ -105,10 +127,14 @@ def analyzation(form_request):
                         odd = odd[odds_type] if form_request.handicap == 'hda' else odd[str(ou_value)][odds_type]
                         odd = float(odd) - float(odd)*odd_toggle/100
 
-                        profit_loss  = hda_calc(event_results, form_request.strategy, odd, odd_value) if form_request.handicap == 'hda' else\
+                        profit_loss  = hda_calc(event_results, form_request.strategy, odd, odd_value, frst_game_coefficient, stake_running_total, stake_varying) if form_request.handicap == 'hda' else\
                                         ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
                         
-                        sum_profit_loss += profit_loss[1]*year_coefficient
+                        if stake_varying:
+                            stake_running_total = profit_loss[2]
+
+                        sum_profit_loss += profit_loss[1] * year_coefficient
+
                         matches_won     += 1 if profit_loss[0] else 0
                         matches_played  += 1
                     except Exception as e:
@@ -135,7 +161,9 @@ def analyzation(form_request):
                                          models.Result.year.in_(form_request.years)).all()
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
-    leagues = [league[0] for league in set(models.Result.query.with_entities(models.Result.league).all())]
+
+    path    = os.path.abspath(__name__).split('oddsportal')[0]
+    leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
 
     timer_01 = datetime.datetime.now()
     home_teams = sorted(list(set([result.home_team for result in results])))
@@ -160,31 +188,24 @@ def analyzation(form_request):
 
     timer_01 = datetime.datetime.now()
     first_value, previous_value = 0, 0
-    for k,v in home_teams_results['home'].iteritems():
-        for i, home_team in enumerate(home_teams):
-
-            new_value = home_teams_results['home'][k]['teams'][home_team]['prft_lss_value']
-
-            if i == 0:
-                home_teams_results['home'][k]['teams'][home_team]['r_total'] = new_value
-                previous_value = home_teams_results['home'][k]['teams'][home_team]['prft_lss_value']
-            else:
-                home_teams_results['home'][k]['teams'][home_team]['r_total'] = previous_value + new_value
-                previous_value = home_teams_results['home'][k]['teams'][home_team]['r_total']
 
 
-    first_value, previous_value = 0, 0
-    for k,v in away_teams_results['away'].iteritems():
-        for i, away_team in enumerate(away_teams):
+    where = ['home', 'away']
+    for w in where:
+        where_team_results = eval(w + '_teams_results')
+        for k,v in eval(w + '_teams_results')[w].iteritems():
+            for i, team in enumerate(eval(w + '_teams')):
 
-            new_value = away_teams_results['away'][k]['teams'][away_team]['prft_lss_value']
+                new_value = where_team_results[w][k]['teams'][team]['prft_lss_value']
 
-            if i == 0:
-                away_teams_results['away'][k]['teams'][away_team]['r_total'] = new_value
-                previous_value = away_teams_results['away'][k]['teams'][away_team]['prft_lss_value']
-            else:
-                away_teams_results['away'][k]['teams'][away_team]['r_total'] = previous_value + new_value
-                previous_value = away_teams_results['away'][k]['teams'][away_team]['r_total']
+                if i == 0:
+                    where_team_results[w][k]['teams'][team]['r_total'] = new_value
+                    previous_value = where_team_results[w][k]['teams'][team]['prft_lss_value']
+                else:
+                    where_team_results[w][k]['teams'][team]['r_total'] = previous_value + new_value
+                    previous_value = where_team_results[w][k]['teams'][team]['r_total']
+
+    
 
     stopwatch_04 = ((datetime.datetime.now()) - timer_01).total_seconds()
     stopwatches  = [stopwatch_01, stopwatch_02, stopwatch_03, stopwatch_04]
