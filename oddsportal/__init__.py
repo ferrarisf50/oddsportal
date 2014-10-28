@@ -8,6 +8,7 @@ from flask import Flask
 from flask.ext import htauth
 
 app = Flask(__name__)
+'''
 try:
 	HTPASSWD = '/var/www/.htpasswd'
 	app.config['HTAUTH_HTPASSWD_PATH'] = HTPASSWD
@@ -15,6 +16,7 @@ try:
 	auth = htauth.HTAuth(app)
 except:
 	pass
+'''
 
 
 assets = Environment(app)
