@@ -10,7 +10,7 @@ from flask.ext import htauth
 app = Flask(__name__)
 
 try:
-	HTPASSWD = '/tmp/.htpasswd'
+	HTPASSWD = '/var/www/htpasswd'
 	app.config['HTAUTH_HTPASSWD_PATH'] = HTPASSWD
 	auth = htauth.HTAuth(app)
 except:
