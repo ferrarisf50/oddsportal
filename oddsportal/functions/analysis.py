@@ -1,7 +1,6 @@
 import json, collections, re, datetime, os, sys
 import models
 
-path    = os.path.dirname(__file__).split('oddsportal')[0]
 
 class RequestObject():
 
@@ -167,7 +166,8 @@ def analyzation(form_request):
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
 
-    
+    path    = os.path.dirname(__file__).split('oddsportal')[0]
+    path    = '/var/www/' if path == '/' else path
     leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
 
     timer_01 = datetime.datetime.now()
