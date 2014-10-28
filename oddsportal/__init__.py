@@ -5,8 +5,16 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
 from hamlish_jinja import HamlishTagExtension
 from flask import Flask
+from flask.ext import htauth
 
 app = Flask(__name__)
+try:
+	HTPASSWD = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'htpasswd')
+	app.config['HTAUTH_HTPASSWD_PATH'] = HTPASSWD
+	app.config['HTAUTH_REALM'] = 'Top Secret Area'
+	auth = htauth.HTAuth(app)
+except:
+	pass
 
 
 assets = Environment(app)

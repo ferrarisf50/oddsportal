@@ -4,6 +4,7 @@ from flask import session, request, url_for, flash
 from werkzeug.datastructures import Headers
 from flask.ext.sqlalchemy import SQLAlchemy
 from functions import generate_xls
+from flask.ext import htauth
 
 from oddsportal import *
 import os
@@ -38,6 +39,7 @@ def labels_getter(session, logged = False):
 
 @app.route('/',      methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+@htauth.authenticated
 def index(logged = False):
 
 
