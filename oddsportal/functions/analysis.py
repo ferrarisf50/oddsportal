@@ -15,7 +15,7 @@ def analyzation(form_request):
 
     def analyze_teams(home_away_teams, results, playing_at, stake_varying = None):
 
-        def stake_varying_calc(varying_template, ):
+        #def stake_varying_calc(varying_template, ):
 
 
         def ou_calc(event_result, strategy, odd, odd_value, ou_value):
@@ -117,8 +117,9 @@ def analyzation(form_request):
                 if stake_varying:
                     pass
 
-                stake_varying = True
-                frst_game_coefficient = 0.2
+
+                stake_varying = True if form_request.stake_varying_01 else False
+                frst_game_coefficient = float(form_request.stake_varying_01) / 100 if stake_varying else 1
                 stake_running_total   = odd_value
                 
                 for match in matches:
