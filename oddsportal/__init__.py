@@ -9,7 +9,7 @@ from flask.ext import htauth
 
 app = Flask(__name__)
 try:
-	HTPASSWD = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'htpasswd')
+	HTPASSWD = '/var/www/.htpasswd'
 	app.config['HTAUTH_HTPASSWD_PATH'] = HTPASSWD
 	app.config['HTAUTH_REALM'] = 'Top Secret Area'
 	auth = htauth.HTAuth(app)
