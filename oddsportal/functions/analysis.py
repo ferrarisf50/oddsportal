@@ -167,7 +167,6 @@ def analyzation(form_request):
 
 
     path    = os.path.dirname(__file__).split('oddsportal')[0]
-    path    = '/var/www/' if not path else path
     leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
 
     timer_01 = datetime.datetime.now()
