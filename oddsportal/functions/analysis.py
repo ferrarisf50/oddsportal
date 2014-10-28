@@ -166,7 +166,7 @@ def analyzation(form_request):
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
 
-    path    = os.path.abspath(__name__).split('oddsportal')[0]
+    path    = os.getcwd().split('oddsportal')[0]
     leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
 
     timer_01 = datetime.datetime.now()
