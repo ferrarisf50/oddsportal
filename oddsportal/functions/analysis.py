@@ -50,7 +50,7 @@ def analyzation(form_request):
 
             return (profit_loss, round(profit_loss_value, 1))
 
-        def hda_calc(event_result, strategy, odd, odd_value, frst_game_coefficient, stake_running_total, stake_varying):
+        def hda_calc(event_result, strategy, odd, odd_value, varying_type, varying_value, varying_stake):
             '''Takes event data and returns True of False for Win and Loss and value'''
 
             event_home_win = 1 if event_result[0] >  event_result[1] else 0
@@ -63,20 +63,29 @@ def analyzation(form_request):
                (event_away_win  == 1 and strategy == 'a'):
                 profit_loss      = 1
 
+            
+            if varying_type == '1' or varying_type == '2':
 
-            if stake_varying:
-                if stake_running_total > odd_value:
-                    profit_loss_value  = (odd * stake_running_total - stake_running_total) if profit_loss == 1 else -stake_running_total
-                else:
-                    profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                profit_loss_value  = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
 
-                stake_running_total    = (stake_running_total + stake_running_total * frst_game_coefficient) if not profit_loss else odd_value
-                return (profit_loss, round(profit_loss_value, 1), stake_running_total)
+                #-- Stake_varying_1 is when we add 'varying_value' to odd_value.  --#
+                #-- Then we take this sum and add 'varying value' to it and so on --#
+                #===================================================================#
+                #-- Stake_varying_2 is when we always add 'varying_value' to --#
+                #-- initial odd_value --#
+
+                if  varying_type == '1':
+                    varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
+                if  varying_type == '2':
+                    varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
+
+
+                return (profit_loss, round(profit_loss_value, 1), varying_stake)
+
 
             else:
                 profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
                 return (profit_loss, round(profit_loss_value, 1))
-
 
             
 
@@ -113,14 +122,15 @@ def analyzation(form_request):
                 where = 'home_team' if playing_at == 'home' else 'away_team'
                 matches = (match for match in year_matches if getattr(match, where) == team)
 
-                #-- Stake variation
-                if stake_varying:
-                    pass
 
+                #-- Varying_type is which variation option we chose --#
+                varying_type  = form_request.varying_type if not form_request.varying_type == '0' else False
 
-                stake_varying = True if form_request.stake_varying_01 else False
-                frst_game_coefficient = float(form_request.stake_varying_01) / 100 if stake_varying else 1
-                stake_running_total   = odd_value
+                #-- Varying_value is % that we add to varying stake when we lose a game --#
+                varying_value = float(form_request.varying_value) / 100 if varying_type else 0
+
+                #-- Varying_stake increases we lose and turns back to odd_value when we win --#
+                varying_stake = odd_value
                 
                 for match in matches:
                     try:
@@ -129,20 +139,23 @@ def analyzation(form_request):
 
                         odd = json.loads(getattr(match, results_column))
                         odd = odd[odds_type] if form_request.handicap == 'hda' else odd[str(ou_value)][odds_type]
-                        odd = float(odd) - float(odd)*odd_toggle/100
+                        odd = float(odd) - (float(odd) * odd_toggle / 100)
 
-                        profit_loss  = hda_calc(event_results, form_request.strategy, odd, odd_value, frst_game_coefficient, stake_running_total, stake_varying) if form_request.handicap == 'hda' else\
-                                        ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
+                        profit_loss = hda_calc(event_results, form_request.strategy, odd, odd_value, varying_type, varying_value, varying_stake) if form_request.handicap == 'hda' else\
+                                       ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
                         
-                        if stake_varying:
-                            stake_running_total = profit_loss[2]
+                        
+                        varying_stake = profit_loss[2] if varying_type else odd_value
+
 
                         sum_profit_loss += profit_loss[1] * year_coefficient
 
                         matches_won     += 1 if profit_loss[0] else 0
                         matches_played  += 1
+
                     except Exception as e:
                         continue
+                        #raise NameError(e)
 
                 matches_played_year += matches_played
                 matches_won_year    += matches_won
@@ -156,6 +169,7 @@ def analyzation(form_request):
             output_results[playing_at][year]['prft_lss_year'] += prft_lss_year
             output_results[playing_at][year]['played_year']    = matches_played_year
             output_results[playing_at][year]['won_year']       = matches_won_year
+
 
         return output_results
 

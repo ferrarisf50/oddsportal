@@ -17,6 +17,10 @@
   text-align: left;
 }
 
+#table_head {
+  width: 250px;
+}
+
 #home_results_table {
   position: relative;
 }

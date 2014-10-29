@@ -117,9 +117,15 @@
 
             .large-6.columns
                 %label.right-inline -> Stake varying
-                
+                    %select name="varying_type"
+                        %option value="0" -> choose option
+                        %option value="1" -> by % of new stake 
+                        %option value="2" -> by % of init stake
+
             .large-6.columns
-                %input name="stake_varying_01" type="text" autocomplete='off'
+                %label -> Varying value
+                    %input name="varying_value" type="text" autocomplete='off'
+
 
             
             .large-12.columns

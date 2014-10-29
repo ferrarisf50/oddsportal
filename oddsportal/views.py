@@ -101,6 +101,8 @@ def search_results(logged = False):
         logged = True
 
     form_request        = RequestObject(request.form)
+    #return jsonify(a = form_request.stake_varying,
+    #               b = form_request.varying_value)
 
     stopwatch_01 = datetime.datetime.now()
     output_results_raw  = analyzation(form_request)
@@ -108,7 +110,7 @@ def search_results(logged = False):
     output_results      = json.loads(output_results_raw)
 
     time_01 = (stopwatch_02 - stopwatch_01).total_seconds()
-    #return jsonify(a=time_01)
+    
 
     stopwatch_01 = datetime.datetime.now()
     home_teams = []

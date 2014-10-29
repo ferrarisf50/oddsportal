@@ -26,10 +26,13 @@
         %table#home_results_table
             %thead
                 %tr.table_header
-                    %th -> Team
-                    %th colspan="3" -> Total
+                    %th
+                        #table_head -> Team
+                    %th colspan="3"
+                        #table_head -> Total
                     -for table_year in table_years
-                        %th colspan="2" -> {{table_year}}
+                        %th colspan="2"
+                            #table_head -> {{table_year}}
 
                 
                 %tr.table_labels
@@ -144,7 +147,7 @@
         $('.last_season').each(function (){
             var cellvalue = $(this).html();
             if ( cellvalue === '0/0') {
-                $(this).parent().css('opacity', '0.3')
+                $(this).parent().css('text-decoration', 'line-through');
             };
         });
 
