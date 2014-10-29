@@ -13,7 +13,9 @@ class RequestObject():
 
 def analyzation(form_request):
 
-    def analyze_teams(home_away_teams, results, playing_at, stake_varying = None):
+    path = os.path.dirname(__file__).split('oddsportal')[0]
+
+    def analyze_teams(home_away_teams, results, recent_season_results, playing_at, stake_varying = None):
 
         #def stake_varying_calc(varying_template, ):
 
@@ -111,11 +113,17 @@ def analyzation(form_request):
             year_matches = [result for result in results if result.year == year]
             
             for team in home_away_teams:
+
+                #-- Check if team played in the recent season --#
+                recent_season_games = [result for result in recent_season_results if result.home_team == team or result.away_team == team]
+                recent_season_games = 'active_team' if recent_season_games else 'deactive_team' 
+
                 output_results[playing_at][year]['teams'][team] = {'played':         0,
                                                                    'won':            0,
                                                                    'loss':           0,
                                                                    'prft_lss_value': 0,
-                                                                   'r_total':        0}
+                                                                   'r_total':        0,
+                                                                   'team_status':    recent_season_games}
 
                 matches_played, matches_won, sum_profit_loss = 0, 0, 0
 
@@ -174,14 +182,25 @@ def analyzation(form_request):
         return output_results
 
     timer_01 = datetime.datetime.now()
+
+    #-- Find group's latest season; we later use it to select non-active teams --#
+    recent_season = json.loads(open(path + 'oddsportal/oddsportal/tmp/group_years.txt').read())
+    recent_season = list(reversed(sorted(recent_season[form_request.league][form_request.group])))[0]
+
     results = models.Result.query.filter(models.Result.league == form_request.league,
                                          models.Result.group  == form_request.group,
                                          models.Result.year.in_(form_request.years)).all()
+
+    recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+                                                       models.Result.group  == form_request.group,
+                                                       models.Result.year   == recent_season).all()
+    
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
 
-    path    = os.path.dirname(__file__).split('oddsportal')[0]
     leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
+    
+   
 
     timer_01 = datetime.datetime.now()
     home_teams = sorted(list(set([result.home_team for result in results])))
@@ -200,8 +219,8 @@ def analyzation(form_request):
     stopwatch_02 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
     timer_01 = datetime.datetime.now()
-    home_teams_results = analyze_teams(home_teams, results, 'home')
-    away_teams_results = analyze_teams(away_teams, results, 'away')
+    home_teams_results = analyze_teams(home_teams, results, recent_season_results, 'home')
+    away_teams_results = analyze_teams(away_teams, results, recent_season_results, 'away')
     stopwatch_03 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
     timer_01 = datetime.datetime.now()
