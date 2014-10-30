@@ -156,7 +156,7 @@ def analyzation(form_request):
                 #-- Number_of_games is the quantity of games the  user set up till the stake varying changes it's behavoir --#
                 #-- Number_of_lost_games is increasing every time user loses --#
                 number_of_lost_games = 0
-                number_of_games = int(form_request.number_of_games) if varying_type else 0
+                number_of_games = int(form_request.number_of_games) if varying_type == '3' else 0
                 
                 for match in matches:
                     try:
