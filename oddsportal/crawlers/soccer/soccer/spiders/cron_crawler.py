@@ -43,19 +43,8 @@ class Cron_crawler(CrawlSpider):
 
         yield Request((new_url), meta = {'year':   year_num,
                                          'group':  group,
-                                         'league': league}, callback=self.parse_year)
+                                         'league': league}, callback=self.parse_category)
 
-    def parse_year(self, response):
-
-        hxs = HtmlXPathSelector(response)
-        pages = list(set(hxs.select("//div[@id='pagination']/a/@href").extract()))
-        pages_to_parse = [urljoin_rfc(get_base_url(response), page) for page in pages if 'page' in page]
-        pages_to_parse.append(response.url + 'page/1')
-
-        for page in pages_to_parse:
-            yield Request(page, meta = {'year':   response.meta['year'],
-                                        'group':  response.meta['group'],
-                                        'league': response.meta['league']}, callback=self.parse_category)
 
     def parse_category(self, response):
 
