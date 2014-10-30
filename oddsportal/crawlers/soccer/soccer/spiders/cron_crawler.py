@@ -25,7 +25,7 @@ from soccer.settings import logger_present, logger_absent
 
 class Cron_crawler(CrawlSpider):
 
-    name            = “soccer_cron”
+    name            = "soccer_cron"
     allowed_domains = ["oddsportal.com"]
     start_urls      = links
 
