@@ -18,7 +18,10 @@
 }
 
 #table_head {
-  width: 250px;
+  width: 150px;
+}
+#table_head_team {
+  width: 200px;
 }
 
 #home_results_table {
