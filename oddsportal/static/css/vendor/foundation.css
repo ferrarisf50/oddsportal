@@ -4277,9 +4277,6 @@ table {
   table .totals {
     font-weight: bold;
   }
-  table .deactive_team {
-    text-decoration: line-through;
-  }
   table tr th,
   table tr td {
     text-align: center;
