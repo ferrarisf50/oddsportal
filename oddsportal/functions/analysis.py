@@ -52,7 +52,8 @@ def analyzation(form_request):
 
             return (profit_loss, round(profit_loss_value, 1))
 
-        def hda_calc(event_result, strategy, odd, odd_value, varying_type, varying_value, varying_stake):
+        def hda_calc(event_result,  strategy, odd, odd_value, varying_type, 
+                     varying_value, varying_stake, number_of_lost_games, number_of_games):
             '''Takes event data and returns True of False for Win and Loss and value'''
 
             event_home_win = 1 if event_result[0] >  event_result[1] else 0
@@ -84,6 +85,18 @@ def analyzation(form_request):
 
                 return (profit_loss, round(profit_loss_value, 1), varying_stake)
 
+            elif varying_type == '3':
+
+                profit_loss_value = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
+                varying_stake     = (varying_stake + varying_stake * varying_value) if number_of_lost_games <= number_of_games else varying_stake
+
+                #-- With every win we reset the number_of_lost_games --#
+                number_of_lost_games += 1 if not profit_loss else 0
+
+                #-- Reset varying stake when user win --#
+                varying_stake = odd_value if profit_loss else varying_stake
+
+                return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games)
 
             else:
                 profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
@@ -139,6 +152,11 @@ def analyzation(form_request):
 
                 #-- Varying_stake increases we lose and turns back to odd_value when we win --#
                 varying_stake = odd_value
+
+                #-- Number_of_games is the quantity of games the  user set up till the stake varying changes it's behavoir --#
+                #-- Number_of_lost_games is increasing every time user loses --#
+                number_of_lost_games = 0
+                number_of_games = int(form_request.number_of_games)
                 
                 for match in matches:
                     try:
@@ -149,11 +167,12 @@ def analyzation(form_request):
                         odd = odd[odds_type] if form_request.handicap == 'hda' else odd[str(ou_value)][odds_type]
                         odd = float(odd) - (float(odd) * odd_toggle / 100)
 
-                        profit_loss = hda_calc(event_results, form_request.strategy, odd, odd_value, varying_type, varying_value, varying_stake) if form_request.handicap == 'hda' else\
+                        profit_loss = hda_calc(event_results, form_request.strategy, odd, odd_value, varying_type, varying_value, varying_stake, number_of_lost_games, number_of_games) if form_request.handicap == 'hda' else\
                                        ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
                         
                         
                         varying_stake = profit_loss[2] if varying_type else odd_value
+                        number_of_lost_games = profit_loss[3] if varying_type == '3' else None
 
 
                         sum_profit_loss += profit_loss[1] * year_coefficient

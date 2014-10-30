@@ -115,16 +115,20 @@
                     &nbsp;Stake
                     %input.high_input name="odd_value" type="text" autocomplete='off'
 
-            .large-6.columns
-                %label.right-inline -> Stake varying
+            .large-12.columns
+                %label -> Stake varying
                     %select name="varying_type"
                         %option value="0" -> choose option
                         %option value="1" -> by % of new stake 
                         %option value="2" -> by % of init stake
+                        %option value="3" -> fix stake after N losses
 
             .large-6.columns
                 %label -> Varying value
                     %input name="varying_value" type="text" autocomplete='off'
+            .large-6.columns
+                %label -> Number of games
+                    %input name="number_of_games" type="text" autocomplete='off'
 
 
             
@@ -155,10 +159,12 @@
         });
     });
 
-    ;Better change it somehow
+    $('input[name=varying_value]').attr('disabled', 'disabled');
+    $('input[name=number_of_games]').attr('disabled', 'disabled');
     
     $("select[name=group]").change(get_years);
     $("select[name=league]").change(get_groups);
+    $("select[name=varying_type]").change(varying_type_change);
     $("#handicap").change(handicap_changed_event);
 
     $('#searchForm').on('keyup keypress change', search_form_check);
