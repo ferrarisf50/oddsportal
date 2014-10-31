@@ -74,6 +74,7 @@ class Missing_games_crawler(CrawlSpider):
 
             checker = session.query(models.Result).filter_by(tournament_url = new_url).all()
             if checker:
+                pass
                 #logger_present.info(new_url)
             else:
                 #logger_absent.info(new_url)
