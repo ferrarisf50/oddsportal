@@ -17,7 +17,7 @@ from soccer.settings import session
 
 
 crawlers_path = os.path.abspath(__name__).split('crawlers')[0]
-links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()
+links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()[64]
 
 #try:
 #    os.remove(crawlers_path + '/crawlers/soccer/present.log')
@@ -32,7 +32,7 @@ class Missing_games_crawler(CrawlSpider):
 
     name            = "soccer_missings"
     allowed_domains = ["oddsportal.com"]
-    start_urls      = links
+    start_urls      = [links]
 
     def parse(self, response):
 
