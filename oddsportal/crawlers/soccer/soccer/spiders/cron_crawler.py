@@ -17,7 +17,7 @@ from soccer.settings import session
 
 
 crawlers_path = os.path.abspath(__name__).split('crawlers')[0]
-links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()
+links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()[64]
 
 
 from soccer.settings import logger_present, logger_absent
@@ -27,7 +27,7 @@ class Cron_crawler(CrawlSpider):
 
     name            = "soccer_cron"
     allowed_domains = ["oddsportal.com"]
-    start_urls      = links
+    start_urls      = [links]
 
     def parse(self, response):
 
