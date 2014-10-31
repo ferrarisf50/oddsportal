@@ -391,13 +391,9 @@ function scroll_right_side_bar() {
 
 function varying_type_change() {
     var type_selected = $('select[name=varying_type]').find(":selected").val();
-    if (type_selected === '3') {
+    if (type_selected !== '0') {
         $('input[name=varying_value]').removeAttr("disabled");
         $('input[name=number_of_games]').removeAttr("disabled");
-    }
-    else if (type_selected !== '0') {
-        $('input[name=varying_value]').removeAttr("disabled");
-        $('input[name=number_of_games]').attr('disabled', 'disabled');
     }
     else {
         $('input[name=varying_value]').attr('disabled', 'disabled');

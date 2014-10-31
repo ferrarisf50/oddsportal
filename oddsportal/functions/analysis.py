@@ -77,26 +77,28 @@ def analyzation(form_request):
                 #-- Stake_varying_2 is when we always add 'varying_value' to --#
                 #-- initial odd_value --#
 
-                if  varying_type == '1':
-                    varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
-                if  varying_type == '2':
-                    varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
+                #-- Check if number_of_games is predefined by user --#
+                if number_of_games:
+                    if number_of_lost_games <= number_of_games:
+                        if    varying_type == '1':
+                              varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
+                        elif  varying_type == '2':
+                              varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
+                    else:
+                        varying_stake = varying_stake
 
-
-                return (profit_loss, round(profit_loss_value, 1), varying_stake)
-
-            elif varying_type == '3':
-
-                profit_loss_value = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
-                varying_stake     = (varying_stake + varying_stake * varying_value) if number_of_lost_games <= number_of_games else varying_stake
+                else:
+                    if    varying_type == '1':
+                          varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
+                    elif  varying_type == '2':
+                          varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
 
                 #-- With every win we reset the number_of_lost_games --#
                 number_of_lost_games += 1 if not profit_loss else 0
 
-                #-- Reset varying stake when user win --#
-                varying_stake = odd_value if profit_loss else varying_stake
-
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games)
+
+            
 
             else:
                 profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
@@ -148,7 +150,7 @@ def analyzation(form_request):
                 varying_type  = form_request.varying_type if not form_request.varying_type == '0' else False
 
                 #-- Varying_value is % that we add to varying stake when we lose a game --#
-                varying_value = float(form_request.varying_value) / 100 if varying_type else 0
+                varying_value = float(form_request.varying_value) / 100 if varying_type and form_request.varying_value else 0
 
                 #-- Varying_stake increases we lose and turns back to odd_value when we win --#
                 varying_stake = odd_value
@@ -156,7 +158,7 @@ def analyzation(form_request):
                 #-- Number_of_games is the quantity of games the  user set up till the stake varying changes it's behavoir --#
                 #-- Number_of_lost_games is increasing every time user loses --#
                 number_of_lost_games = 0
-                number_of_games = int(form_request.number_of_games) if varying_type == '3' else 0
+                number_of_games = int(form_request.number_of_games) if varying_type and form_request.number_of_games else 0
                 
                 for match in matches:
                     try:
@@ -172,7 +174,7 @@ def analyzation(form_request):
                         
                         
                         varying_stake = profit_loss[2] if varying_type else odd_value
-                        number_of_lost_games = profit_loss[3] if varying_type == '3' else None
+                        number_of_lost_games = profit_loss[3] if varying_type else 0
 
 
                         sum_profit_loss += profit_loss[1] * year_coefficient
@@ -209,6 +211,8 @@ def analyzation(form_request):
     results = models.Result.query.filter(models.Result.league == form_request.league,
                                          models.Result.group  == form_request.group,
                                          models.Result.year.in_(form_request.years)).all()
+
+    results.sort(key=lambda x: x.datetime, reverse=False)
 
     recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
                                                        models.Result.group  == form_request.group,
