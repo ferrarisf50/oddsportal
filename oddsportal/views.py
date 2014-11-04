@@ -130,6 +130,8 @@ def search_results(logged = False):
     
     strategies_dict = {'h': 'win at Home', 'a': "win Away", 'd': 'Draw', 'u': 'Under', 'o': 'Over'}
     playing_at_type = 'Home' if form_request.form_playing_at_types == 'h' else 'Away'
+
+    stake = int(form_request.odd_value)
     
     if form_request.handicap == 'ou':
         results_labels = {'h': 'Backing at {}-{}'.format(form_request.ou_values, strategies_dict[form_request.strategy]),
@@ -151,10 +153,16 @@ def search_results(logged = False):
             team_all_years_pl  += output_results['home'][year]['teams'][team]['prft_lss_value']
 
         for year in form_request.years:
+            invest = team_all_years_pld * stake
+            roi    = (1 - ((invest - abs(team_all_years_pl)) / invest)) * 100 if team_all_years_won else 100
+            roi    = -round(roi, 1) if team_all_years_pl <= 0 else round(roi, 1)
             output_results['home'][year]['teams'][team]['team_all_years_won'] = team_all_years_won
             output_results['home'][year]['teams'][team]['team_all_years_pld'] = team_all_years_pld
             output_results['home'][year]['teams'][team]['team_all_years_pl']  = team_all_years_pl
+            output_results['home'][year]['teams'][team]['team_all_years_inv'] = invest
+            output_results['home'][year]['teams'][team]['team_all_years_roi'] = roi
             break
+
 
     for team in away_teams:
         team_all_years_won = 0
@@ -166,18 +174,25 @@ def search_results(logged = False):
             team_all_years_pl  += output_results['away'][year]['teams'][team]['prft_lss_value']
 
         for year in form_request.years:
+            invest = team_all_years_pld * stake
+            roi    = (1 - ((invest - abs(team_all_years_pl)) / invest)) * 100
+            roi    = -round(roi, 1) if team_all_years_pl <= 0 else round(roi, 1)
             output_results['away'][year]['teams'][team]['team_all_years_won'] = team_all_years_won
             output_results['away'][year]['teams'][team]['team_all_years_pld'] = team_all_years_pld
             output_results['away'][year]['teams'][team]['team_all_years_pl']  = team_all_years_pl
+            output_results['away'][year]['teams'][team]['team_all_years_inv'] = invest
+            output_results['away'][year]['teams'][team]['team_all_years_roi'] = roi
             break
 
     
     totals = {'home': {'all_teams_all_years_won': 0,
                        'all_teams_all_years_pld': 0,
-                       'all_teams_all_years_pl':  0},
+                       'all_teams_all_years_pl':  0,
+                       'all_teams_all_years_inv': 0},
               'away': {'all_teams_all_years_won': 0,
                        'all_teams_all_years_pld': 0,
-                       'all_teams_all_years_pl':  0}}
+                       'all_teams_all_years_pl':  0,
+                       'all_teams_all_years_inv': 0}}
 
 
     for year in form_request.years:
@@ -185,14 +200,26 @@ def search_results(logged = False):
             totals['home']['all_teams_all_years_won'] += output_results['home'][year]['teams'][team]['team_all_years_won']
             totals['home']['all_teams_all_years_pld'] += output_results['home'][year]['teams'][team]['team_all_years_pld']
             totals['home']['all_teams_all_years_pl']  += output_results['home'][year]['teams'][team]['team_all_years_pl']
+            totals['home']['all_teams_all_years_inv'] += output_results['home'][year]['teams'][team]['team_all_years_inv']
         break
+    total_investments  = totals['home']['all_teams_all_years_inv']
+    total_games_played = totals['home']['all_teams_all_years_pld']
+    total_play_loss    = totals['home']['all_teams_all_years_pl']
+    totals['home']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2)
+    totals['home']['all_teams_all_years_roi'] = -totals['home']['all_teams_all_years_roi'] if total_play_loss <= 0 else roi
 
     for year in form_request.years:
         for team in away_teams:
             totals['away']['all_teams_all_years_won'] += output_results['away'][year]['teams'][team]['team_all_years_won']
             totals['away']['all_teams_all_years_pld'] += output_results['away'][year]['teams'][team]['team_all_years_pld']
             totals['away']['all_teams_all_years_pl']  += output_results['away'][year]['teams'][team]['team_all_years_pl']
+            totals['away']['all_teams_all_years_inv'] += output_results['away'][year]['teams'][team]['team_all_years_inv']
         break
+    total_investments  = totals['away']['all_teams_all_years_inv']
+    total_games_played = totals['away']['all_teams_all_years_pld']
+    total_play_loss    = totals['away']['all_teams_all_years_pl']
+    totals['away']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2) if total_investments else 0
+    totals['away']['all_teams_all_years_roi'] = -totals['away']['all_teams_all_years_roi'] if total_play_loss <= 0 else roi
 
     stopwatch_02 = datetime.datetime.now()
     time_02 = (stopwatch_02 - stopwatch_01).total_seconds()
