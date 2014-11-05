@@ -147,13 +147,16 @@ def search_results(logged = False):
         team_all_years_won = 0
         team_all_years_pld = 0
         team_all_years_pl  = 0
+        team_all_years_inv = 0
         for year in form_request.years:
             team_all_years_won += output_results['home'][year]['teams'][team]['won']
             team_all_years_pld += output_results['home'][year]['teams'][team]['played']
             team_all_years_pl  += output_results['home'][year]['teams'][team]['prft_lss_value']
+            team_all_years_inv += output_results['home'][year]['teams'][team]['investments']
+
 
         for year in form_request.years:
-            invest = team_all_years_pld * stake
+            invest = team_all_years_inv
             roi    = (1 - ((invest - abs(team_all_years_pl)) / invest)) * 100 if team_all_years_won else 100
             roi    = -round(roi, 1) if team_all_years_pl <= 0 else round(roi, 1)
             output_results['home'][year]['teams'][team]['team_all_years_won'] = team_all_years_won
@@ -168,13 +171,15 @@ def search_results(logged = False):
         team_all_years_won = 0
         team_all_years_pld = 0
         team_all_years_pl  = 0
+        team_all_years_inv = 0
         for year in form_request.years:
             team_all_years_won += output_results['away'][year]['teams'][team]['won']
             team_all_years_pld += output_results['away'][year]['teams'][team]['played']
             team_all_years_pl  += output_results['away'][year]['teams'][team]['prft_lss_value']
+            team_all_years_inv += output_results['home'][year]['teams'][team]['investments']
 
         for year in form_request.years:
-            invest = team_all_years_pld * stake
+            invest = team_all_years_inv
             roi    = (1 - ((invest - abs(team_all_years_pl)) / invest)) * 100
             roi    = -round(roi, 1) if team_all_years_pl <= 0 else round(roi, 1)
             output_results['away'][year]['teams'][team]['team_all_years_won'] = team_all_years_won

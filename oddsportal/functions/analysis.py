@@ -159,9 +159,14 @@ def analyzation(form_request):
                 #-- Number_of_lost_games is increasing every time user loses --#
                 number_of_lost_games = 0
                 number_of_games = int(form_request.number_of_games) if varying_type and form_request.number_of_games else 0
+
+                investments = 0
                 
                 for match in matches:
                     try:
+
+                        investments  += varying_stake
+
                         event_results = json.loads(match.event_results)
                         event_results = event_results[form_request.game_part].split(':') if event_results[form_request.game_part] else 0
 
@@ -194,6 +199,8 @@ def analyzation(form_request):
                 output_results[playing_at][year]['teams'][team]['won']            = matches_won
                 output_results[playing_at][year]['teams'][team]['loss']           = matches_played - matches_won
                 output_results[playing_at][year]['teams'][team]['prft_lss_value'] = sum_profit_loss
+
+                output_results[playing_at][year]['teams'][team]['investments']    = investments
 
             output_results[playing_at][year]['prft_lss_year'] += prft_lss_year
             output_results[playing_at][year]['played_year']    = matches_played_year
