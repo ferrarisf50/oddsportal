@@ -166,7 +166,7 @@ def analyzation(form_request):
                 varying_type  = form_request.varying_type if not form_request.varying_type == '0' else False
 
                 #-- Varying_value is % that we add to varying stake when we lose a game --#
-                varying_value = float(form_request.varying_value) / 100 if varying_type and form_request.varying_value else 0
+                varying_value = float(form_request.varying_value) / 100 if varying_type and varying_type != '3' and form_request.varying_value else 0
 
                 #-- Varying_stake increases we lose and turns back to odd_value when we win --#
                 varying_stake = odd_value
