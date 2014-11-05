@@ -53,7 +53,7 @@ def analyzation(form_request):
             return (profit_loss, round(profit_loss_value, 1))
 
         def hda_calc(event_result,  strategy, odd, odd_value, varying_type, 
-                     varying_value, varying_stake, number_of_lost_games, number_of_games):
+                     varying_value, varying_stake, number_of_lost_games, number_of_games, waiting_for_win):
             '''Takes event data and returns True of False for Win and Loss and value'''
 
             event_home_win = 1 if event_result[0] >  event_result[1] else 0
@@ -98,7 +98,21 @@ def analyzation(form_request):
 
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games)
 
-            
+            elif varying_type == '3':
+                if not profit_loss:
+                    waiting_for_win = False
+                if number_of_lost_games == number_of_games:
+                    profit_loss_value = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                    waiting_for_win = True
+                elif number_of_lost_games  > number_of_games:
+                    profit_loss_value = 0
+                else:
+                    profit_loss_value = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+
+                #-- With every win we reset the number_of_lost_games --#
+                number_of_lost_games += 1 if not profit_loss else 0
+
+                return (profit_loss, round(profit_loss_value, 1), number_of_lost_games, waiting_for_win)
 
             else:
                 profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
@@ -161,11 +175,13 @@ def analyzation(form_request):
                 number_of_games = int(form_request.number_of_games) if varying_type and form_request.number_of_games else 0
 
                 investments = 0
+                waiting_for_win = False
                 
                 for match in matches:
                     try:
 
-                        investments  += varying_stake
+                        if not waiting_for_win:
+                            investments  += varying_stake
 
                         event_results = json.loads(match.event_results)
                         event_results = event_results[form_request.game_part].split(':') if event_results[form_request.game_part] else 0
@@ -174,15 +190,16 @@ def analyzation(form_request):
                         odd = odd[odds_type] if form_request.handicap == 'hda' else odd[str(ou_value)][odds_type]
                         odd = float(odd) - (float(odd) * odd_toggle / 100)
 
-                        profit_loss = hda_calc(event_results, form_request.strategy, odd, odd_value, varying_type, varying_value, varying_stake, number_of_lost_games, number_of_games) if form_request.handicap == 'hda' else\
+                        profit_loss = hda_calc(event_results, form_request.strategy, odd, odd_value, varying_type, varying_value, varying_stake, number_of_lost_games, number_of_games, waiting_for_win) if form_request.handicap == 'hda' else\
                                        ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
                         
                         
-                        varying_stake = profit_loss[2] if varying_type else odd_value
+                        varying_stake = profit_loss[2] if varying_type and varying_type != '3' else odd_value
                         number_of_lost_games = profit_loss[3] if varying_type else 0
 
 
                         sum_profit_loss += profit_loss[1] * year_coefficient
+                        waiting_for_win  = profit_loss[2] if varying_type == '3' else False
 
                         matches_won     += 1 if profit_loss[0] else 0
                         matches_played  += 1
