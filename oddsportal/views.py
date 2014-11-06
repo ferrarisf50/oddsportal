@@ -176,7 +176,7 @@ def search_results(logged = False):
             team_all_years_won += output_results['away'][year]['teams'][team]['won']
             team_all_years_pld += output_results['away'][year]['teams'][team]['played']
             team_all_years_pl  += output_results['away'][year]['teams'][team]['prft_lss_value']
-            team_all_years_inv += output_results['home'][year]['teams'][team]['investments']
+            team_all_years_inv += output_results['away'][year]['teams'][team]['investments']
 
         for year in form_request.years:
             invest = team_all_years_inv
