@@ -8,6 +8,7 @@ class RequestObject():
 
         [setattr(self, key, value) for key, value in request_values.iteritems()]
         self.years = request_values.getlist('years')
+        self.wait_for_win = request_values.getlist('bet_from_win')
 
 
 
@@ -177,11 +178,10 @@ def analyzation(form_request):
                 number_of_games = int(form_request.number_of_games) if varying_type and form_request.number_of_games else 0
                 
                 investments = 0
-                waiting_for_win = False
+                waiting_for_win = True if '1' in form_request.wait_for_win else False
                 
                 for match in matches:
                     try:
-
 
                         event_results = json.loads(match.event_results)
                         event_results = event_results[form_request.game_part].split(':') if event_results[form_request.game_part] else 0
@@ -198,13 +198,15 @@ def analyzation(form_request):
                         number_of_lost_games = profit_loss[3] if varying_type else 0
 
 
-                        sum_profit_loss += profit_loss[1] * year_coefficient
-                        waiting_for_win  = profit_loss[4] if varying_type == '3' else False
-
                         if not waiting_for_win:
-                            matches_won    += 1 if profit_loss[0] else 0
-                            matches_played += 1
-                            investments += varying_stake
+                            matches_won     += 1 if profit_loss[0] else 0
+                            matches_played  += 1
+                            investments     += varying_stake
+                            sum_profit_loss += profit_loss[1] * year_coefficient
+
+                        waiting_for_win = profit_loss[4] if varying_type == '3' else False
+
+                        
 
                     except Exception as e:
                         continue
@@ -219,7 +221,7 @@ def analyzation(form_request):
                 output_results[playing_at][year]['teams'][team]['loss']           = matches_played - matches_won
                 output_results[playing_at][year]['teams'][team]['prft_lss_value'] = sum_profit_loss
 
-                output_results[playing_at][year]['teams'][team]['investments']    = investments
+                output_results[playing_at][year]['teams'][team]['investments']    = round(investments,1)
 
             output_results[playing_at][year]['prft_lss_year'] += prft_lss_year
             output_results[playing_at][year]['played_year']    = matches_played_year

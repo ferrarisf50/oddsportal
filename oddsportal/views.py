@@ -180,7 +180,7 @@ def search_results(logged = False):
 
         for year in form_request.years:
             invest = team_all_years_inv
-            roi    = (1 - ((invest - abs(team_all_years_pl)) / invest)) * 100
+            roi    = (1 - ((invest - abs(team_all_years_pl)) / invest)) * 100 if invest else 0
             roi    = -round(roi, 1) if team_all_years_pl <= 0 else round(roi, 1)
             output_results['away'][year]['teams'][team]['team_all_years_won'] = team_all_years_won
             output_results['away'][year]['teams'][team]['team_all_years_pld'] = team_all_years_pld
