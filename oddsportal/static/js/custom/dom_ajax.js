@@ -404,3 +404,14 @@ function varying_type_change() {
         $('input[name=number_of_games]').attr('disabled', 'disabled');
     }
 }
+
+
+
+function delete_template() {
+    var selected_template = $('#select_template').find(":selected").val();
+    $.post('/delete_template', {
+            template_name: selected_template
+        }).done(function (data) {
+            swal("Template deleted!", "Thank you", "success")
+        }); 
+}

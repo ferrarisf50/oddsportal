@@ -505,3 +505,23 @@ def raw_download(logged = False):
                                                         logged     = logged)
 
         return render_template("index.html")
+
+
+
+@app.route('/delete_template', methods=['GET', 'POST'])
+def delete_template():
+
+    templates = models.User.query.filter_by(login = session['login']).first().templates
+    templates = json.loads(templates) if templates else {}
+
+    name = request.values.get('template_name')
+
+    del templates[name]
+
+    user = models.User.query.filter_by(login = session['login']).first()
+    user.templates = json.dumps(templates)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(templates = templates)

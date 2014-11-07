@@ -89,7 +89,11 @@ tr .table_total td {
 
 
 
-
+.delete_template {
+  margin-left: 1.2rem;
+  text-decoration: none;
+  font-size: 0.7rem;
+}
 
 #mySlideToggler{
   margin-left: 1.2rem;
