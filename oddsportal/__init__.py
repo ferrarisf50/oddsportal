@@ -8,23 +8,19 @@ from flask import Flask
 from flask.ext import htauth
 
 app = Flask(__name__)
-'''
-try:
-	HTPASSWD = '/var/www/htpasswd'
-	app.config['HTAUTH_HTPASSWD_PATH'] = HTPASSWD
-	auth = htauth.HTAuth(app)
-except:
-	pass
-'''
 
 
 assets = Environment(app)
 
-js_bundle  = Bundle('js/vendor/jquery.min.js',
+js_bundle  = Bundle('js/vendor/jquery.autocomplete.js',
+					'js/vendor/jquery.js',
+					'js/vendor/jquery-ui.min.js',
 					'js/custom/dom_ajax.js',
 					'js/vendor/foundation.min.js',
 					'js/vendor/jquery.sidr.min.js',
 					'js/vendor/sweet-alert.min.js',
+					'js/vendor/knockout-3.2.0.js',
+					
 					'js/vendor/perfect-scrollbar.js', output = 'gen/all.js')
 
 css_bundle = Bundle('css/custom/style.css',

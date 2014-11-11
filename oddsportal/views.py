@@ -525,3 +525,27 @@ def delete_template():
     db.session.commit()
 
     return jsonify(templates = templates)
+
+
+@app.route('/select_teams', methods=['GET', 'POST'])
+def select_teams():
+
+    path = os.path.dirname(__file__)
+    winter_teams = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['winter'])
+    summer_teams = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['summer'])
+    return render_template('select_teams.html', winter_teams = winter_teams, 
+                                                summer_teams = summer_teams)
+
+
+@app.route('/autocomplete', methods=['GET', 'POST'])
+def autocomplete():
+
+    path = os.path.dirname(__file__)
+    winter_teams = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['winter'])
+    summer_teams = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['summer'])
+
+    results = []
+    #search  = request.args.get('term')
+    l = winter_teams
+
+    return jsonify(json_list=l) 

@@ -108,7 +108,10 @@ def analyzation(form_request):
                         waiting_for_win = True
                         profit_loss_value = 0
                     else:
-                        profit_loss_value = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                        profit_loss_value = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
+
+                varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
+
                 #-- With every win we reset the number_of_lost_games --#
                 number_of_lost_games += 1 if not profit_loss else 0
 
@@ -167,7 +170,7 @@ def analyzation(form_request):
                 varying_type  = form_request.varying_type if not form_request.varying_type == '0' else False
 
                 #-- Varying_value is % that we add to varying stake when we lose a game --#
-                varying_value = float(form_request.varying_value) / 100 if varying_type and varying_type != '3' and form_request.varying_value else 0
+                varying_value = float(form_request.varying_value) / 100 if varying_type and form_request.varying_value else 0
 
                 #-- Varying_stake increases we lose and turns back to odd_value when we win --#
                 varying_stake = odd_value
@@ -194,7 +197,7 @@ def analyzation(form_request):
                                        ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
                         
                         
-                        varying_stake = profit_loss[2] if varying_type and varying_type != '3' else odd_value
+                        varying_stake = profit_loss[2] if varying_type else odd_value
                         number_of_lost_games = profit_loss[3] if varying_type else 0
 
 

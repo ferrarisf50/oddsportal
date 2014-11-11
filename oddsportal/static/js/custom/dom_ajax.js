@@ -396,7 +396,7 @@ function varying_type_change() {
         $('input[name=number_of_games]').removeAttr("disabled");
     }
     else if (type_selected === '3') {
-        $('input[name=varying_value]').attr('disabled', 'disabled');
+        $('input[name=varying_value]').removeAttr("disabled");
         $('input[name=number_of_games]').removeAttr("disabled");
     }
     else {

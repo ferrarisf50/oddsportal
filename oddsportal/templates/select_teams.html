@@ -1,0 +1,72 @@
+{% haml %}
+
+%html
+    %head
+        -assets "js_all"
+            %script src="{{ ASSET_URL }}" type="text/javascript"
+        -assets "css_all"
+            %link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"
+
+        
+        
+
+    %body
+
+        .row
+            #select_teams.large-8.large-centered.columns
+                %form#select_teams data-bind="submit:addItem"
+                    %label -> Add item: 
+                    %input#query type="text" data-bind='value:itemToAdd, valueUpdate: "afterkeydown"'
+                    %button type="submit" data-bind="enable: itemToAdd().length > 0" -> Add
+                    
+                 
+                %p -> Your values:
+                %select.selected_teams multiple="multiple" height="5" data-bind="options:allItems, selectedOptions:selectedItems"
+                 
+                %div
+                    %button data-bind="click: removeSelected, enable: selectedItems().length > 0" -> Remove
+                    &nbsp;
+                    %button data-bind="click: sortItems, enable: allItems().length > 1" -> Sort
+
+    
+        %script
+            var BetterListModel = function () {
+                this.itemToAdd = ko.observable("");
+                this.allItems = ko.observableArray([]);
+                this.selectedItems = ko.observableArray([]);
+             
+                this.addItem = function () {
+                    if ((this.itemToAdd() != "") && (this.allItems.indexOf(this.itemToAdd()) < 0))
+                        this.allItems.push(this.itemToAdd());
+                    this.itemToAdd("");
+                };
+             
+                this.removeSelected = function () {
+                    this.allItems.removeAll(this.selectedItems());
+                    this.selectedItems([]);
+                };
+             
+                this.sortItems = function() {
+                    this.allItems.sort();
+                };
+            };
+             
+            ko.applyBindings(new BetterListModel());
+
+        %script
+            $(document).ready(function() {
+                $.ajax({
+                    url: '{{ url_for("autocomplete") }}'
+                }).done(function (data) {
+                    $('#query').autocomplete({
+                        source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(data.json_list, request.term);
+                            response(results.slice(0, 10));
+                        },
+                        minLength: 2,
+                    });
+                });
+            });
+            
+
+{% endhaml %}
