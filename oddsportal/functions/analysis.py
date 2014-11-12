@@ -70,7 +70,10 @@ def analyzation(form_request):
             
             if varying_type == '1' or varying_type == '2':
 
-                profit_loss_value  = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
+                if waiting_for_win:
+                    profit_loss_value = 0
+                else:
+                    profit_loss_value  = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
 
                 #-- Stake_varying_1 is when we add 'varying_value' to odd_value.  --#
                 #-- Then we take this sum and add 'varying value' to it and so on --#
@@ -97,7 +100,10 @@ def analyzation(form_request):
                 #-- With every win we reset the number_of_lost_games --#
                 number_of_lost_games += 1 if not profit_loss else 0
 
-                return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games)
+                if profit_loss:
+                    waiting_for_win = False
+
+                return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
             elif varying_type == '3':
 
@@ -121,8 +127,15 @@ def analyzation(form_request):
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
             else:
-                profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
-                return (profit_loss, round(profit_loss_value, 1))
+                if waiting_for_win:
+                    profit_loss_value = 0
+                else:
+                    profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                
+                if profit_loss:
+                    waiting_for_win = False
+
+                return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
             
 
@@ -207,7 +220,7 @@ def analyzation(form_request):
                             investments     += varying_stake
                             sum_profit_loss += profit_loss[1] * year_coefficient
 
-                        waiting_for_win = profit_loss[4] if varying_type == '3' else False
+                        waiting_for_win = profit_loss[4]
 
                         
 
