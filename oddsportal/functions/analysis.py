@@ -18,62 +18,86 @@ def analyzation(form_request):
 
     def analyze_teams(home_away_teams, results, recent_season_results, playing_at, stake_varying = None):
 
-        #def stake_varying_calc(varying_template, ):
-
-
-        def ou_calc(event_result, strategy, odd, odd_value, ou_value):
-            '''Takes event_results and odd, returns True of False for Win and Loss'''
-
-            sum_goals = int(event_result[0]) + int(event_result[1])
-            half_win, full_win, profit_loss = 0, 0, 0
-
-            if strategy == 'o':
-                if (sum_goals - ou_value)   >= 0.5:
-                    full_win, profit_loss    = 1, 1
-                elif (sum_goals - ou_value) >= 0.25:
-                    half_win, profit_loss    = 1, 1
-                else:
-                    pass
-
-            else:
-                if (ou_value - sum_goals)   >= 0.5:
-                    full_win, profit_loss    = 1, 1
-                elif (ou_value - sum_goals) >= 0.25:
-                    half_win, profit_loss    = 1, 1
-                else:
-                    pass
-
-
-            if   full_win == 1:
-                profit_loss_value =   odd * odd_value - odd_value
-            elif half_win == 1:
-                profit_loss_value =  (odd * odd_value / 2) + (odd_value / 2)
-            else:
-                profit_loss_value = -odd_value
-
-            return (profit_loss, round(profit_loss_value, 1))
-
-        def hda_calc(event_result,  strategy, odd, odd_value, varying_type, 
-                     varying_value, varying_stake, number_of_lost_games, number_of_games, waiting_for_win):
+        def calc(handicap,
+                 event_results,
+                 strategy,
+                 odd,
+                 odd_value,
+                 ou_value,
+                 varying_type,
+                 varying_value,
+                 varying_stake,
+                 number_of_lost_games,
+                 number_of_games,
+                 waiting_for_win):     
             '''Takes event data and returns True of False for Win and Loss and value'''
 
-            event_home_win = 1 if event_result[0] >  event_result[1] else 0
-            event_draw     = 1 if event_result[0] == event_result[1] else 0
-            event_away_win = 1 if event_result[0] <  event_result[1] else 0
+            def pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win):
+                if handicap == 'hda':
+                    profit_loss_value  = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
+                elif handicap == 'ou':
+                    if   full_win == 1:
+                        profit_loss_value =   odd * varying_stake - varying_stake
+                    elif half_win == 1:
+                        profit_loss_value =  (odd * varying_stake / 2) + (varying_stake / 2)
+                    else:
+                        profit_loss_value = -varying_stake
+                return profit_loss_value
 
-            profit_loss    = 0
-            if (event_home_win  == 1 and strategy == 'h') or\
-               (event_draw      == 1 and strategy == 'd') or\
-               (event_away_win  == 1 and strategy == 'a'):
-                profit_loss      = 1
+            def pl_fixed_calc(handicap, odd, odd_value, profit_loss, full_win, half_win):
+                if handicap == 'hda':
+                    profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                elif handicap == 'ou':
+                    if   full_win == 1:
+                        profit_loss_value =   odd * odd_value - odd_value
+                    elif half_win == 1:
+                        profit_loss_value =  (odd * odd_value / 2) + (odd_value / 2)
+                    else:
+                        profit_loss_value = -odd_value
+                return profit_loss_value
 
+
+
+            #== PROFIT or LOSS calculation; HALF_WIN of FULL_WIN for Over/Under ==#
+            half_win, full_win, profit_loss = 0, 0, 0
+
+            if handicap == 'hda':
+                event_home_win = 1 if event_results[0] >  event_results[1] else 0
+                event_draw     = 1 if event_results[0] == event_results[1] else 0
+                event_away_win = 1 if event_results[0] <  event_results[1] else 0
+
+                if (event_home_win  == 1 and strategy == 'h') or\
+                   (event_draw      == 1 and strategy == 'd') or\
+                   (event_away_win  == 1 and strategy == 'a'):
+                    profit_loss      = 1
             
+            elif handicap == 'ou':
+                sum_goals = int(event_results[0]) + int(event_results[1])
+                
+                if strategy == 'o':
+                    if (sum_goals - ou_value)   >= 0.5:
+                        full_win, profit_loss    = 1, 1
+                    elif (sum_goals - ou_value) >= 0.25:
+                        half_win, profit_loss    = 1, 1
+                    else:
+                        pass
+
+                else:
+                    if (ou_value - sum_goals)   >= 0.5:
+                        full_win, profit_loss    = 1, 1
+                    elif (ou_value - sum_goals) >= 0.25:
+                        half_win, profit_loss    = 1, 1
+                    else:
+                        pass
+            #==========================================#
+
+            # "by % of new stake" or "by % of init stake"
             if varying_type == '1' or varying_type == '2':
 
                 if waiting_for_win:
                     profit_loss_value = 0
                 else:
-                    profit_loss_value  = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
+                    profit_loss_value = pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win)
 
                 #-- Stake_varying_1 is when we add 'varying_value' to odd_value.  --#
                 #-- Then we take this sum and add 'varying value' to it and so on --#
@@ -84,10 +108,10 @@ def analyzation(form_request):
                 #-- Check if number_of_games is predefined by user --#
                 if number_of_games:
                     if number_of_lost_games <= number_of_games:
-                        if    varying_type == '1':
-                              varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
-                        elif  varying_type == '2':
-                              varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
+                        if    varying_type  == '1':
+                              varying_stake  = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
+                        elif  varying_type  == '2':
+                              varying_stake  = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
                     else:
                         varying_stake = varying_stake
 
@@ -105,16 +129,14 @@ def analyzation(form_request):
 
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
+            # "stop after X loses"
             elif varying_type == '3':
 
                 if waiting_for_win:
                     profit_loss_value = 0
                 else:
-                    if number_of_lost_games == number_of_games:
-                        waiting_for_win = True
-                        profit_loss_value = 0
-                    else:
-                        profit_loss_value = (odd * varying_stake - varying_stake) if profit_loss == 1 else -varying_stake
+                    profit_loss_value = 0  if number_of_lost_games == number_of_games else pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win)
+                    waiting_for_win = True if number_of_lost_games == number_of_games else False
 
                 varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
 
@@ -130,7 +152,7 @@ def analyzation(form_request):
                 if waiting_for_win:
                     profit_loss_value = 0
                 else:
-                    profit_loss_value  = (odd * odd_value - odd_value) if profit_loss == 1 else -odd_value
+                    profit_loss_value = pl_fixed_calc(handicap, odd, odd_value, profit_loss, full_win, half_win)
                 
                 if profit_loss:
                     waiting_for_win = False
@@ -175,7 +197,7 @@ def analyzation(form_request):
 
                 matches_played, matches_won, sum_profit_loss = 0, 0, 0
 
-                where = 'home_team' if playing_at == 'home' else 'away_team'
+                where   = 'home_team' if playing_at == 'home' else 'away_team'
                 matches = (match for match in year_matches if getattr(match, where) == team)
 
 
@@ -206,13 +228,23 @@ def analyzation(form_request):
                         odd = odd[odds_type] if form_request.handicap == 'hda' else odd[str(ou_value)][odds_type]
                         odd = float(odd) - (float(odd) * odd_toggle / 100)
 
-                        profit_loss = hda_calc(event_results, form_request.strategy, odd, odd_value, varying_type, varying_value, varying_stake, number_of_lost_games, number_of_games, waiting_for_win) if form_request.handicap == 'hda' else\
-                                       ou_calc(event_results, form_request.strategy, odd, odd_value, ou_value)
+                        handicap, strategy = form_request.handicap, form_request.strategy
+                        profit_loss        = calc(handicap,             # 1
+                                                  event_results,        # 2
+                                                  strategy,             # 3
+                                                  odd,                  # 4
+                                                  odd_value,            # 5
+                                                  ou_value,             # 6
+                                                  varying_type,         # 7
+                                                  varying_value,        # 8
+                                                  varying_stake,        # 9
+                                                  number_of_lost_games, # 10
+                                                  number_of_games,      # 11
+                                                  waiting_for_win)      # 12
                         
                         
                         varying_stake = profit_loss[2] if varying_type else odd_value
                         number_of_lost_games = profit_loss[3] if varying_type else 0
-
 
                         if not waiting_for_win:
                             matches_won     += 1 if profit_loss[0] else 0
@@ -225,8 +257,8 @@ def analyzation(form_request):
                         
 
                     except Exception as e:
-                        continue
-                        #raise NameError(e)
+                        #continue
+                        raise NameError(e)
 
                 matches_played_year += matches_played
                 matches_won_year    += matches_won
