@@ -29,7 +29,8 @@ def analyzation(form_request):
                  varying_stake,
                  number_of_lost_games,
                  number_of_games,
-                 waiting_for_win):     
+                 waiting_for_win,
+                 stop_after):     
             '''Takes event data and returns True of False for Win and Loss and value'''
 
             def pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win):
@@ -91,71 +92,42 @@ def analyzation(form_request):
                         pass
             #==========================================#
 
-            # "by % of new stake" or "by % of init stake"
-            if varying_type == '1' or varying_type == '2':
+            if waiting_for_win:
+                waiting_for_win = False if profit_loss else True  
+                return waiting_for_win
 
-                if waiting_for_win:
-                    profit_loss_value = 0
+            if stop_after and number_of_lost_games > stop_after:
+                waiting_for_win = False if profit_loss else True
+                return waiting_for_win
+
+
+            #== If "stake varying is enabled " ==#
+            if varying_type:
+
+                profit_loss_value = pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win)
+
+                if number_of_games and number_of_lost_games > number_of_games:
+                    varying_stake = varying_stake
                 else:
-                    profit_loss_value = pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win)
-
-                #-- Stake_varying_1 is when we add 'varying_value' to odd_value.  --#
-                #-- Then we take this sum and add 'varying value' to it and so on --#
-                #===================================================================#
-                #-- Stake_varying_2 is when we always add 'varying_value' to --#
-                #-- initial odd_value --#
-
-                #-- Check if number_of_games is predefined by user --#
-                if number_of_games:
-                    if number_of_lost_games <= number_of_games:
-                        if    varying_type  == '1':
-                              varying_stake  = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
-                        elif  varying_type  == '2':
-                              varying_stake  = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
-                    else:
-                        varying_stake = varying_stake
-
-                else:
-                    if    varying_type == '1':
-                          varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
-                    elif  varying_type == '2':
-                          varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
+                    if   varying_type == '1':
+                         varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
+                    elif varying_type == '2':
+                         varying_stake = (varying_stake + odd_value     * varying_value) if not profit_loss else odd_value
 
                 #-- With every win we reset the number_of_lost_games --#
                 number_of_lost_games += 1 if not profit_loss else 0
 
                 if profit_loss:
-                    waiting_for_win = False
-
-                return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
-
-            # "stop after X loses"
-            elif varying_type == '3':
-
-                if waiting_for_win:
-                    profit_loss_value = 0
-                else:
-                    profit_loss_value = 0  if number_of_lost_games == number_of_games else pl_varying_calc(handicap, odd, varying_stake, profit_loss, full_win, half_win)
-                    waiting_for_win = True if number_of_lost_games == number_of_games else False
-
-                varying_stake = (varying_stake + varying_stake * varying_value) if not profit_loss else odd_value
-
-                #-- With every win we reset the number_of_lost_games --#
-                number_of_lost_games += 1 if not profit_loss else 0
-
-                if profit_loss:
-                    waiting_for_win = False
+                    waiting_for_win   = False
 
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
             else:
-                if waiting_for_win:
-                    profit_loss_value = 0
-                else:
-                    profit_loss_value = pl_fixed_calc(handicap, odd, odd_value, profit_loss, full_win, half_win)
-                
+                profit_loss_value     = pl_fixed_calc(handicap, odd, odd_value, profit_loss, full_win, half_win)
+                number_of_lost_games += 1 if not profit_loss else 0
+
                 if profit_loss:
-                    waiting_for_win = False
+                    waiting_for_win   = False
 
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
@@ -213,8 +185,9 @@ def analyzation(form_request):
                 #-- Number_of_games is the quantity of games the  user set up till the stake varying changes it's behavoir --#
                 #-- Number_of_lost_games is increasing every time user loses --#
                 number_of_lost_games = 0
+                stop_after      = int(form_request.stop_after) if form_request.stop_after else 0
                 number_of_games = int(form_request.number_of_games) if varying_type and form_request.number_of_games else 0
-                
+
                 investments = 0
                 waiting_for_win = True if '1' in form_request.wait_for_win else False
                 
@@ -240,20 +213,26 @@ def analyzation(form_request):
                                                   varying_stake,        # 9
                                                   number_of_lost_games, # 10
                                                   number_of_games,      # 11
-                                                  waiting_for_win)      # 12
+                                                  waiting_for_win,      # 12
+                                                  stop_after)           # 13
                         
-                        
-                        varying_stake = profit_loss[2] if varying_type else odd_value
-                        number_of_lost_games = profit_loss[3] if varying_type else 0
+                        try:
+                            varying_stake         = profit_loss[2] if varying_type else odd_value
+                            number_of_lost_games  = profit_loss[3]
+                            waiting_for_win       = profit_loss[4]
+                        except:
+                            varying_stake         = varying_stake if varying_type else odd_value
+                            number_of_lost_games += 1 if profit_loss else 0
+                            waiting_for_win       = profit_loss
 
                         if not waiting_for_win:
-                            matches_won     += 1 if profit_loss[0] else 0
-                            matches_played  += 1
-                            investments     += varying_stake
-                            sum_profit_loss += profit_loss[1] * year_coefficient
-
-                        waiting_for_win = profit_loss[4]
-
+                            try:
+                                matches_won     += 1 if profit_loss[0] else 0
+                                matches_played  += 1
+                                investments     += varying_stake
+                                sum_profit_loss += profit_loss[1] * year_coefficient
+                            except:
+                                pass
                         
 
                     except Exception as e:
