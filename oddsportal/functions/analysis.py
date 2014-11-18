@@ -236,8 +236,8 @@ def analyzation(form_request):
                         
 
                     except Exception as e:
-                        #continue
-                        raise NameError(e)
+                        continue
+                        #raise NameError(e)
 
                 matches_played_year += matches_played
                 matches_won_year    += matches_won
