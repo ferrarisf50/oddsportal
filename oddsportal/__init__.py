@@ -13,14 +13,13 @@ app = Flask(__name__)
 assets = Environment(app)
 
 js_bundle  = Bundle('js/vendor/jquery.autocomplete.js',
-					'js/vendor/jquery.js',
+					'js/vendor/jquery.min.js',
 					'js/vendor/jquery-ui.min.js',
 					'js/custom/dom_ajax.js',
 					'js/vendor/foundation.min.js',
 					'js/vendor/jquery.sidr.min.js',
 					'js/vendor/sweet-alert.min.js',
 					'js/vendor/knockout-3.2.0.js',
-					
 					'js/vendor/perfect-scrollbar.js', output = 'gen/all.js')
 
 css_bundle = Bundle('css/custom/style.css',

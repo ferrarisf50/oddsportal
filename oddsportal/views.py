@@ -101,8 +101,7 @@ def search_results(logged = False):
         logged = True
 
     form_request        = RequestObject(request.form)
-    #return jsonify(a = form_request.stake_varying,
-    #               b = form_request.varying_value)
+    #return jsonify(a = form_request.selected_teams_hidden)
 
     stopwatch_01 = datetime.datetime.now()
     output_results_raw  = analyzation(form_request)
@@ -281,8 +280,14 @@ def years_update():
     requested_group  = request.values.get('grp').strip()
     requested_league = request.values.get('lea').strip()
 
-    path  = os.path.dirname(__file__)
-    years = sorted(json.loads(open(path + '/tmp/group_years.txt').read())[requested_league][requested_group])
+    requested_teams  = request.values.get('selected_teams_hidden')
+    if requested_teams:
+        years_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams)).with_entities(models.Result.year).all()
+        years_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams)).with_entities(models.Result.year).all()
+        years    = list(set(years_01 + years_02))
+    else:
+        path  = os.path.dirname(__file__)
+        years = sorted(json.loads(open(path + '/tmp/group_years.txt').read())[requested_league][requested_group])
 
     return jsonify(years = years)
 
@@ -321,28 +326,27 @@ def test():
 
 
 
-@app.route('/save_template', methods=['GET', 'POST'])
-def save_template(logged = False):
+@app.route('/save_calc_template', methods=['GET', 'POST'])
+def save_calc_template(logged = False):
 
 
     templates = models.User.query.filter_by(login = session['login']).first().templates
-    templates = json.loads(templates) if templates else {}
+    templates = json.loads(templates) if templates else {'teams_templates': {}, 'calc_templates': {}}
 
-    name = request.values.get('template_name')
-
+    name  = request.values.get('template_name')
     years = json.loads(request.values.get('years'))
-    
-    template    = {'playing_at':  request.values.get('playing_at'),
-                   'handicap':    request.values.get('handicap'),
-                   'strategy':    request.values.get('strategy'),
-                   'ou_values':   request.values.get('ou_values'),
-                   'game_part':   request.values.get('game_part'),
-                   'odds_type':   request.values.get('odds_type'),
-                   'odd_toggle':  request.values.get('odd_toggle'),
-                   'odd_value':   request.values.get('odd_value'),
-                   'years':       years}
 
-    templates[name] = json.dumps(template)
+    template = {'playing_at':  request.values.get('playing_at'),
+                'handicap':    request.values.get('handicap'),
+                'strategy':    request.values.get('strategy'),
+                'ou_values':   request.values.get('ou_values'),
+                'game_part':   request.values.get('game_part'),
+                'odds_type':   request.values.get('odds_type'),
+                'odd_toggle':  request.values.get('odd_toggle'),
+                'odd_value':   request.values.get('odd_value'),
+                'years':       years}
+
+    templates['calc_templates'][name] = json.dumps(template)
 
     user = models.User.query.filter_by(login = session['login']).first()
     user.templates = json.dumps(templates)
@@ -350,7 +354,30 @@ def save_template(logged = False):
     db.session.add(user)
     db.session.commit()
 
-    return jsonify(templates = templates)
+    return jsonify(calc_templates = templates)
+
+
+@app.route('/save_teams_template', methods=['GET', 'POST'])
+def save_teams_template(logged = False):
+
+
+    templates = models.User.query.filter_by(login = session['login']).first().templates
+    templates = json.loads(templates) if templates else {'teams_templates': {}, 'calc_templates': {}}
+
+    name  = request.values.get('template_name')
+    selected_teams = request.values.get('selected_teams')
+    
+    template = {'selected_teams': selected_teams}
+
+    templates['teams_templates'][name] = json.dumps(template)
+
+    user = models.User.query.filter_by(login = session['login']).first()
+    user.templates = json.dumps(templates)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(teams_templates = templates)
 
 
 
@@ -541,11 +568,10 @@ def select_teams():
 def autocomplete():
 
     path = os.path.dirname(__file__)
-    winter_teams = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['winter'])
-    summer_teams = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['summer'])
-
-    results = []
-    #search  = request.args.get('term')
-    l = winter_teams
-
-    return jsonify(json_list=l) 
+    summer_winter = request.args.get('summer_winter')
+    if summer_winter == 'summer':
+        autocomplete_teams  = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['summer'])
+    else:
+        autocomplete_teams  = sorted(json.loads(open(path + '/tmp/summer_winter_teams.txt').read())['winter'])
+    
+    return jsonify(json_list=autocomplete_teams) 

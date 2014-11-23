@@ -1,7 +1,7 @@
 function get_template() {
 
     var selected_template = $('select[name=select_template]').find(":selected").val();
-    var template_values   = JSON.parse(templates[selected_template]);
+    var template_values   = JSON.parse(templates['calc_templates'][selected_template]);
 
     for (var x in template_values){
         $('select[name=' + x + ']').val(template_values[x]);
@@ -25,7 +25,7 @@ function get_template() {
 }
 
 
-function save_template() {
+function save_calc_template() {
 
     var template_name = $('input[name=template_name]').val();
 
@@ -54,7 +54,7 @@ function save_template() {
     var odd_toggle  = $('input[name=odd_toggle]').val();
     var odd_value   = $('input[name=odd_value]').val();
 
-    $.post('/save_template', {
+    $.post('/save_calc_template', {
 
         form_playing_at_types: form_playing_at_types,
         handicap:      handicap,
@@ -68,19 +68,42 @@ function save_template() {
         years:         years_json
 
     }).done(function (data) {
-
-        var templates = data.templates;
+        var templates = data.templates['calc_templates'];
         $('select[name=select_template]').empty();
 
             function templates_appender(selector) {
                 $(selector).append('<option disabled selected> -- select a template -- </option>')
-                $.each(data.templates, function (i, v) {
+                $.each(templates, function (i, v) {
                     $(selector)
                         .append('<option>' + i + '</option>');
                 });
             }
             templates_appender('select[name=select_template]');
             swal("Template saved!", "You can now use it.", "success")
+
+    });
+}
+
+
+function save_teams_template() {
+
+    var teams_template_name = '234';
+
+    if (teams_template_name === "") {
+        swal("Don't you think tamplate needs a name?");
+        return;
+    }
+
+    var selected_teams = $('input[name=selected_teams_hidden]').val();
+
+    $.post('/save_teams_template', {
+
+        template_name:  teams_template_name,
+        selected_teams: selected_teams
+
+    }).done(function (data) {
+        var templates = data.templates['teams_templates'];
+        swal("Template saved!", "You can now use it.", "success")
 
     });
 }
@@ -159,6 +182,7 @@ function registration_form_check() {
 function get_years() {
     var group = $('select[name=group]').find(":selected").text();
     var league = $('select[name=league]').find(":selected").text();
+    var selected_teams = $('.selected_teams_hidden').val();
     $('#mySlideContent').html('');
 
     if (group === '') {
@@ -168,7 +192,8 @@ function get_years() {
     else {
         $.post('/years_update', {
             grp: group,
-            lea: league
+            lea: league,
+            selected_teams: selected_teams
         }).done(function (data) {
             $('#years').html('');
             $('#years_coeffs').html('');
@@ -414,4 +439,49 @@ function delete_template() {
         }).done(function (data) {
             swal("Template deleted!", "Thank you", "success")
         }); 
+}
+
+function select_teams() {
+    $("#test-form").css("display", "block");
+}
+
+
+function close_selection_team() {
+    $('#mask, .select_teams_popup').fadeOut(300 , function() {
+        $('#mask').remove();
+    });
+
+    var years = ['2013', '2014']
+    $('#years').html('');
+    $('#years_coeffs').html('');
+
+    if (years.length > 1) {
+        $('#mySlideToggler').show();
+    }
+    else {
+        $('#mySlideToggler').hide();
+    }
+
+    var first_year = years.slice(-1)
+    $('#years').append('<input id="' + first_year + '" name="years" type="checkbox" value="' + first_year +  '"><label>' + first_year + '</label><br>');
+    $('#years_coeffs').append('<input id="coefficient" name="' + first_year + '_coeff" type="text" autocomplete="off">');
+
+    for (var i in years.slice(1)) {
+    
+        var year_div    = '<div class="large-7 text-left columns" id="years">'
+
+        var year_input  = '<input id="' + years[i] + '" \
+                           name="years" \
+                           type="checkbox" \
+                           value="' + years[i] + '">'
+
+        var coeff_div   = '<div class="large-5 columns id="years_coeffs">'
+
+        var coeff_input = '<input id="coefficient" name="' + years[i] + '_coeff" type="text" autocomplete="off">'
+
+        $('#mySlideContent').prepend(year_div + year_input + '<label>' + years[i] + '</label><br></div>' + coeff_div + coeff_input + '</div>');
+    };
+
+    $('#button_save').removeAttr('disabled');
+    $('#button_get').removeAttr('disabled');
 }

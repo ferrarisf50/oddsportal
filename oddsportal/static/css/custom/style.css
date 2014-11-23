@@ -1,3 +1,63 @@
+#select_by_button {
+  padding: 0 2rem 0 2rem;
+  color: grey;
+}
+  #select_by_button:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+/* Mask for background, by default is not display */
+#mask {
+    display: none;
+    background: #000;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    z-index: 999;
+}
+
+a.close {
+  float: right;
+  color: #999;
+}
+
+/* You can customize to your needs  */
+.select_teams_popup {
+    width: 700px;
+    display: none;
+    background: #333;
+    padding: 30px;
+    border: 2px solid #ddd;
+    float: left;
+    font-size: 1.2em;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 99999;
+    box-shadow: 0px 0px 10px #999;
+    /* CSS3 */
+        -moz-box-shadow: 0px 0px 10px #999;
+    /* Firefox */
+        -webkit-box-shadow: 0px 0px 10px #999;
+    /* Safari, Chrome */
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px;
+    /* Firefox */
+        -webkit-border-radius: 3px;
+    /* Safari, Chrome */;
+}
+
+
+
+
+
+
+
 .ui-helper-hidden-accessible {
   display: none;
 }
@@ -5,7 +65,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 1000;
+    z-index: 1008;
     float: left;
     display: none;
     min-width: 160px;   
@@ -51,18 +111,42 @@
     background-image: none;
 }
 
+.selected_teams_hidden {
+  display: none;
+}
+span.warning {
+  color: grey;
+  font-size: .8rem;
+  line-height: 1.2rem;
+}
+.reset_all {
+  font-size: 1rem;
+  float: right;
+  line-height: 1.8rem;
+}
+  .reset_all:hover {
+    text-decoration: underline;
+  }
+.winter{
+  color: lightblue !important;
+  padding-right: 1rem;
+}
+.summer {
+  color: lightyellow !important;
+  padding-right: 1rem;
+}
 #select_teams button {
   line-height: 1rem;
   padding: 0.3rem 1rem 0.3rem 1rem;
 }
 
 #select_teams form {
-  margin-top: 7rem;
+  margin-top: 2rem;
 }
 
 .selected_teams {
   padding: 0.5rem;
-  height: auto !important;
+  height: 200px !important;
 }
 
 #raw_data {

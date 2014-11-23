@@ -3,8 +3,17 @@
 #right_side_bar
     %form#searchForm method="post" action="/search_results"
         %br
-        %br
-        #row
+        .row
+            .large-12.text-center.columns
+                %h4 -> Selecting by
+            .large-12.text-center.columns
+                %a#select_by_button.select_league_window -> leagues
+                %a#select_by_button.select_teams_window href="#select_teams_box" -> teams
+                %br
+                %br
+                %br
+                
+        .row#select_by_league_block
             .large-3.columns
                 %label.right-inline -> Country
             .large-9.columns
@@ -12,14 +21,14 @@
                     %option selected="selected" value=""
                     -for league in leagues
                         %option value="{{ league }}" -> {{ league }}
-
+        
             .large-3.columns
                 %label -> League
             .large-9.columns
                 %select name="group" disabled
                     %option selected="selected" value=""
 
-
+        .row
             .large-7.text-left.columns
                 %br
                 %label -> Select year
@@ -46,9 +55,9 @@
                 .large-12.columns
                     .row.collapse
                         .small-9.columns
-                            %select#select_template name="select_template"
+                            %select#select_calc_template name="select_template"
                                 %option disabled selected -> select a template
-                                -for template in templates
+                                -for template in calc_templates
                                     %option value={{ template }} -> {{ template }}
 
                         .small-3.columns
@@ -57,10 +66,10 @@
                 .large-12.columns
                     .row.collapse
                         .small-9.columns
-                            %input.template_name name="template_name" type="text" placeholder="Template name"
+                            %input.calc_template_name name="template_name" type="text" placeholder="Template name"
 
                         .small-3.columns
-                            %a#button_save.button.postfix disabled onclick="save_template()" -> save
+                            %a#button_save.button.postfix disabled onclick="save_calc_template()" -> save
             %a.delete_template onclick="delete_template()" -> Delete template
 
         .row
@@ -138,6 +147,7 @@
                     %input name="stop_after" type="text" autocomplete='off'
 
 
+            %input.selected_teams_hidden name='selected_teams_hidden'
             
             .large-12.columns
                 %br
@@ -146,8 +156,154 @@
             .large-12.text-center.columns
                 %span#error -> {{error}}
                 <br><br><br><br><br>
+
+            
                 
 
+    
+
+    #select_teams_box.select_teams_popup
+        %a.winter href="#" value='winter' -> WINTER teams
+        %a.summer href="#" value='summer' -> SUMMER teams
+        %br
+        %span.warning -> Warning: switching selector will remove all selected teams
+        %a.close onclick="close_selection_team()"
+            %i.fa.fa-times
+        #select_teams.large-12.large-centered.columns
+            %form#select_teams data-bind="submit:addItem"
+                %label -> Team name: 
+                .large-12.columns
+                    .row.collapse
+                        .large-9.columns
+                            %input#query disabled type="text" disabled data-bind='value:itemToAdd, valueUpdate: "afterkeydown"'
+                        .large-3.columns
+                            %button#button_team_name.button.postfix disabled type="submit" data-bind="enable: itemToAdd().length > 0" -> Add
+            .row
+                .large-12.columns
+                    .row.collapse
+                        .small-9.columns
+                            %select#select_teams_template name="select_teams_template"
+                                %option disabled selected -> select a template
+                                -for template in teams_templates
+                                    %option value={{ template }} -> {{ template }}
+
+                        .small-3.columns
+                            %a#select_teams_button_get.button.postfix disabled onclick="get_team_template()" -> get
+                        
+                .large-12.columns
+                    .row.collapse
+                        .small-9.columns
+                            %input.teams_template_name name="teams_template_name" type="text" placeholder="Template name"
+
+                        .small-3.columns
+                            %a#select_teams_button_save.button.postfix disabled onclick="save_teams_template()" -> save
+                
+             
+            %label -> Selected teams:
+            %select.selected_teams multiple="multiple" height="15" data-bind="options:allItems, selectedOptions:selectedItems"
+             
+            %div
+                %button data-bind="click: removeSelected, enable: selectedItems().length > 0" -> Remove
+                &nbsp;
+                %button data-bind="click: sortItems, enable: allItems().length > 1" -> Sort
+                %a.reset_all data-bind="click: removeAllItems, enable: allItems().length > 1" -> reset all
+                
+
+
+%script
+    $(document).ready(function() {
+        $('#select_by_league_block').css('display', 'none');
+    });
+    $('a.select_league_window').on('click', function() {
+        $('a.select_teams_window').css('text-decoration', 'none');
+        $(this).css('text-decoration', 'underline');
+        $('a.reset_all').click();
+        $('#select_by_league_block').css('display', 'block');
+    });
+    $('a.select_teams_window').on('click', function() {
+        $('a.select_league_window').css('text-decoration', 'none');
+        $(this).css('text-decoration', 'underline');
+        $('#select_by_league_block').css('display', 'none');
+        $('select[name=league]').reset(); #TODO reset, TODO pass winter years or summer years to main form
+    });
+
+%script
+    $('a.reset_all').on('click', function() {
+        $('.selected_teams').val('').trigger('chosen');
+    });
+
+
+%script
+    var BetterListModel = function () {
+        this.itemToAdd = ko.observable("");
+        this.allItems = ko.observableArray([]);
+        this.selectedItems = ko.observableArray([]);
+     
+        this.addItem = function () {
+            if ((this.itemToAdd() != "") && (this.allItems.indexOf(this.itemToAdd()) < 0))
+                this.allItems.push(this.itemToAdd() + ';');
+            this.itemToAdd("");
+        };
+
+        this.removeAllItems = function () {
+            this.allItems.removeAll();
+        };
+     
+        this.removeSelected = function () {
+            this.allItems.removeAll(this.selectedItems());
+            this.selectedItems([]);
+        };
+     
+        this.sortItems = function() {
+            this.allItems.sort();
+        };
+    };
+     
+    ko.applyBindings(new BetterListModel());
+
+%script
+    $('.summer, .winter').click(function() {
+        $('.summer, .winter').css('text-decoration', 'none');
+        $('#query').removeAttr('disabled');
+        $('#button_team_name').removeAttr('disabled');
+        $('#select_teams_button_get').removeAttr('disabled');
+        $('#select_teams_button_save').removeAttr('disabled');
+        $('a.reset_all').click();
+        $(this).css('text-decoration', 'underline');
+        var summer_winter = $(this).attr("value");
+        $.ajax({
+            url: '{{ url_for("autocomplete") }}',
+            data: {'summer_winter': summer_winter }
+        }).done(function (data) {
+            $('#query').autocomplete({
+                source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(data.json_list, request.term);
+                    response(results.slice(0, 10));
+                },
+                minLength: 2,
+            });
+        });
+    });
+
+%script
+    $(document).ready(function() {
+        $('a.select_teams_window').click(function() {
+            var loginBox = $(this).attr('href');
+            $(loginBox).fadeIn(300);
+            var popMargTop = ($(loginBox).height() + 24) / 2; 
+            var popMargLeft = ($(loginBox).width() + 24) / 2; 
+            
+            $(loginBox).css({ 
+                'margin-top' : -popMargTop,
+                'margin-left' : -popMargLeft
+            });
+            
+            $('body').append('<div id="mask"></div>');
+            $('#mask').fadeIn(300);
+            
+            return false;
+        });
+    });
 
 %script
 

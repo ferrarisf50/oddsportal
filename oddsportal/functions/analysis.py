@@ -40,7 +40,7 @@ def analyzation(form_request):
                     if   full_win == 1:
                         profit_loss_value =   odd * varying_stake - varying_stake
                     elif half_win == 1:
-                        profit_loss_value =  (odd * varying_stake / 2) + (varying_stake / 2)
+                        profit_loss_value =  (odd * varying_stake / 2) - varying_stake
                     else:
                         profit_loss_value = -varying_stake
                 return profit_loss_value
@@ -52,7 +52,7 @@ def analyzation(form_request):
                     if   full_win == 1:
                         profit_loss_value =   odd * odd_value - odd_value
                     elif half_win == 1:
-                        profit_loss_value =  (odd * odd_value / 2) + (odd_value / 2)
+                        profit_loss_value =  (odd * odd_value / 2) - odd_value
                     else:
                         profit_loss_value = -odd_value
                 return profit_loss_value
@@ -263,26 +263,46 @@ def analyzation(form_request):
     recent_season = json.loads(open(path + 'oddsportal/oddsportal/tmp/group_years.txt').read())
     recent_season = list(reversed(sorted(recent_season[form_request.league][form_request.group])))[0]
 
-    results = models.Result.query.filter(models.Result.league == form_request.league,
-                                         models.Result.group  == form_request.group,
-                                         models.Result.year.in_(form_request.years)).all()
+    #-- Check if specific teams were selected instead of League and Group --#
+    if form_request.selected_teams_hidden:
+        #raise NameError(123)
+        selected_teams = form_request.selected_teams_hidden.split(';')
+        results_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams),
+                                                models.Result.year.in_(form_request.years)).all()
+        results_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams),
+                                                models.Result.year.in_(form_request.years)).all()
+        results    = results_01 + results_02
+
+        recent_season_results_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams),
+                                                              models.Result.year   == recent_season).all()
+        recent_season_results_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams),
+                                                              models.Result.year   == recent_season).all()
+        recent_season_results = recent_season_results_01 + recent_season_results_02
+
+    else:
+        results = models.Result.query.filter(models.Result.league == form_request.league,
+                                             models.Result.group  == form_request.group,
+                                             models.Result.year.in_(form_request.years)).all()
+
+        recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+                                                           models.Result.group  == form_request.group,
+                                                           models.Result.year   == recent_season).all()
 
     results.sort(key=lambda x: x.datetime, reverse=False)
 
-    recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
-                                                       models.Result.group  == form_request.group,
-                                                       models.Result.year   == recent_season).all()
-    
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
-
-    leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
+    #leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
     
    
 
     timer_01 = datetime.datetime.now()
-    home_teams = sorted(list(set([result.home_team for result in results])))
-    away_teams = sorted(list(set([result.away_team for result in results])))
+    if form_request.selected_teams_hidden:
+        home_teams = sorted(list(set(selected_teams)))
+        away_teams = sorted(list(set(selected_teams)))
+    else:
+        home_teams = sorted(list(set([result.home_team for result in results])))
+        away_teams = sorted(list(set([result.away_team for result in results])))
 
     results_column = '{}_{}_results'.format(form_request.handicap, form_request.game_part)
     odd_value      = float(form_request.odd_value)

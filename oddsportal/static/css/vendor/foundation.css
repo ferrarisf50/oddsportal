@@ -2863,7 +2863,14 @@ p {
     font-style: italic; }
 
 /* Default header styles */
-h1, h2, h3, h4, h5, h6 {
+h4 {
+  color: lightgrey;
+  text-rendering: optimizeLegibility;
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+h1, h2, h3, h5, h6 {
   font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
@@ -4402,12 +4409,16 @@ select::-ms-expand {
   line-height: 2.3125rem; }
 
 /* Adjust padding, alignment and radius if pre/post element is a button */
-#button_save {
+#button_save, #select_teams_button_save {
   background-color: #ed4a3b !important;
   line-height: 1.8rem;
   height: 2rem;
 }
-#button_get {
+#button_team_name {
+  line-height: 1.8rem;
+  height: 2rem;
+}
+#button_get, #select_teams_button_get {
   background-color: #ed4a3b !important;
   line-height: 1.8rem;
   height: 2rem;
@@ -4475,7 +4486,7 @@ span.postfix, label.postfix {
 #get_results_by_link {
   height: 2.3125rem !important;
 }
-.template_name {
+.teams_template_name, .calc_template_name {
   height: 2rem !important;
 }
 input:disabled {
@@ -4599,7 +4610,7 @@ textarea[rows] {
   height: auto; }
 
 /* Add height value for select elements to match text input height */
-#select_template {
+#select_calc_template, #select_teams_template, #query {
   height: 2rem !important;
 }
 select {
