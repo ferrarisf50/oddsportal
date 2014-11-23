@@ -74,7 +74,7 @@ def analyzation(form_request):
             
             elif handicap == 'ou':
                 sum_goals = int(event_results[0]) + int(event_results[1])
-                
+
                 if strategy == 'o':
                     if (sum_goals - ou_value)   >= 0.5:
                         full_win, profit_loss    = 1, 1
@@ -93,12 +93,13 @@ def analyzation(form_request):
             #==========================================#
 
             if waiting_for_win:
-                waiting_for_win = False if profit_loss else True  
-                return waiting_for_win
+                waiting_for_win = False if profit_loss else True
+                return [waiting_for_win]
 
             if stop_after and number_of_lost_games > stop_after:
                 waiting_for_win = False if profit_loss else True
-                return waiting_for_win
+                #raise NameError(123)
+                return [waiting_for_win]
 
 
             #== If "stake varying is enabled " ==#
@@ -123,6 +124,7 @@ def analyzation(form_request):
                 return (profit_loss, round(profit_loss_value, 1), varying_stake, number_of_lost_games, waiting_for_win)
 
             else:
+
                 profit_loss_value     = pl_fixed_calc(handicap, odd, odd_value, profit_loss, full_win, half_win)
                 number_of_lost_games += 1 if not profit_loss else 0
 
@@ -222,22 +224,24 @@ def analyzation(form_request):
                             waiting_for_win       = profit_loss[4]
                         except:
                             varying_stake         = varying_stake if varying_type else odd_value
-                            number_of_lost_games += 1 if profit_loss else 0
-                            waiting_for_win       = profit_loss
+                            if not profit_loss[0]:
+                                number_of_lost_games = 0 
+                            waiting_for_win       = profit_loss[0]
 
                         if not waiting_for_win:
                             try:
-                                matches_won     += 1 if profit_loss[0] else 0
-                                matches_played  += 1
-                                investments     += varying_stake
-                                sum_profit_loss += profit_loss[1] * year_coefficient
+                                sum_profit_loss  += profit_loss[1] * year_coefficient
+                                matches_won      += 1 if profit_loss[0] else 0
+                                matches_played   += 1
+                                investments      += varying_stake
                             except:
                                 pass
+
                         
 
                     except Exception as e:
                         continue
-                        #raise NameError(e)
+                        raise NameError(e)
 
                 matches_played_year += matches_played
                 matches_won_year    += matches_won
@@ -259,12 +263,11 @@ def analyzation(form_request):
 
     timer_01 = datetime.datetime.now()
 
-    #-- Find group's latest season; we later use it to select non-active teams --#
-    recent_season = json.loads(open(path + 'oddsportal/oddsportal/tmp/group_years.txt').read())
-    recent_season = list(reversed(sorted(recent_season[form_request.league][form_request.group])))[0]
+    
 
     #-- Check if specific teams were selected instead of League and Group --#
     if form_request.selected_teams_hidden:
+        recent_season = '2014' if form_request.summer_winter == 'summer' else '2014-2015'
         #raise NameError(123)
         selected_teams = form_request.selected_teams_hidden.split(';')
         results_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams),
@@ -280,6 +283,10 @@ def analyzation(form_request):
         recent_season_results = recent_season_results_01 + recent_season_results_02
 
     else:
+        #-- Find group's latest season; we later use it to select non-active teams --#
+        recent_season = json.loads(open(path + 'oddsportal/oddsportal/tmp/group_years.txt').read())
+        recent_season = list(reversed(sorted(recent_season[form_request.league][form_request.group])))[0]
+
         results = models.Result.query.filter(models.Result.league == form_request.league,
                                              models.Result.group  == form_request.group,
                                              models.Result.year.in_(form_request.years)).all()

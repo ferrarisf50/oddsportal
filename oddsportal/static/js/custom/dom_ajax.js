@@ -1,7 +1,7 @@
-function get_template() {
+function get_calc_template() {
 
-    var selected_template = $('select[name=select_template]').find(":selected").val();
-    var template_values   = JSON.parse(templates['calc_templates'][selected_template]);
+    var selected_template = $('select[name=select_calc_template]').find(":selected").val();
+    var template_values   = JSON.parse(calc_templates[selected_template]);
 
     for (var x in template_values){
         $('select[name=' + x + ']').val(template_values[x]);
@@ -27,7 +27,8 @@ function get_template() {
 
 function save_calc_template() {
 
-    var template_name = $('input[name=template_name]').val();
+    var template_name = $('input[name=calc_template_name]').val();
+
 
     if (template_name === "") {
         swal("Don't you think tamplate needs a name?");
@@ -68,8 +69,8 @@ function save_calc_template() {
         years:         years_json
 
     }).done(function (data) {
-        var templates = data.templates['calc_templates'];
-        $('select[name=select_template]').empty();
+        var templates = data.calc_templates;
+        $('select[name=select_calc_template]').empty();
 
             function templates_appender(selector) {
                 $(selector).append('<option disabled selected> -- select a template -- </option>')
@@ -78,23 +79,31 @@ function save_calc_template() {
                         .append('<option>' + i + '</option>');
                 });
             }
-            templates_appender('select[name=select_template]');
+            templates_appender('select[name=select_calc_template]');
             swal("Template saved!", "You can now use it.", "success")
 
     });
 }
 
 
+function get_teams_template() {
+
+    var selected_template = $('select[name=select_teams_template]').find(":selected").val();
+    var template_values   = JSON.parse(teams_templates[selected_template])['selected_teams'];
+    $('.selected_teams').push('123');
+}
+
+
 function save_teams_template() {
 
-    var teams_template_name = '234';
+    var teams_template_name = $('input[name=teams_template_name]').val();
 
     if (teams_template_name === "") {
         swal("Don't you think tamplate needs a name?");
         return;
     }
 
-    var selected_teams = $('input[name=selected_teams_hidden]').val();
+    var selected_teams = $('.selected_teams').text();
 
     $.post('/save_teams_template', {
 
@@ -102,9 +111,8 @@ function save_teams_template() {
         selected_teams: selected_teams
 
     }).done(function (data) {
-        var templates = data.templates['teams_templates'];
+        var teams_templates = data.teams_templates;
         swal("Template saved!", "You can now use it.", "success")
-
     });
 }
 
@@ -182,7 +190,6 @@ function registration_form_check() {
 function get_years() {
     var group = $('select[name=group]').find(":selected").text();
     var league = $('select[name=league]').find(":selected").text();
-    var selected_teams = $('.selected_teams_hidden').val();
     $('#mySlideContent').html('');
 
     if (group === '') {
@@ -192,8 +199,7 @@ function get_years() {
     else {
         $.post('/years_update', {
             grp: group,
-            lea: league,
-            selected_teams: selected_teams
+            lea: league
         }).done(function (data) {
             $('#years').html('');
             $('#years_coeffs').html('');
@@ -451,9 +457,21 @@ function close_selection_team() {
         $('#mask').remove();
     });
 
-    var years = ['2013', '2014']
+    $('.selected_teams_hidden').val($('.selected_teams').text());
+
+
+    var winter = $('.winter').css("text-decoration");
+    if (winter === 'none') {
+        $('.summer_winter').val('summer');
+        var years = ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014'];
+    }
+    else {
+        $('.summer_winter').val('winter');
+        var years = ['2000-2001', '2001-2002', '2002-2003', '2003-2004', '2004-2005', '2005-2006', '2006-2007', '2007-2008', '2008-2009', '2009-2010', '2010-2011', '2011-2012', '2012-2013', '2013-2014', '2014-2015'];
+    };
     $('#years').html('');
     $('#years_coeffs').html('');
+    $('#mySlideContent').html('');
 
     if (years.length > 1) {
         $('#mySlideToggler').show();
@@ -481,6 +499,7 @@ function close_selection_team() {
 
         $('#mySlideContent').prepend(year_div + year_input + '<label>' + years[i] + '</label><br></div>' + coeff_div + coeff_input + '</div>');
     };
+
 
     $('#button_save').removeAttr('disabled');
     $('#button_get').removeAttr('disabled');

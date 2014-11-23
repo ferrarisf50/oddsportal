@@ -114,6 +114,9 @@ a.close {
 .selected_teams_hidden {
   display: none;
 }
+.summer_winter {
+  display: none;
+}
 span.warning {
   color: grey;
   font-size: .8rem;

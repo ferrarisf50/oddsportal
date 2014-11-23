@@ -22,6 +22,10 @@ def labels_getter(session, logged = False):
     else:
         templates = {}
 
+    teams_templates = templates.get('teams_templates') if templates.get('teams_templates') else {}
+    calc_templates  = templates.get('calc_templates')  if templates.get('calc_templates')  else {}
+
+
     years, leagues, groups = [], [], []
     ou_values = [0.5, 1, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5.5]
 
@@ -32,7 +36,8 @@ def labels_getter(session, logged = False):
     labels  = {'years':     years,
                'leagues':   leagues,
                'ou_values': ou_values,
-               'templates': templates}
+               'teams_templates': teams_templates,
+               'calc_templates':  calc_templates}
 
     return labels
 
@@ -47,10 +52,12 @@ def index(logged = False):
         logged = True
 
     labels = labels_getter(session)
+    #return jsonify(a=labels.get('teams_templates'), b=labels.get('templates'))
     return render_template('index.html', years      = labels.get('years'),
                                          ou_values  = labels.get('ou_values'), 
                                          leagues    = labels.get('leagues'),
-                                         templates  = labels.get('templates'),
+                                         teams_templates = labels.get('teams_templates'),
+                                         calc_templates  = labels.get('calc_templates'),
                                          logged     = logged)
 
 
@@ -227,6 +234,11 @@ def search_results(logged = False):
 
     stopwatch_02 = datetime.datetime.now()
     time_02 = (stopwatch_02 - stopwatch_01).total_seconds()
+
+    try:
+        group, league  = form_request.group, form_request.league
+    except:
+        group, league  = None, None
     return render_template("search_results.html", output_results     = output_results,
                                                   table_years        = form_request.years,
                                                   ou_values          = labels.get('ou_values'), 
@@ -237,12 +249,13 @@ def search_results(logged = False):
                                                   output_results_raw = output_results_raw,
                                                   results_labels     = results_labels,
                                                   playing_at_type    = form_request.form_playing_at_types,
-                                                  group              = form_request.group,
+                                                  group              = group,
                                                   totals             = totals,
-                                                  league             = form_request.league,
+                                                  league             = league,
                                                   timers             = {'analyse': time_01, 'rest': time_02},
                                                   logged             = logged,
-                                                  templates          = labels.get('templates'))
+                                                  teams_templates    = labels.get('teams_templates'),
+                                                  calc_templates     = labels.get('calc_templates'))
 
 
 
@@ -280,14 +293,8 @@ def years_update():
     requested_group  = request.values.get('grp').strip()
     requested_league = request.values.get('lea').strip()
 
-    requested_teams  = request.values.get('selected_teams_hidden')
-    if requested_teams:
-        years_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams)).with_entities(models.Result.year).all()
-        years_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams)).with_entities(models.Result.year).all()
-        years    = list(set(years_01 + years_02))
-    else:
-        path  = os.path.dirname(__file__)
-        years = sorted(json.loads(open(path + '/tmp/group_years.txt').read())[requested_league][requested_group])
+    path  = os.path.dirname(__file__)
+    years = sorted(json.loads(open(path + '/tmp/group_years.txt').read())[requested_league][requested_group])
 
     return jsonify(years = years)
 
@@ -354,7 +361,7 @@ def save_calc_template(logged = False):
     db.session.add(user)
     db.session.commit()
 
-    return jsonify(calc_templates = templates)
+    return jsonify(calc_templates = templates['calc_templates'])
 
 
 @app.route('/save_teams_template', methods=['GET', 'POST'])
@@ -377,7 +384,7 @@ def save_teams_template(logged = False):
     db.session.add(user)
     db.session.commit()
 
-    return jsonify(teams_templates = templates)
+    return jsonify(teams_templates = templates['teams_templates'])
 
 
 
