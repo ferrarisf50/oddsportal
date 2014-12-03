@@ -11,51 +11,43 @@ from scrapy.utils.url import urljoin_rfc
 from scrapy.http import Request
 
 from flask import session, request, url_for, flash
-import re, json, time, urllib2, requests
+import re, json, logging, time, urllib2, requests
 from soccer import models
 from soccer.settings import session
 
 
 crawlers_path = os.path.abspath(__name__).split('crawlers')[0]
-links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()[64]
-
-#try:
-#    os.remove(crawlers_path + '/crawlers/soccer/present.log')
-#    os.remove(crawlers_path + '/crawlers/soccer/absent.log')
-#except:
-#    pass
-
-from soccer.settings import logger_present, logger_absent
+links = open(crawlers_path + '/crawlers/soccer/soccer/spiders/links.txt').readlines()
 
 
-class Missing_games_crawler(CrawlSpider):
+class SoccerSpider(CrawlSpider):
 
-    name            = "soccer_missings"
+    name            = "soccer"
     allowed_domains = ["oddsportal.com"]
-    start_urls      = [links]
-
+    start_urls      = links[30:80]
+    
     def parse(self, response):
 
         hxs    = HtmlXPathSelector(response)
-        years  = hxs.xpath("//div[@class='main-menu2 main-menu-gray']/ul//a").extract()
-        league = hxs.xpath("//div[@id='breadcrumb']/a/text()").extract()[2]
-        group  = hxs.xpath("//div[@id='breadcrumb']/a/text()").extract()[3]
+        years  = hxs.select("//ul[@class='main-filter']/parent::div[@class='main-menu2 main-menu-gray']/ul//a")
+        league = hxs.select("//div[@id='breadcrumb']/a/text()").extract()[2]
+        group  = hxs.select("//div[@id='breadcrumb']/a/text()").extract()[3]
 
         for year in years:
         
-            year_url = re.findall(re.compile('\"(.+?)\"'),  year)[0]
-            year_num = re.findall(re.compile('>(.+?)</a>'), year)[0]
-            year_for_database = re.sub('/', '-', year_num)
-            new_url  = urljoin_rfc(get_base_url(response),  year_url)
+            year_url = year.select('./@href').extract()[0]
+            year_num = year.select('./text()').extract()[0]
+            new_url  = urljoin_rfc(get_base_url(response),  year_url)\
 
             yield Request((new_url), meta = {'year':   year_num,
                                              'group':  group,
                                              'league': league}, callback=self.parse_year)
 
+
     def parse_year(self, response):
 
         hxs = HtmlXPathSelector(response)
-        pages = list(set(hxs.xpath("//div[@id='pagination']/a/@href").extract()))
+        pages = list(set(hxs.select("//div[@id='pagination']/a/@href").extract()))
         pages_to_parse = [urljoin_rfc(get_base_url(response), page) for page in pages if 'page' in page]
         pages_to_parse.append(response.url + 'page/1')
 
@@ -64,40 +56,38 @@ class Missing_games_crawler(CrawlSpider):
                                         'group':  response.meta['group'],
                                         'league': response.meta['league']}, callback=self.parse_category)
 
+
     def parse_category(self, response):
 
         hxs = HtmlXPathSelector(response)
-        tournament_links = hxs.xpath("//table[@id='tournamentTable']//a[not(@class)]/@href").extract()
-        
+        tournament_links = hxs.select("//table[@id='tournamentTable']//a[not(@class)]/@href").extract()  
+
         for i, link in enumerate(tournament_links[1:]):
             new_url = urljoin_rfc(get_base_url(response), link)
-
             checker = session.query(models.Result).filter_by(tournament_url = new_url).all()
-            if checker:
-                pass
-                #logger_present.info(new_url)
-            else:
-                #logger_absent.info(new_url)
+
+            if not checker:
                 yield Request(new_url, meta={'url':    response.url,
                                              'year':   response.meta['year'],
                                              'group':  response.meta['group'],
                                              'league': response.meta['league']}, callback=self.parse_item)
 
+            else:
+                logger.warning('Results already scraped for:')
+                logger.warning(new_url)
+                logger.warning('-'*30)
+                logger.warning('\n')
+
+
 
     def parse_item(self, response):
-
-        print '='*30
-        print 'Start working on tournament'
-
+    
+    	tournament_url = response.url
+    	
         hxs = HtmlXPathSelector(response)
         html_data  = response.body
         event_id   = re.findall(re.compile('"id":"(.+?)"'),             html_data)[0]
-        
-        #-- If there is no xhash tag on the page, we are on the wrong page, let's skip it
-        try:
-            event_hash_01  = re.findall(re.compile('"xhash":"(.+?)"'),      html_data)[0]
-        except:
-            return
+        event_hash_01  = re.findall(re.compile('"xhash":"(.+?)"'),      html_data)[0]
         event_hash_02  = re.findall(re.compile('"xhashf":"(.+?)"'),     html_data)[0]
         tournament_id  = re.findall(re.compile('tournamentId\":(\d*)'), html_data)[0]
         tournament_url = response.url
@@ -106,28 +96,28 @@ class Missing_games_crawler(CrawlSpider):
         
 
         #-- We want to ignore live events and wait for results --#
-        live_tag = hxs.xpath("//p[@class='result-live']/text()").extract()
+        live_tag = hxs.select("//p[@class='result-live']/text()").extract()
         if live_tag:
             return
 
-        home_team = hxs.xpath("//div[@id='col-content']/h1/text()").extract()[0].split(' - ')[0]
-        away_team = hxs.xpath("//div[@id='col-content']/h1/text()").extract()[0].split(' - ')[1]
+        home_team = hxs.select("//div[@id='col-content']/h1/text()").extract()[0].split(' - ')[0]
+        away_team = hxs.select("//div[@id='col-content']/h1/text()").extract()[0].split(' - ')[1]
 
         #-- Datetime gonna be in Unix format like "1410112800" for 07'Sep 2014 --#
-        event_datetime = hxs.xpath("//p[contains(@class, 'datet')]/@class").extract()[0]
+        event_datetime = hxs.select("//p[contains(@class, 'datet')]/@class").extract()[0]
         event_datetime = re.findall(re.compile('datet t(.+?)-'), event_datetime)[0]
 
         #-- Results are written this way: "1:1 (1:1, 0:0)" --#
         #-- final results, then 1st half and then 2nd half --#
         try:
-            halfs_results = hxs.xpath("//p[@class='result']/text()").extract()[0]
+            halfs_results = hxs.select("//p[@class='result']/text()").extract()[0]
             first_half_results  = re.findall(re.compile('\((.+?)\)'), halfs_results)[0].split(', ')[0]
             second_half_results = re.findall(re.compile('\((.+?)\)'), halfs_results)[0].split(', ')[1]
         except:
             first_half_results, second_half_results = '', ''
 
         try:
-            final_results = hxs.xpath("//p[@class='result']/strong/text()").extract()[0]
+            final_results = hxs.select("//p[@class='result']/strong/text()").extract()[0]
             final_results = re.findall(re.compile('(\d:\d)'), final_results)[0]
             results       = {'full': final_results, 'frst': first_half_results, 'scnd': second_half_results}
         except:
@@ -237,5 +227,4 @@ class Missing_games_crawler(CrawlSpider):
 
         response.meta['item'].add_value('hda_scnd_results', home_draw_away(response.body))
 
-        #logger_absent.info('Saved: ' + str(response.meta['item'].__dict__))
         yield response.meta['item'].load_item()

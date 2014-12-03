@@ -17,7 +17,10 @@ def labels_getter(session, logged = False):
 
     if 'login' in session:
         logged = True
-        templates = models.User.query.filter_by(login = session['login']).first().templates
+        try:
+            templates = models.User.query.filter_by(login = session['login']).first().templates
+        except:
+            templates = None
         templates = json.loads(templates) if templates else {}
     else:
         templates = {}

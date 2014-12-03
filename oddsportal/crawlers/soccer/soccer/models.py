@@ -23,7 +23,7 @@ def create_deals_table(engine):
 
 class Result(DeclarativeBase):
     """Sqlalchemy deals model"""
-    __tablename__ = "results_03"
+    __tablename__ = "results_04"
 
     id = Column(Integer, primary_key=True)
 

@@ -29,13 +29,14 @@ def over_under(response):
                             #-- Check for the odd not to be False --#
                             if v['act'][key]:
                                 if odd_type == '0':
-                                    total_under += odd
-                                    if odd > highest_under:
-                                        highest_under = odd
-                                else:
                                     total_over  += odd
                                     if odd > highest_over:
                                         highest_over = odd
+                                else:
+                                    total_under += odd
+                                    if odd > highest_under:
+                                        highest_under = odd
+                                    
                             #-- We want to exclude False odds later so --#
                             #-- we need to know how many of them are --# 
                             else:

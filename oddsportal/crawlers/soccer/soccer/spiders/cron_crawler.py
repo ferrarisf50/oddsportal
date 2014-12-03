@@ -27,7 +27,7 @@ class Cron_crawler(CrawlSpider):
 
     name            = "soccer_cron"
     allowed_domains = ["oddsportal.com"]
-    start_urls      = links
+    start_urls      = links[45:90]
 
     def parse(self, response):
 
@@ -76,7 +76,7 @@ class Cron_crawler(CrawlSpider):
         
         #-- If there is no xhash tag on the page, we are on the wrong page, let's skip it
         try:
-            event_hash_01  = re.findall(re.compile('"xhash":"(.+?)"'),      html_data)[0]
+            event_hash_01 = re.findall(re.compile('"xhash":"(.+?)"'),   html_data)[0]
         except:
             return
         event_hash_02  = re.findall(re.compile('"xhashf":"(.+?)"'),     html_data)[0]
