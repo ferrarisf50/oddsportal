@@ -129,6 +129,7 @@
         this.get_teams_template = function () {
             var selected_template = $('select[name=select_teams_template]').find(":selected").val();
             var template_values   = JSON.parse(teams_templates[selected_template])['selected_teams'].split(';');
+            this.allItems.removeAll();
             for (i in template_values) {
                 if (template_values[i]) {
                     this.allItems.push(template_values[i]);
