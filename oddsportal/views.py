@@ -115,6 +115,8 @@ def search_results(logged = False):
 
     stopwatch_01 = datetime.datetime.now()
     output_results_raw  = analyzation(form_request)
+    if not output_results_raw:
+        return jsonify(result='No results for selected teams found')
     stopwatch_02 = datetime.datetime.now()
     output_results      = json.loads(output_results_raw)
 
@@ -376,6 +378,7 @@ def save_teams_template(logged = False):
 
     name  = request.values.get('template_name')
     selected_teams = request.values.get('selected_teams')
+    selected_teams = ';'.join(list(set(selected_teams.split(';'))))
     
     template = {'selected_teams': selected_teams}
 
@@ -545,15 +548,19 @@ def raw_download(logged = False):
 
 
 
-@app.route('/delete_template', methods=['GET', 'POST'])
-def delete_template():
+@app.route('/delete_calc_template', methods=['GET', 'POST'])
+def delete_calc_template():
 
-    templates = models.User.query.filter_by(login = session['login']).first().templates
+    try:
+        templates = models.User.query.filter_by(login = session['login']).first().templates
+    except:
+        templates = None
+
     templates = json.loads(templates) if templates else {}
 
     name = request.values.get('template_name')
 
-    del templates[name]
+    del templates['calc_templates'][name]
 
     user = models.User.query.filter_by(login = session['login']).first()
     user.templates = json.dumps(templates)
@@ -561,7 +568,30 @@ def delete_template():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify(templates = templates)
+    return jsonify(calc_templates = templates['calc_templates'])
+
+
+@app.route('/delete_teams_template', methods=['GET', 'POST'])
+def delete_teams_template():
+
+    try:
+        templates = models.User.query.filter_by(login = session['login']).first().templates
+    except:
+        templates = None
+        
+    templates = json.loads(templates) if templates else {}
+
+    name = request.values.get('template_name')
+
+    del templates['teams_templates'][name]
+
+    user = models.User.query.filter_by(login = session['login']).first()
+    user.templates = json.dumps(templates)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(teams_templates = templates['teams_templates'])
 
 
 @app.route('/select_teams', methods=['GET', 'POST'])

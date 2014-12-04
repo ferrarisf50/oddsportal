@@ -86,11 +86,13 @@ function save_calc_template() {
 }
 
 
-function get_teams_template() {
-
-    var selected_template = $('select[name=select_teams_template]').find(":selected").val();
-    var template_values   = JSON.parse(teams_templates[selected_template])['selected_teams'];
-    $('.selected_teams').push('123');
+function delete_calc_template() {
+    var selected_template = $('#select_calc_template').find(":selected").val();
+    $.post('/delete_calc_template', {
+        template_name: selected_template
+    }).done(function (data) {
+        swal("Template deleted!", "Thank you", "success")
+    }); 
 }
 
 
@@ -115,6 +117,17 @@ function save_teams_template() {
         swal("Template saved!", "You can now use it.", "success")
     });
 }
+
+
+function delete_teams_template() {
+    var selected_template = $('#select_teams_template').find(":selected").val();
+    $.post('/delete_teams_template', {
+        template_name: selected_template
+    }).done(function (data) {
+        swal("Template deleted!", "Thank you", "success")
+    }); 
+}
+
 
 
 function save_database_changes() {
@@ -438,14 +451,7 @@ function varying_type_change() {
 
 
 
-function delete_template() {
-    var selected_template = $('#select_template').find(":selected").val();
-    $.post('/delete_template', {
-            template_name: selected_template
-        }).done(function (data) {
-            swal("Template deleted!", "Thank you", "success")
-        }); 
-}
+
 
 function select_teams() {
     $("#test-form").css("display", "block");
@@ -503,4 +509,27 @@ function close_selection_team() {
 
     $('#button_save').removeAttr('disabled');
     $('#button_get').removeAttr('disabled');
+}
+
+
+
+function open_select_teams() {
+
+    $('a.select_teams_window').click(function() {
+        var loginBox = $(this).attr('href');
+        $(loginBox).fadeIn(300);
+        var popMargTop = ($(loginBox).height() + 24) / 2; 
+        var popMargLeft = ($(loginBox).width() + 24) / 2; 
+        
+        $(loginBox).css({ 
+            'margin-top' : -popMargTop,
+            'margin-left' : -popMargLeft
+        });
+        
+        $('body').append('<div id="mask"></div>');
+        $('#mask').fadeIn(300);
+        
+        return false;
+        
+    });
 }

@@ -275,6 +275,8 @@ def analyzation(form_request):
         results_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams),
                                                 models.Result.year.in_(form_request.years)).all()
         results    = results_01 + results_02
+        if not results:
+            return None
 
         recent_season_results_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams),
                                                               models.Result.year   == recent_season).all()
