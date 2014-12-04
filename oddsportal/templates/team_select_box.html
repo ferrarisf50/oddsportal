@@ -60,11 +60,13 @@
         var query_value  = $('#query').val();
         if (summer_value === 'none' & winter_value === 'none') {
             $('#query').attr('disabled', 'disabled');
+            $('#select_teams_template').attr('disabled', 'disabled');
             $('#select_teams_button_get').attr('disabled', 'disabled');
             $('#select_teams_button_save').attr('disabled', 'disabled');
         }
         else {
             $('#query').removeAttr('disabled');
+            $('#select_teams_template').removeAttr('disabled');
             $('#select_teams_button_get').removeAttr('disabled');
             $('#select_teams_button_save').removeAttr('disabled');
         };
