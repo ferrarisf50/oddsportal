@@ -41,11 +41,11 @@ def get_teams():
     
     for result in models.Result.query.all():
         if '-' in result.year:
-            summer_winter_teams['winter'].append(result.home_team)
-            summer_winter_teams['winter'].append(result.away_team)
+            summer_winter_teams['winter'].append(result.home_team + ' -- ' + result.league)
+            summer_winter_teams['winter'].append(result.away_team + ' -- ' + result.league)
         else:
-            summer_winter_teams['summer'].append(result.home_team)
-            summer_winter_teams['summer'].append(result.away_team)
+            summer_winter_teams['summer'].append(result.home_team + ' -- ' + result.league)
+            summer_winter_teams['summer'].append(result.away_team + ' -- ' + result.league)
 
     summer_winter_teams['winter'] = list(set(summer_winter_teams['winter']))
     summer_winter_teams['summer'] = list(set(summer_winter_teams['summer']))
@@ -76,25 +76,25 @@ def get_teams_years():
 def final():
 
     try:
-        #os.remove('../tmp/league_groups.txt')
-        #os.remove('../tmp/group_years.txt')
-        #os.remove('../tmp/leagues.txt')
-        #os.remove('../tmp/summer_winter_teams.txt')
+        os.remove('../tmp/league_groups.txt')
+        os.remove('../tmp/group_years.txt')
+        os.remove('../tmp/leagues.txt')
+        os.remove('../tmp/summer_winter_teams.txt')
         os.remove('../tmp/teams_years.txt')
     except:
         pass
 
-    #os.rename('../tmp/league_groups_tmp.txt', '../tmp/league_groups.txt')
-    #os.rename('../tmp/group_years_tmp.txt', '../tmp/group_years.txt')
-    #os.rename('../tmp/leagues_tmp.txt', '../tmp/leagues.txt')
-    #os.rename('../tmp/summer_winter_teams_tmp.txt', '../tmp/summer_winter_teams.txt')
+    os.rename('../tmp/league_groups_tmp.txt', '../tmp/league_groups.txt')
+    os.rename('../tmp/group_years_tmp.txt', '../tmp/group_years.txt')
+    os.rename('../tmp/leagues_tmp.txt', '../tmp/leagues.txt')
+    os.rename('../tmp/summer_winter_teams_tmp.txt', '../tmp/summer_winter_teams.txt')
     os.rename('../tmp/teams_years_tmp.txt', '../tmp/teams_years.txt')
 
     try:
-        #os.remove('../tmp/league_groups_tmp.txt')
-        #os.remove('../tmp/group_years_tmp.txt')
-        #os.remove('../tmp/leagues_tmp.txt')
-        #os.remove('../tmp/summer_winter_teams_tmp.txt')
+        os.remove('../tmp/league_groups_tmp.txt')
+        os.remove('../tmp/group_years_tmp.txt')
+        os.remove('../tmp/leagues_tmp.txt')
+        os.remove('../tmp/summer_winter_teams_tmp.txt')
         os.remove('../tmp/teams_years_tmp.txt')
     except:
         pass
@@ -103,13 +103,13 @@ def final():
 
 if __name__ == "__main__":
 
-    #league_groups_writer = open('../tmp/league_groups_tmp.txt', 'w')
-    #group_years_writer   = open('../tmp/group_years_tmp.txt',   'w')
-    #leagues_writer       = open('../tmp/leagues_tmp.txt',       'w')
-    #teams_writer         = open('../tmp/summer_winter_teams_tmp.txt', 'w')
+    league_groups_writer = open('../tmp/league_groups_tmp.txt', 'w')
+    group_years_writer   = open('../tmp/group_years_tmp.txt',   'w')
+    leagues_writer       = open('../tmp/leagues_tmp.txt',       'w')
+    teams_writer         = open('../tmp/summer_winter_teams_tmp.txt', 'w')
     teams_years_writer   = open('../tmp/teams_years_tmp.txt', 'w')
 
-    #get_leagues_groups()
-    #get_teams()
+    get_leagues_groups()
+    get_teams()
     get_teams_years()
     final()

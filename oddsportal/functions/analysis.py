@@ -158,10 +158,13 @@ def analyzation(form_request):
             
             for team in home_away_teams:
 
-                #-- Check if team played in the recent season --#
-                recent_season_games = [result for result in recent_season_results if result.home_team == team or result.away_team == team]
-                recent_season_games = 'active_team' if recent_season_games else 'deactive_team' 
+                team_league = team.split(' -- ')[1]
+                team        = team.split(' -- ')[0]
 
+                #-- Check if team played in the recent season --#
+                recent_season_games = [result for result in recent_season_results if result.league == team_league and (result.home_team == team or result.away_team == team)]
+                recent_season_games = 'active_team' if recent_season_games else 'deactive_team'
+                
                 output_results[playing_at][year]['teams'][team] = {'played':         0,
                                                                    'won':            0,
                                                                    'loss':           0,
@@ -172,7 +175,7 @@ def analyzation(form_request):
                 matches_played, matches_won, sum_profit_loss = 0, 0, 0
 
                 where   = 'home_team' if playing_at == 'home' else 'away_team'
-                matches = (match for match in year_matches if getattr(match, where) == team)
+                matches = (match for match in year_matches if getattr(match, where) == team and match.league == team_league)
 
 
                 #-- Varying_type is which variation option we chose --#
@@ -264,26 +267,36 @@ def analyzation(form_request):
     timer_01 = datetime.datetime.now()
 
     
-
+    
     #-- Check if specific teams were selected instead of League and Group --#
     if form_request.selected_teams_hidden:
-        recent_season = '2014' if form_request.summer_winter == 'summer' else '2014-2015'
-        #raise NameError(123)
+
+        recent_season  = '2014' if form_request.summer_winter == 'summer' else '2014-2015'
+
         selected_teams = list(set(form_request.selected_teams_hidden.split(';')))
-        home_selected_teams = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'home']
-        away_selected_teams = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'away']
-        #selected_teams = home_selected_teams if form_request.
+        home_selected  = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'home']
+        away_selected  = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'away']
+
+        home_selected_teams = [team.split(' -- ')[0] for team in home_selected]
+        away_selected_teams = [team.split(' -- ')[0] for team in away_selected]
+        home_selected_leagues = [league.split(' -- ')[1] for league in home_selected]
+        away_selected_leagues = [league.split(' -- ')[1] for league in away_selected]
+
         results_01 = models.Result.query.filter(models.Result.home_team.in_(home_selected_teams),
+                                                models.Result.league.in_(home_selected_leagues),
                                                 models.Result.year.in_(form_request.years)).all()
         results_02 = models.Result.query.filter(models.Result.away_team.in_(away_selected_teams),
+                                                models.Result.league.in_(away_selected_leagues),
                                                 models.Result.year.in_(form_request.years)).all()
         results    = results_01 + results_02
         if not results:
             return None
 
         recent_season_results_01 = models.Result.query.filter(models.Result.home_team.in_(home_selected_teams),
+                                                              models.Result.league.in_(home_selected_leagues),
                                                               models.Result.year   == recent_season).all()
         recent_season_results_02 = models.Result.query.filter(models.Result.away_team.in_(away_selected_teams),
+                                                              models.Result.league.in_(away_selected_leagues),
                                                               models.Result.year   == recent_season).all()
         recent_season_results = recent_season_results_01 + recent_season_results_02
 
@@ -308,11 +321,11 @@ def analyzation(form_request):
 
     timer_01 = datetime.datetime.now()
     if form_request.selected_teams_hidden:
-        home_teams = sorted(list(set(home_selected_teams)))
-        away_teams = sorted(list(set(away_selected_teams)))
+        home_teams = sorted(list(set(home_selected)))
+        away_teams = sorted(list(set(away_selected)))
     else:
-        home_teams = sorted(list(set([result.home_team for result in results])))
-        away_teams = sorted(list(set([result.away_team for result in results])))
+        home_teams = sorted(list(set([result.home_team + ' -- ' + result.league for result in results])))
+        away_teams = sorted(list(set([result.away_team + ' -- ' + result.league for result in results])))
 
     results_column = '{}_{}_results'.format(form_request.handicap, form_request.game_part)
     odd_value      = float(form_request.odd_value)
@@ -341,6 +354,7 @@ def analyzation(form_request):
         for k,v in eval(w + '_teams_results')[w].iteritems():
             for i, team in enumerate(eval(w + '_teams')):
 
+                team = team.split(' -- ')[0]
                 new_value = where_team_results[w][k]['teams'][team]['prft_lss_value']
 
                 if i == 0:
