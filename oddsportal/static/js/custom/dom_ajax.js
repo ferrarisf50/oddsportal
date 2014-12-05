@@ -286,7 +286,7 @@ function search_form_check() {
     odd_value = $('input[name="odd_value"]').val()
     var selected_teams_hidden = $('.selected_teams_hidden').val();
 
-    if (odd_value && years_selected.length > 0 && selected_teams_hidden) {
+    if (odd_value && years_selected.length > 0) {
         $("#error").text('');
         $('input[type=submit]').removeAttr("disabled");
     }
