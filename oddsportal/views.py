@@ -210,7 +210,7 @@ def search_results(logged = False):
                        'all_teams_all_years_pl':  0,
                        'all_teams_all_years_inv': 0}}
 
-
+    #return jsonify(a=output_results)
     for year in form_request.years:
         for team in home_teams:
             totals['home']['all_teams_all_years_won'] += output_results['home'][year]['teams'][team]['team_all_years_won']
@@ -221,7 +221,10 @@ def search_results(logged = False):
     total_investments  = totals['home']['all_teams_all_years_inv']
     total_games_played = totals['home']['all_teams_all_years_pld']
     total_play_loss    = totals['home']['all_teams_all_years_pl']
-    totals['home']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2)
+    if total_investments == 0:
+        totals['home']['all_teams_all_years_roi'] = 0
+    else:
+        totals['home']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2)
     totals['home']['all_teams_all_years_roi'] = -totals['home']['all_teams_all_years_roi'] if total_play_loss <= 0 else roi
 
     for year in form_request.years:
@@ -234,7 +237,10 @@ def search_results(logged = False):
     total_investments  = totals['away']['all_teams_all_years_inv']
     total_games_played = totals['away']['all_teams_all_years_pld']
     total_play_loss    = totals['away']['all_teams_all_years_pl']
-    totals['away']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2) if total_investments else 0
+    if total_investments == 0:
+        totals['away']['all_teams_all_years_roi'] = 0
+    else:
+        totals['away']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2) if total_investments else 0
     totals['away']['all_teams_all_years_roi'] = -totals['away']['all_teams_all_years_roi'] if total_play_loss <= 0 else roi
 
     stopwatch_02 = datetime.datetime.now()
@@ -373,14 +379,24 @@ def save_calc_template(logged = False):
 def save_teams_template(logged = False):
 
 
-    templates = models.User.query.filter_by(login = session['login']).first().templates
+    try:
+        templates = models.User.query.filter_by(login = session['login']).first().templates
+    except:
+        templates = None
+
     templates = json.loads(templates) if templates else {'teams_templates': {}, 'calc_templates': {}}
 
     name  = request.values.get('template_name')
     selected_teams = request.values.get('selected_teams')
-    selected_teams = ';'.join(list(set(selected_teams.split(';'))))
+    selected_teams = list(set(selected_teams.split(';')))
+
+    home_selected_teams = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'home']
+    away_selected_teams = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'away']
     
-    template = {'selected_teams': selected_teams}
+    home_selected_teams = ';'.join(home_selected_teams)
+    away_selected_teams = ';'.join(away_selected_teams)
+
+    template = {'home': home_selected_teams, 'away': away_selected_teams}
 
     templates['teams_templates'][name] = json.dumps(template)
 

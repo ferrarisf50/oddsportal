@@ -269,18 +269,21 @@ def analyzation(form_request):
     if form_request.selected_teams_hidden:
         recent_season = '2014' if form_request.summer_winter == 'summer' else '2014-2015'
         #raise NameError(123)
-        selected_teams = form_request.selected_teams_hidden.split(';')
-        results_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams),
+        selected_teams = list(set(form_request.selected_teams_hidden.split(';')))
+        home_selected_teams = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'home']
+        away_selected_teams = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'away']
+        #selected_teams = home_selected_teams if form_request.
+        results_01 = models.Result.query.filter(models.Result.home_team.in_(home_selected_teams),
                                                 models.Result.year.in_(form_request.years)).all()
-        results_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams),
+        results_02 = models.Result.query.filter(models.Result.away_team.in_(away_selected_teams),
                                                 models.Result.year.in_(form_request.years)).all()
         results    = results_01 + results_02
         if not results:
             return None
 
-        recent_season_results_01 = models.Result.query.filter(models.Result.home_team.in_(selected_teams),
+        recent_season_results_01 = models.Result.query.filter(models.Result.home_team.in_(home_selected_teams),
                                                               models.Result.year   == recent_season).all()
-        recent_season_results_02 = models.Result.query.filter(models.Result.away_team.in_(selected_teams),
+        recent_season_results_02 = models.Result.query.filter(models.Result.away_team.in_(away_selected_teams),
                                                               models.Result.year   == recent_season).all()
         recent_season_results = recent_season_results_01 + recent_season_results_02
 
@@ -301,14 +304,12 @@ def analyzation(form_request):
 
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
-    #leagues = sorted(json.loads(open(path + 'oddsportal/oddsportal/tmp/leagues.txt').read()))
-    
    
 
     timer_01 = datetime.datetime.now()
     if form_request.selected_teams_hidden:
-        home_teams = sorted(list(set(selected_teams)))
-        away_teams = sorted(list(set(selected_teams)))
+        home_teams = sorted(list(set(home_selected_teams)))
+        away_teams = sorted(list(set(away_selected_teams)))
     else:
         home_teams = sorted(list(set([result.home_team for result in results])))
         away_teams = sorted(list(set([result.away_team for result in results])))

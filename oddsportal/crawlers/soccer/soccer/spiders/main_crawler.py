@@ -24,7 +24,7 @@ class SoccerSpider(CrawlSpider):
 
     name            = "soccer"
     allowed_domains = ["oddsportal.com"]
-    start_urls      = links[30:80]
+    start_urls      = links[80:120]
     
     def parse(self, response):
 
@@ -73,10 +73,10 @@ class SoccerSpider(CrawlSpider):
                                              'league': response.meta['league']}, callback=self.parse_item)
 
             else:
-                logger.warning('Results already scraped for:')
-                logger.warning(new_url)
-                logger.warning('-'*30)
-                logger.warning('\n')
+                print ('Results already scraped for:')
+                print (new_url)
+                print ('-'*30)
+                print ('\n')
 
 
 

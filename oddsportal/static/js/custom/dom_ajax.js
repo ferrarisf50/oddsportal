@@ -98,6 +98,7 @@ function delete_calc_template() {
 
 function save_teams_template() {
 
+
     var teams_template_name = $('input[name=teams_template_name]').val();
 
     if (teams_template_name === "") {
@@ -283,8 +284,9 @@ function search_form_check() {
     });
     
     odd_value = $('input[name="odd_value"]').val()
+    var selected_teams_hidden = $('.selected_teams_hidden').val();
 
-    if (odd_value && years_selected.length > 0) {
+    if (odd_value && years_selected.length > 0 && selected_teams_hidden) {
         $("#error").text('');
         $('input[type=submit]').removeAttr("disabled");
     }
@@ -465,50 +467,53 @@ function close_selection_team() {
 
     $('.selected_teams_hidden').val($('.selected_teams').text());
 
+    if ($('.selected_teams_hidden').val()) {
 
-    var winter = $('.winter').css("text-decoration");
-    if (winter === 'none') {
-        $('.summer_winter').val('summer');
-        var years = ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014'];
+        var winter = $('.winter').css("text-decoration");
+        if (winter === 'none') {
+            $('.summer_winter').val('summer');
+            var years = ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014'];
+        }
+        else {
+            $('.summer_winter').val('winter');
+            var years = ['2000-2001', '2001-2002', '2002-2003', '2003-2004', '2004-2005', '2005-2006', '2006-2007', '2007-2008', '2008-2009', '2009-2010', '2010-2011', '2011-2012', '2012-2013', '2013-2014', '2014-2015'];
+        };
+        $('#years').html('');
+        $('#years_coeffs').html('');
+        $('#mySlideContent').html('');
+
+        if (years.length > 1) {
+            $('#mySlideToggler').show();
+        }
+        else {
+            $('#mySlideToggler').hide();
+        }
+
+        var first_year = years.slice(-1)
+        $('#years').append('<input id="' + first_year + '" name="years" type="checkbox" value="' + first_year +  '"><label>' + first_year + '</label><br>');
+        $('#years_coeffs').append('<input id="coefficient" name="' + first_year + '_coeff" type="text" autocomplete="off">');
+
+        for (var i in years.slice(1)) {
+        
+            var year_div    = '<div class="large-7 text-left columns" id="years">'
+
+            var year_input  = '<input id="' + years[i] + '" \
+                               name="years" \
+                               type="checkbox" \
+                               value="' + years[i] + '">'
+
+            var coeff_div   = '<div class="large-5 columns id="years_coeffs">'
+
+            var coeff_input = '<input id="coefficient" name="' + years[i] + '_coeff" type="text" autocomplete="off">'
+
+            $('#mySlideContent').prepend(year_div + year_input + '<label>' + years[i] + '</label><br></div>' + coeff_div + coeff_input + '</div>');
+        };
+
+
+        $('#button_save').removeAttr('disabled');
+        $('#button_get').removeAttr('disabled');
     }
-    else {
-        $('.summer_winter').val('winter');
-        var years = ['2000-2001', '2001-2002', '2002-2003', '2003-2004', '2004-2005', '2005-2006', '2006-2007', '2007-2008', '2008-2009', '2009-2010', '2010-2011', '2011-2012', '2012-2013', '2013-2014', '2014-2015'];
-    };
-    $('#years').html('');
-    $('#years_coeffs').html('');
-    $('#mySlideContent').html('');
 
-    if (years.length > 1) {
-        $('#mySlideToggler').show();
-    }
-    else {
-        $('#mySlideToggler').hide();
-    }
-
-    var first_year = years.slice(-1)
-    $('#years').append('<input id="' + first_year + '" name="years" type="checkbox" value="' + first_year +  '"><label>' + first_year + '</label><br>');
-    $('#years_coeffs').append('<input id="coefficient" name="' + first_year + '_coeff" type="text" autocomplete="off">');
-
-    for (var i in years.slice(1)) {
-    
-        var year_div    = '<div class="large-7 text-left columns" id="years">'
-
-        var year_input  = '<input id="' + years[i] + '" \
-                           name="years" \
-                           type="checkbox" \
-                           value="' + years[i] + '">'
-
-        var coeff_div   = '<div class="large-5 columns id="years_coeffs">'
-
-        var coeff_input = '<input id="coefficient" name="' + years[i] + '_coeff" type="text" autocomplete="off">'
-
-        $('#mySlideContent').prepend(year_div + year_input + '<label>' + years[i] + '</label><br></div>' + coeff_div + coeff_input + '</div>');
-    };
-
-
-    $('#button_save').removeAttr('disabled');
-    $('#button_get').removeAttr('disabled');
 }
 
 

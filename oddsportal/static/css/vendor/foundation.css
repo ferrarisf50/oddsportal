@@ -4610,7 +4610,7 @@ textarea[rows] {
   height: auto; }
 
 /* Add height value for select elements to match text input height */
-#select_calc_template, #select_teams_template, #query {
+#select_calc_template, #select_teams_template, #query, #home_away_team {
   height: 2rem !important;
 }
 select {
