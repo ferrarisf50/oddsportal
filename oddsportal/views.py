@@ -115,10 +115,12 @@ def search_results(logged = False):
 
     stopwatch_01 = datetime.datetime.now()
     output_results_raw  = analyzation(form_request)
+
     if not output_results_raw:
-        return jsonify(result='No results for selected teams found')
-    stopwatch_02 = datetime.datetime.now()
-    output_results      = json.loads(output_results_raw)
+        return jsonify(result='No results for selected team(s) found')
+
+    stopwatch_02  = datetime.datetime.now()
+    output_results = json.loads(output_results_raw)
 
     time_01 = (stopwatch_02 - stopwatch_01).total_seconds()
     
@@ -224,8 +226,8 @@ def search_results(logged = False):
     if total_investments == 0:
         totals['home']['all_teams_all_years_roi'] = 0
     else:
-        totals['home']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2)
-    totals['home']['all_teams_all_years_roi'] = -totals['home']['all_teams_all_years_roi'] if total_play_loss <= 0 else roi
+        totals['home']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 1)
+    totals['home']['all_teams_all_years_roi'] = -totals['home']['all_teams_all_years_roi'] if total_play_loss <= 0 else totals['home']['all_teams_all_years_roi']
 
     for year in form_request.years:
         for team in away_teams:
@@ -240,8 +242,8 @@ def search_results(logged = False):
     if total_investments == 0:
         totals['away']['all_teams_all_years_roi'] = 0
     else:
-        totals['away']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 2) if total_investments else 0
-    totals['away']['all_teams_all_years_roi'] = -totals['away']['all_teams_all_years_roi'] if total_play_loss <= 0 else roi
+        totals['away']['all_teams_all_years_roi'] = round(((1 - ((total_investments - abs(total_play_loss)) / total_investments)) * 100), 1) if total_investments else 0
+    totals['away']['all_teams_all_years_roi'] = -totals['away']['all_teams_all_years_roi'] if total_play_loss <= 0 else totals['away']['all_teams_all_years_roi']
 
     stopwatch_02 = datetime.datetime.now()
     time_02 = (stopwatch_02 - stopwatch_01).total_seconds()

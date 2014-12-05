@@ -104,6 +104,7 @@
             %tbody
                 -for team in away_teams
                     %tr.{{output_results['away'][table_years[0]]['teams'][team]['team_status']}}
+                    
                         %td -> {{team}}
 
                         %td -> {{ output_results['away'][table_years[0]]['teams'][team]['team_all_years_inv'] }}
