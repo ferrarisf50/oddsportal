@@ -143,12 +143,12 @@
             this.allItems.removeAll();
             for (i in home_selected_teams) {
                 if (home_selected_teams[i]) {
-                    this.allItems.push('home || ' + home_selected_teams[i]);
+                    this.allItems.push('home || ' + home_selected_teams[i] + ';');
                 }
             }
             for (i in away_selected_teams) {
                 if (away_selected_teams[i]) {
-                    this.allItems.push('away || ' + away_selected_teams[i]);
+                    this.allItems.push('away || ' + away_selected_teams[i] + ';');
                 }
             }
 
