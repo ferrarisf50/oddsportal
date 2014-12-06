@@ -1,4 +1,5 @@
-import sys, os, json
+# -*- coding: utf-8 -*-
+import sys, os, json, ast
 sys.dont_write_bytecode = True
 sys.path.append(os.path.abspath(__name__).split('oddsportal')[0] + 'oddsportal/')
 
@@ -38,14 +39,15 @@ def get_leagues_groups():
 def get_teams():
 
     summer_winter_teams = {'summer': [], 'winter': []}
+    teams_years = json.loads(open('../tmp/teams_years_tmp.txt').read())
     
-    for result in models.Result.query.all():
-        if '-' in result.year:
-            summer_winter_teams['winter'].append(result.home_team + ' -- ' + result.league)
-            summer_winter_teams['winter'].append(result.away_team + ' -- ' + result.league)
+    for team, years in teams_years.iteritems():
+        for year in years:
+            if '-' in year:
+                summer_winter_teams['winter'].append(team)
+                break
         else:
-            summer_winter_teams['summer'].append(result.home_team + ' -- ' + result.league)
-            summer_winter_teams['summer'].append(result.away_team + ' -- ' + result.league)
+            summer_winter_teams['summer'].append(team)
 
     summer_winter_teams['winter'] = list(set(summer_winter_teams['winter']))
     summer_winter_teams['summer'] = list(set(summer_winter_teams['summer']))
@@ -56,20 +58,21 @@ def get_teams_years():
 
     teams = {}
     for result in models.Result.query.all():
-        if not teams.get(result.home_team):
-            teams[result.home_team] = [result.year]
+        if not teams.get(result.home_team + ' -- ' + result.league):
+            teams[result.home_team + ' -- ' + result.league] = [result.year]
         else:
-            teams[result.home_team].append(result.year)
+            teams[result.home_team + ' -- ' + result.league].append(result.year)
 
-        if not teams.get(result.away_team):
-            teams[result.away_team] = [result.year]
+        if not teams.get(result.away_team + ' -- ' + result.league):
+            teams[result.away_team + ' -- ' + result.league] = [result.year]
         else:
-            teams[result.away_team].append(result.year)
+            teams[result.away_team + ' -- ' + result.league].append(result.year)
 
     for name, years in teams.iteritems():
         teams[name] = list(set(teams[name]))
 
     teams_years_writer.write(json.dumps(teams))
+    teams_years_writer.close()
 
     
 
@@ -103,6 +106,15 @@ def final():
 
 if __name__ == "__main__":
 
+    try:
+        os.remove('../tmp/league_groups.txt')
+        os.remove('../tmp/group_years.txt')
+        os.remove('../tmp/leagues.txt')
+        os.remove('../tmp/summer_winter_teams.txt')
+        os.remove('../tmp/teams_years.txt')
+    except:
+        pass
+
     league_groups_writer = open('../tmp/league_groups_tmp.txt', 'w')
     group_years_writer   = open('../tmp/group_years_tmp.txt',   'w')
     leagues_writer       = open('../tmp/leagues_tmp.txt',       'w')
@@ -110,6 +122,6 @@ if __name__ == "__main__":
     teams_years_writer   = open('../tmp/teams_years_tmp.txt', 'w')
 
     get_leagues_groups()
-    get_teams()
     get_teams_years()
+    get_teams()
     final()

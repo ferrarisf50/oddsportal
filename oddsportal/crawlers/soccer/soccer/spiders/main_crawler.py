@@ -24,7 +24,7 @@ class SoccerSpider(CrawlSpider):
 
     name            = "soccer"
     allowed_domains = ["oddsportal.com"]
-    start_urls      = links[120:150]
+    start_urls      = links[150:170]
     
     def parse(self, response):
 
