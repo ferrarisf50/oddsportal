@@ -25,7 +25,7 @@ session._model_changes = {}
 
 #-- This is used to enable requests with through Tor   --#
 #-- Tor should be installed in order to make this work --#
-
+'''
 import socks, socket
 
 def create_connection(address, timeout=None, source_address=None):
@@ -36,7 +36,7 @@ def create_connection(address, timeout=None, source_address=None):
 socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
 socket.socket = socks.socksocket
 socket.create_connection = create_connection
-
+'''
 
 columns_to_check = ['hda_full_results', 
                     'hda_frst_results', 

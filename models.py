@@ -6,7 +6,7 @@ from oddsportal import db
 
 
 class Result(db.Model):
-    __tablename__ = "results_03"
+    __tablename__ = "results_04"
 
     id = db.Column(Integer, primary_key=True)
 
