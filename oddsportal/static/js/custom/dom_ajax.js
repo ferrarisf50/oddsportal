@@ -7,9 +7,21 @@ function get_calc_template() {
         $('select[name=' + x + ']').val(template_values[x]);
     }
 
+    if ($('select[name=varying_type]').find(":selected").val() !== '0') {
+        $('input[name=varying_value]').removeAttr('disabled');
+        $('input[name=number_of_games]').removeAttr('disabled');
+    };
+
     $('input[name=odd_toggle]').val(template_values['odd_toggle']);
     $('input[name=odd_value]').val(template_values['odd_value']);
+    $('input[name=varying_value]').val(template_values['varying_value']);
+    $('input[name=number_of_games]').val(template_values['number_of_games']);
+    $('input[name=stop_after]').val(template_values['stop_after']);
 
+    if (template_values['bet_from_win'] === '1') {
+        $('input[name=bet_from_win]').attr('checked', 'checked');
+    }
+    
     for (var x in template_values['years']) {
         $('input[id=' + x + ']').attr('checked', 'checked');
         $('input[name=' + x + '_coeff]').val(template_values['years'][x]);
@@ -47,26 +59,36 @@ function save_calc_template() {
 
 
     var form_playing_at_types  = $('select[name=form_playing_at_types]').find(":selected").val();
-    var handicap    = $('select[name=handicap]').find(":selected").val();
-    var strategy    = $('select[name=strategy]').find(":selected").val();
-    var ou_values   = $('select[name=ou_values]').find(":selected").val();
-    var game_part   = $('select[name=game_part]').find(":selected").val();
-    var odds_type   = $('select[name=odds_type]').find(":selected").val();
-    var odd_toggle  = $('input[name=odd_toggle]').val();
-    var odd_value   = $('input[name=odd_value]').val();
+    var handicap        = $('select[name=handicap]').find(":selected").val();
+    var strategy        = $('select[name=strategy]').find(":selected").val();
+    var ou_values       = $('select[name=ou_values]').find(":selected").val();
+    var game_part       = $('select[name=game_part]').find(":selected").val();
+    var odds_type       = $('select[name=odds_type]').find(":selected").val();
+    var varying_type    = $('select[name=varying_type]').find(":selected").val();
+    var odd_toggle      = $('input[name=odd_toggle]').val();
+    var odd_value       = $('input[name=odd_value]').val();
+    var varying_value   = $('input[name=varying_value]').val();
+    var number_of_games = $('input[name=number_of_games]').val();
+    var bet_from_win    = $('input[name=bet_from_win]').val();
+    var stop_after      = $('input[name=stop_after]').val();
 
     $.post('/save_calc_template', {
 
         form_playing_at_types: form_playing_at_types,
-        handicap:      handicap,
-        strategy:      strategy,
-        ou_values:     ou_values,
-        game_part:     game_part,
-        odds_type:     odds_type,
-        odd_toggle:    odd_toggle,
-        odd_value:     odd_value,
-        template_name: template_name,
-        years:         years_json
+        handicap:        handicap,
+        strategy:        strategy,
+        ou_values:       ou_values,
+        game_part:       game_part,
+        odds_type:       odds_type,
+        odd_toggle:      odd_toggle,
+        odd_value:       odd_value,
+        template_name:   template_name,
+        years:           years_json,
+        varying_type:    varying_type,
+        varying_value:   varying_value,
+        number_of_games: number_of_games,
+        bet_from_win:    bet_from_win,
+        stop_after:      stop_after
 
     }).done(function (data) {
         var templates = data.calc_templates;

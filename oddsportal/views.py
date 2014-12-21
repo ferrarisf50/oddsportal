@@ -356,15 +356,20 @@ def save_calc_template(logged = False):
     name  = request.values.get('template_name')
     years = json.loads(request.values.get('years'))
 
-    template = {'playing_at':  request.values.get('playing_at'),
-                'handicap':    request.values.get('handicap'),
-                'strategy':    request.values.get('strategy'),
-                'ou_values':   request.values.get('ou_values'),
-                'game_part':   request.values.get('game_part'),
-                'odds_type':   request.values.get('odds_type'),
-                'odd_toggle':  request.values.get('odd_toggle'),
-                'odd_value':   request.values.get('odd_value'),
-                'years':       years}
+    template = {'playing_at':      request.values.get('playing_at'),
+                'handicap':        request.values.get('handicap'),
+                'strategy':        request.values.get('strategy'),
+                'ou_values':       request.values.get('ou_values'),
+                'game_part':       request.values.get('game_part'),
+                'odds_type':       request.values.get('odds_type'),
+                'odd_toggle':      request.values.get('odd_toggle'),
+                'odd_value':       request.values.get('odd_value'),
+                'years':           years,
+                'varying_type':    request.values.get('varying_type'),
+                'varying_value':   request.values.get('varying_value'),
+                'number_of_games': request.values.get('number_of_games'),
+                'bet_from_win':    request.values.get('bet_from_win'),
+                'stop_after':      request.values.get('stop_after')}
 
     templates['calc_templates'][name] = json.dumps(template)
 
