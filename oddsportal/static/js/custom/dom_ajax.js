@@ -21,6 +21,9 @@ function get_calc_template() {
     if (template_values['bet_from_win'] === '1') {
         $('input[name=bet_from_win]').attr('checked', 'checked');
     }
+    else {
+        $('input[name=bet_from_win]').attr('checked', false);
+    }
     
     for (var x in template_values['years']) {
         $('input[id=' + x + ']').attr('checked', 'checked');
@@ -69,7 +72,7 @@ function save_calc_template() {
     var odd_value       = $('input[name=odd_value]').val();
     var varying_value   = $('input[name=varying_value]').val();
     var number_of_games = $('input[name=number_of_games]').val();
-    var bet_from_win    = $('input[name=bet_from_win]').val();
+    var bet_from_win    = $('input[name=bet_from_win]:checked').length;
     var stop_after      = $('input[name=stop_after]').val();
 
     $.post('/save_calc_template', {
