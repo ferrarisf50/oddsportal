@@ -16,7 +16,7 @@ def analyzation(form_request):
 
     path = os.path.dirname(__file__).split('oddsportal')[0]
 
-    def analyze_teams(home_away_teams, results, playing_at, stake_varying = None):
+    def analyze_teams(home_away_teams, results, recent_season_results, playing_at, stake_varying = None):
 
         def calc(handicap,
                  event_results,
@@ -163,11 +163,9 @@ def analyzation(form_request):
                 team           = team.split(' -- ')[0]
 
                 #-- Check if team played in the recent season --#
-                recent_season = ['2014', '2014-2015']
-
-                recent_season_games = [result for result in results if result.year in recent_season and (result.home_team == team or result.away_team == team)]
+                recent_season_games = [result for result in recent_season_results if result.home_team == team or result.away_team == team]
                 recent_season_games = 'active_team' if recent_season_games else 'deactive_team'
-                
+
                 output_results[playing_at][year]['teams'][team] = {'played':         0,
                                                                    'won':            0,
                                                                    'loss':           0,
@@ -290,6 +288,15 @@ def analyzation(form_request):
                                                 models.Result.league.in_(away_selected_leagues),
                                                 models.Result.year.in_(form_request.years)).all()
         results    = results_01 + results_02
+
+        recent_season = ['2014', '2014-2015']
+        recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+                                                           models.Result.home_team.in_(home_selected_teams),
+                                                           models.Result.year.in_(recent_season)).all()
+        if not recent_season_results:
+            recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+                                                               models.Result.home_away.in_(away_selected_teams),
+                                                               models.Result.year.in_(recent_season)).all()
         if not results:
             return None
 
@@ -300,13 +307,17 @@ def analyzation(form_request):
                                              models.Result.group  == form_request.group,
                                              models.Result.year.in_(form_request.years)).all()
 
+        recent_season = ['2014', '2014-2015']
+        recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+                                                           models.Result.group  == form_request.group,
+                                                           models.Result.year.in_(recent_season)).all()
+
+
     results.sort(key=lambda x: x.datetime, reverse=False)
 
     stopwatch_01 = ((datetime.datetime.now()) - timer_01).total_seconds()
+    timer_01     = datetime.datetime.now()
 
-   
-
-    timer_01 = datetime.datetime.now()
     if form_request.selected_teams_hidden:
         home_teams = sorted(list(set(home_selected)))
         away_teams = sorted(list(set(away_selected)))
@@ -327,8 +338,8 @@ def analyzation(form_request):
     stopwatch_02 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
     timer_01 = datetime.datetime.now()
-    home_teams_results = analyze_teams(home_teams, results, 'home')
-    away_teams_results = analyze_teams(away_teams, results, 'away')
+    home_teams_results = analyze_teams(home_teams, results, recent_season_results, 'home')
+    away_teams_results = analyze_teams(away_teams, results, recent_season_results, 'away')
     stopwatch_03 = ((datetime.datetime.now()) - timer_01).total_seconds()
 
     timer_01 = datetime.datetime.now()
