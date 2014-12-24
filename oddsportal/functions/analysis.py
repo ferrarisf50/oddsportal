@@ -295,7 +295,7 @@ def analyzation(form_request):
                                                            models.Result.year.in_(recent_season)).all()
         if not recent_season_results:
             recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
-                                                               models.Result.home_away.in_(away_selected_teams),
+                                                               models.Result.away_team.in_(away_selected_teams),
                                                                models.Result.year.in_(recent_season)).all()
         if not results:
             return None
