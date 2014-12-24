@@ -290,11 +290,12 @@ def analyzation(form_request):
         results    = results_01 + results_02
 
         recent_season = ['2014', '2014-2015']
-        recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+        recent_season_results = models.Result.query.filter(models.Result.league.in_(home_selected_leagues),
                                                            models.Result.home_team.in_(home_selected_teams),
                                                            models.Result.year.in_(recent_season)).all()
+
         if not recent_season_results:
-            recent_season_results = models.Result.query.filter(models.Result.league == form_request.league,
+            recent_season_results = models.Result.query.filter(models.Result.league.in_(away_selected_leagues),
                                                                models.Result.away_team.in_(away_selected_teams),
                                                                models.Result.year.in_(recent_season)).all()
         if not results:
