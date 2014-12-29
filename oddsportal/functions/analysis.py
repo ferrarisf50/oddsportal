@@ -196,6 +196,9 @@ def analyzation(form_request):
 
                 investments = 0
                 waiting_for_win = True if '1' in form_request.wait_for_win else False
+
+                if not waiting_for_win and not stop_after and not number_of_games:
+                    varying_type = False
                 
                 for match in matches:
                     try:
@@ -276,26 +279,33 @@ def analyzation(form_request):
         home_selected  = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'home']
         away_selected  = [team.split(' || ')[1] for team in selected_teams if team.split(' || ')[0] == 'away']
 
-        home_selected_teams = [team.split(' -- ')[0] for team in home_selected]
-        away_selected_teams = [team.split(' -- ')[0] for team in away_selected]
+        home_selected_teams   = [team.split(' -- ')[0]   for team   in home_selected]
+        away_selected_teams   = [team.split(' -- ')[0]   for team   in away_selected]
         home_selected_leagues = [league.split(' -- ')[1] for league in home_selected]
         away_selected_leagues = [league.split(' -- ')[1] for league in away_selected]
+        home_selected_groups  = [group.split(' -- ')[2]  for group  in home_selected]
+        away_selected_groups  = [group.split(' -- ')[2]  for group  in away_selected]
 
         results_01 = models.Result.query.filter(models.Result.home_team.in_(home_selected_teams),
                                                 models.Result.league.in_(home_selected_leagues),
+                                                models.Result.group.in_(home_selected_groups),
                                                 models.Result.year.in_(form_request.years)).all()
         results_02 = models.Result.query.filter(models.Result.away_team.in_(away_selected_teams),
                                                 models.Result.league.in_(away_selected_leagues),
+                                                models.Result.group.in_(away_selected_groups),
                                                 models.Result.year.in_(form_request.years)).all()
+
         results    = results_01 + results_02
 
         recent_season = ['2014', '2014-2015']
         recent_season_results = models.Result.query.filter(models.Result.league.in_(home_selected_leagues),
+                                                           models.Result.group.in_(home_selected_groups),
                                                            models.Result.home_team.in_(home_selected_teams),
                                                            models.Result.year.in_(recent_season)).all()
 
         if not recent_season_results:
             recent_season_results = models.Result.query.filter(models.Result.league.in_(away_selected_leagues),
+                                                               models.Result.group.in_(away_selected_groups),
                                                                models.Result.away_team.in_(away_selected_teams),
                                                                models.Result.year.in_(recent_season)).all()
         if not results:

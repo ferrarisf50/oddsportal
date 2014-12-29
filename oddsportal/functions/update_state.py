@@ -58,15 +58,15 @@ def get_teams_years():
 
     teams = {}
     for result in models.Result.query.all():
-        if not teams.get(result.home_team + ' -- ' + result.league):
-            teams[result.home_team + ' -- ' + result.league] = [result.year]
+        if not teams.get(result.home_team + ' -- ' + result.league + ' -- ' + result.group):
+            teams[result.home_team + ' -- ' + result.league + ' -- ' + result.group] = [result.year]
         else:
-            teams[result.home_team + ' -- ' + result.league].append(result.year)
+            teams[result.home_team + ' -- ' + result.league + ' -- ' + result.group].append(result.year)
 
-        if not teams.get(result.away_team + ' -- ' + result.league):
-            teams[result.away_team + ' -- ' + result.league] = [result.year]
+        if not teams.get(result.away_team + ' -- ' + result.league + ' -- ' + result.group):
+            teams[result.away_team + ' -- ' + result.league + ' -- ' + result.group] = [result.year]
         else:
-            teams[result.away_team + ' -- ' + result.league].append(result.year)
+            teams[result.away_team + ' -- ' + result.league + ' -- ' + result.group].append(result.year)
 
     for name, years in teams.iteritems():
         teams[name] = list(set(teams[name]))
